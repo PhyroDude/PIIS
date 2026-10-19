@@ -2,3 +2,13 @@
 .participant{display:flex;align-items:center;justify-content:space-between;gap:14px}.participantInfo{display:flex;flex-direction:column;gap:4px}.participantInfo strong{font-size:13px}.participantInfo .muted{font-size:11px}.selectStudent,.secondary{border:1px solid #ccd6f5;background:#f7f8ff;color:#2546a8;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}.selectStudent:disabled,button:disabled{opacity:.45;cursor:not-allowed}.screenPanel,.consent{margin:22px 0;padding:18px;border:1px solid #e2e7ef;border-radius:12px;background:#fbfcff}.screenPanel h3,.consent h3{margin-top:0}.screenPanel video{display:block;width:100%;min-height:180px;max-height:480px;object-fit:contain;background:#111827;border-radius:8px}.secondary{margin-top:10px}.consent .primary{margin-right:8px}
 
 .screenActions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.screenActions .secondary{margin-top:0}.screenPanel:fullscreen{width:100vw;height:100vh;max-width:none;margin:0;padding:clamp(16px,3vw,36px);border:0;border-radius:0;background:#101522;color:#f8fafc;display:flex;flex-direction:column;justify-content:center}.screenPanel:fullscreen h3{font-size:clamp(20px,3vw,32px)}.screenPanel:fullscreen video{width:100%;height:calc(100vh - 190px);max-height:none;min-height:0;flex:1;background:#05070b}.screenPanel:fullscreen .muted{color:#cbd5e1}.screenPanel:fullscreen .secondary{background:#27334b;color:#fff;border-color:#53627d}
+
+
+/* Modo pantalla completa para toda la aplicación, como el reproductor de YouTube. */
+:root:fullscreen { background: #f5f7fb; min-height: 100%; overflow-y: auto; }
+:root:fullscreen body { min-height: 100vh; }
+:root:fullscreen header { padding-left: max(24px, calc((100% - 1200px)/2)); padding-right: max(24px, calc((100% - 1200px)/2)); }
+:root:fullscreen main { width: calc(100% - 48px); max-width: 1200px; margin: 24px auto 36px; }
+:root:fullscreen #teacherView { min-height: calc(100vh - 220px); }
+:root:fullscreen .screenPanel video { max-height: 58vh; }
+:root:fullscreen footer { padding: 14px; }

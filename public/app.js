@@ -161,12 +161,13 @@ $("copy").onclick = async () => {
 };
 
 $("fullscreenProjection").onclick = async () => {
-  const projection = $("screenPanel");
   try {
-    if (document.fullscreenElement === projection) {
+    // Como YouTube: activar pantalla completa para toda la aplicación,
+    // no únicamente para el panel de vídeo.
+    if (document.fullscreenElement) {
       await document.exitFullscreen();
-    } else if (projection.requestFullscreen) {
-      await projection.requestFullscreen();
+    } else if (document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen();
     } else {
       $("screenViewStatus").textContent = "Este navegador no permite activar pantalla completa.";
     }
@@ -177,9 +178,9 @@ $("fullscreenProjection").onclick = async () => {
 
 document.addEventListener("fullscreenchange", () => {
   const button = $("fullscreenProjection");
-  if (button) button.textContent = document.fullscreenElement === $("screenPanel")
+  if (button) button.textContent = document.fullscreenElement
     ? "Salir de pantalla completa"
-    : "Proyectar en pantalla completa";
+    : "Pantalla completa ⛶";
 });
 
 $("stopViewing").onclick = () => {

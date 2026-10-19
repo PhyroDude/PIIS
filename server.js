@@ -3,7 +3,7 @@ const http = require("http");
 const crypto = require("crypto");
 const path = require("path");
 const { Server } = require("socket.io");
-//asd
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
