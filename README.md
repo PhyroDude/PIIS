@@ -6,6 +6,53 @@
 **Estado:** Propuesta inicial para Product Delivery  
 **Documento de referencia:** Especificación de requisitos de software (SRS) del Sistema local de retroalimentación para laboratorios de cómputo.
 
+## Índice
+
+- [Documento de alcance del MVP](#documento-de-alcance-del-mvp)
+  - [1. Propósito](#1-propósito)
+  - [2. Contexto y problema que se busca resolver](#2-contexto-y-problema-que-se-busca-resolver)
+  - [3. Objetivo del MVP](#3-objetivo-del-mvp)
+  - [4. Usuarios y actores involucrados](#4-usuarios-y-actores-involucrados)
+  - [5. Alcance funcional incluido](#5-alcance-funcional-incluido)
+    - [Gestión de sesiones](#51-gestión-de-sesiones)
+    - [Incorporación e identificación temporal](#52-incorporación-e-identificación-temporal)
+    - [Consulta y selección de participantes](#53-consulta-y-selección-de-participantes)
+    - [Captura y visualización del trabajo](#54-captura-y-visualización-del-trabajo)
+    - [Registro y consulta de observaciones individuales](#55-registro-y-consulta-de-observaciones-individuales)
+    - [Control de acceso y roles](#56-control-de-acceso-y-roles)
+    - [Operación local y eliminación de datos temporales](#57-operación-local-y-eliminación-de-datos-temporales)
+  - [6. Funcionalidades excluidas del MVP](#6-funcionalidades-excluidas-del-mvp)
+  - [7. Requisitos no funcionales y restricciones](#7-requisitos-no-funcionales-y-restricciones)
+  - [8. Criterios de aceptación del MVP](#8-criterios-de-aceptación-del-mvp)
+  - [9. Primer incremento funcional](#9-primer-incremento-funcional)
+  - [10. Indicadores para evaluar el MVP](#10-indicadores-para-evaluar-el-mvp)
+  - [11. Supuestos y decisiones pendientes](#11-supuestos-y-decisiones-pendientes)
+  - [12. Relación con el SRS](#12-relación-con-el-srs)
+  - [13. Definición de terminado](#13-definición-de-terminado)
+  - [14. Resultado esperado](#14-resultado-esperado)
+- [Product Backlog inicial](#product-backlog-inicial)
+  - [1. Criterios de priorización](#1-criterios-de-priorización)
+  - [2. Épicas del producto](#2-épicas-del-producto)
+  - [3. Backlog de historias de usuario](#3-backlog-de-historias-de-usuario)
+    - [HU-01 — Iniciar una sesión](#hu-01--iniciar-una-sesión)
+    - [HU-02 — Incorporarse con un alias temporal](#hu-02--incorporarse-con-un-alias-temporal)
+    - [HU-03 — Consultar participantes](#hu-03--consultar-participantes)
+    - [HU-04 — Seleccionar un estudiante](#hu-04--seleccionar-un-estudiante)
+    - [HU-05 — Autorizar y transmitir una captura de pantalla](#hu-05--autorizar-y-transmitir-una-captura-de-pantalla)
+    - [HU-06 — Registrar una observación individual](#hu-06--registrar-una-observación-individual)
+    - [HU-07 — Consultar mi retroalimentación](#hu-07--consultar-mi-retroalimentación)
+    - [HU-08 — Finalizar una sesión y eliminar su estado temporal](#hu-08--finalizar-una-sesión-y-eliminar-su-estado-temporal)
+    - [HU-09 — Recuperarse de una desconexión temporal](#hu-09--recuperarse-de-una-desconexión-temporal)
+    - [HU-10 — Validar el funcionamiento sin Internet](#hu-10--validar-el-funcionamiento-sin-internet)
+    - [HU-11 — Verificar capacidad, rendimiento y compatibilidad](#hu-11--verificar-capacidad-rendimiento-y-compatibilidad)
+    - [HU-12 — Compartir una observación con el grupo](#hu-12--compartir-una-observación-con-el-grupo)
+    - [HU-13 — Proyectar observaciones](#hu-13--proyectar-observaciones)
+  - [4. Trabajo técnico habilitador](#4-trabajo-técnico-habilitador)
+  - [5. Trazabilidad entre historias y SRS](#5-trazabilidad-entre-historias-y-srs)
+  - [6. Orden recomendado de ejecución](#6-orden-recomendado-de-ejecución)
+
+---
+
 ---
 
 ## 1. Propósito
