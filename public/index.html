@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sistema local de retroalimentación</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/socket.io/socket.io.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="mark">SL</div>
+    <div><small>LABORATORIO DE CÓMPUTO</small><h1>Sistema local de retroalimentación</h1></div>
+    <span id="connection">Conectando…</span>
+  </header>
+  <main>
+    <section class="intro">
+      <small>SEGUNDO INCREMENTO</small>
+      <h2>Revisa el trabajo mientras la sesión está en marcha.</h2>
+      <p>El estudiante autoriza la captura de pantalla una vez que se incorpora. La transmisión se establece cuando el docente lo selecciona.</p>
+      <aside><b>Datos temporales.</b> No se guarda un historial de pantallas ni de sesiones.</aside>
+    </section>
+
+    <section class="panel" id="roles">
+      <h2>¿Cómo deseas ingresar?</h2>
+      <p class="muted">Elige el rol correspondiente a este equipo.</p>
+      <div class="choices">
+        <button id="teacherChoice"><b>▤ Docente</b><span>Crear y administrar la sesión</span></button>
+        <button id="studentChoice"><b>⌘ Estudiante</b><span>Ingresar con código y alias</span></button>
+      </div>
+      <form id="teacherForm" class="hidden">
+        <h3>Crear sesión</h3><p class="muted">Una sesión activa por servidor.</p>
+        <button class="primary">Crear sesión temporal</button>
+      </form>
+      <form id="studentForm" class="hidden">
+        <h3>Incorporarme a una sesión</h3>
+        <label for="code">Código de sesión</label><input id="code" maxlength="6" placeholder="Ej. 7KMP2A" required>
+        <label for="alias">Alias temporal</label><input id="alias" maxlength="32" placeholder="Ej. Estudiante 04" required>
+        <button class="primary">Ingresar a la sesión</button>
+      </form>
+      <p id="message" role="status"></p>
+    </section>
+
+    <section id="teacherView" class="panel hidden">
+      <small>PANEL DEL DOCENTE</small><h2>Sesión activa</h2>
+      <div class="code"><span>CÓDIGO PARA ESTUDIANTES</span><strong id="displayCode"></strong><button id="copy">Copiar código</button></div>
+      <div class="listHead"><h3>Participantes</h3><span id="count">0 / 30</span></div>
+      <p class="muted">Selecciona “Revisar pantalla” para iniciar la transmisión de un estudiante que haya autorizado la captura.</p>
+      <ul id="participants"><li class="muted">Esperando estudiantes…</li></ul>
+      <section class="screenPanel">
+        <h3>Pantalla del estudiante</h3>
+        <video id="screenVideo" autoplay playsinline muted></video>
+        <p id="screenViewStatus" class="muted">Selecciona un estudiante autorizado para iniciar la revisión.</p>
+        <div class="screenActions">
+          <button id="fullscreenProjection" class="secondary" type="button">Proyectar en pantalla completa</button>
+          <button id="stopViewing" class="secondary" type="button">Detener revisión</button>
+        </div>
+      </section>
+      <button id="end" class="danger">Finalizar sesión</button>
+    </section>
+
+    <section id="studentView" class="panel hidden">
+      <small>PANEL DEL ESTUDIANTE</small><h2>Ya estás en la sesión</h2>
+      <p>Tu alias temporal: <b id="joinedAlias"></b></p>
+      <div class="consent">
+        <h3>Autorizar captura de pantalla</h3>
+        <p class="muted">Al pulsar el botón, el navegador te pedirá elegir qué pantalla o ventana compartir. La captura queda disponible para esta sesión, pero solo se transmite cuando el docente te selecciona. No compartas información privada que no quieras mostrar.</p>
+        <button id="startScreen" class="primary">Autorizar y elegir pantalla</button>
+        <button id="stopScreen" class="secondary" disabled>Dejar de compartir</button>
+        <p id="screenStatus" role="status" class="muted">Aún no has autorizado la captura de pantalla.</p>
+      </div>
+    </section>
+    <p id="notice" class="notice hidden" role="status"></p>
+  </main>
+  <footer>Prototipo de desarrollo · Red local · Estado temporal en memoria</footer>
+</body>
+</html>
