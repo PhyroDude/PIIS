@@ -9,28 +9,47 @@
 ## Índice
 
 - [Documento de alcance del MVP](#documento-de-alcance-del-mvp)
+  - [Sistema local de retroalimentación para laboratorios de cómputo](#sistema-local-de-retroalimentación-para-laboratorios-de-cómputo)
+  - [Índice](#índice)
+  - [Estructura documental](#estructura-documental)
   - [1. Propósito](#1-propósito)
   - [2. Contexto y problema que se busca resolver](#2-contexto-y-problema-que-se-busca-resolver)
   - [3. Objetivo del MVP](#3-objetivo-del-mvp)
   - [4. Usuarios y actores involucrados](#4-usuarios-y-actores-involucrados)
+    - [4.1 Docente](#41-docente)
+    - [4.2 Estudiante](#42-estudiante)
+    - [4.3 Sistema de control de sesión](#43-sistema-de-control-de-sesión)
+    - [4.4 Entorno de operación](#44-entorno-de-operación)
   - [5. Alcance funcional incluido](#5-alcance-funcional-incluido)
-    - [Gestión de sesiones](#51-gestión-de-sesiones)
-    - [Incorporación e identificación temporal](#52-incorporación-e-identificación-temporal)
-    - [Consulta y selección de participantes](#53-consulta-y-selección-de-participantes)
-    - [Captura y visualización del trabajo](#54-captura-y-visualización-del-trabajo)
-    - [Registro y consulta de observaciones individuales](#55-registro-y-consulta-de-observaciones-individuales)
-    - [Control de acceso y roles](#56-control-de-acceso-y-roles)
-    - [Operación local y eliminación de datos temporales](#57-operación-local-y-eliminación-de-datos-temporales)
+    - [5.1 Gestión de sesiones](#51-gestión-de-sesiones)
+    - [5.2 Incorporación e identificación temporal](#52-incorporación-e-identificación-temporal)
+    - [5.3 Consulta y selección de participantes](#53-consulta-y-selección-de-participantes)
+    - [5.4 Captura y visualización del trabajo](#54-captura-y-visualización-del-trabajo)
+    - [5.5 Registro y consulta de observaciones individuales](#55-registro-y-consulta-de-observaciones-individuales)
+    - [5.6 Control de acceso y roles](#56-control-de-acceso-y-roles)
+    - [5.7 Operación local y eliminación de datos temporales](#57-operación-local-y-eliminación-de-datos-temporales)
   - [6. Funcionalidades excluidas del MVP](#6-funcionalidades-excluidas-del-mvp)
   - [7. Requisitos no funcionales y restricciones](#7-requisitos-no-funcionales-y-restricciones)
+    - [7.1 Operación sin Internet](#71-operación-sin-internet)
+    - [7.2 No persistencia](#72-no-persistencia)
+    - [7.3 Rendimiento y capacidad](#73-rendimiento-y-capacidad)
+    - [7.4 Interrupciones temporales](#74-interrupciones-temporales)
+    - [7.5 Usabilidad](#75-usabilidad)
+    - [7.6 Autorización y permisos](#76-autorización-y-permisos)
+    - [7.7 Compatibilidad y comunicación local](#77-compatibilidad-y-comunicación-local)
   - [8. Criterios de aceptación del MVP](#8-criterios-de-aceptación-del-mvp)
   - [9. Primer incremento funcional](#9-primer-incremento-funcional)
+    - [Incremento 1: sesión y participantes](#incremento-1-sesión-y-participantes)
+    - [Incremento 2: observación de pantalla](#incremento-2-observación-de-pantalla)
+    - [Incremento 3: retroalimentación individual](#incremento-3-retroalimentación-individual)
+    - [Incremento 4: cierre y validación técnica](#incremento-4-cierre-y-validación-técnica)
   - [10. Indicadores para evaluar el MVP](#10-indicadores-para-evaluar-el-mvp)
   - [11. Supuestos y decisiones pendientes](#11-supuestos-y-decisiones-pendientes)
   - [12. Relación con el SRS](#12-relación-con-el-srs)
   - [13. Definición de terminado](#13-definición-de-terminado)
   - [14. Resultado esperado](#14-resultado-esperado)
 - [Product Backlog inicial](#product-backlog-inicial)
+  - [Sistema local de retroalimentación para laboratorios de cómputo](#sistema-local-de-retroalimentación-para-laboratorios-de-cómputo-1)
   - [1. Criterios de priorización](#1-criterios-de-priorización)
   - [2. Épicas del producto](#2-épicas-del-producto)
   - [3. Backlog de historias de usuario](#3-backlog-de-historias-de-usuario)
@@ -50,10 +69,13 @@
   - [4. Trabajo técnico habilitador](#4-trabajo-técnico-habilitador)
   - [5. Trazabilidad entre historias y SRS](#5-trazabilidad-entre-historias-y-srs)
   - [6. Orden recomendado de ejecución](#6-orden-recomendado-de-ejecución)
+    - [1](#1)
+    - [2](#2)
+    - [3](#3)
+    - [4](#4)
+    - [5](#5)
 
 ---
-<<<<<<< HEAD
-=======
 ## Estructura documental
 
 - [`docs/README.md`](docs/README.md): índice y reglas para mantener documentos.
@@ -63,7 +85,6 @@
 - [`docs/diseno/`](docs/diseno/): comportamiento detallado de las observaciones.
 - [`docs/pruebas/`](docs/pruebas/): trazabilidad, casos de prueba y resultados pendientes.
 - [`docs/desarrollo/`](docs/desarrollo/): puesta en marcha y limitaciones técnicas.
->>>>>>> 73db87b (implementacion de observaciones y una cola)
 
 ---
 
