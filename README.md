@@ -52,6 +52,18 @@
   - [6. Orden recomendado de ejecución](#6-orden-recomendado-de-ejecución)
 
 ---
+<<<<<<< HEAD
+=======
+## Estructura documental
+
+- [`docs/README.md`](docs/README.md): índice y reglas para mantener documentos.
+- [`docs/requisitos/`](docs/requisitos/): SRS original y referencias de requisitos.
+- [`docs/producto/`](docs/producto/): alcance del MVP y backlog base.
+- [`docs/arquitectura/`](docs/arquitectura/): arquitectura y decisiones (ADR).
+- [`docs/diseno/`](docs/diseno/): comportamiento detallado de las observaciones.
+- [`docs/pruebas/`](docs/pruebas/): trazabilidad, casos de prueba y resultados pendientes.
+- [`docs/desarrollo/`](docs/desarrollo/): puesta en marcha y limitaciones técnicas.
+>>>>>>> 73db87b (implementacion de observaciones y una cola)
 
 ---
 

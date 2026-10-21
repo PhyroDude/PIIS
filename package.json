@@ -1,1 +1,18 @@
+<<<<<<< HEAD
 {"name":"sistema-local-retroalimentacion","version":"0.1.0","private":true,"scripts":{"start":"node server.js"},"dependencies":{"express":"^5.1.0","socket.io":"^4.8.1"}}
+=======
+{
+  "name": "sistema-local-retroalimentacion",
+  "version": "0.2.0",
+  "private": true,
+  "description": "MVP local de retroalimentación para laboratorios de cómputo; estado temporal en memoria.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}
+>>>>>>> 73db87b (implementacion de observaciones y una cola)

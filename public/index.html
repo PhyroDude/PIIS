@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
+<<<<<<< HEAD
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Sistema local de retroalimentación</title>
@@ -74,5 +75,51 @@
     <p id="notice" class="notice hidden" role="status"></p>
   </main>
   <footer>Prototipo de desarrollo · Red local · Estado temporal en memoria</footer>
+=======
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Aplicación web local para retroalimentación durante sesiones de laboratorio.">
+  <title>Sistema local de retroalimentación</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/socket.io/socket.io.js" defer></script>
+  <script src="/config.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<header><div class="mark">SL</div><div><small>LABORATORIO DE CÓMPUTO</small><h1>Sistema local de retroalimentación</h1></div><span id="connection" class="status">Conectando…</span></header>
+<main>
+  <section class="intro"><small>MVP · SESIONES TEMPORALES</small><h2>Revisa el trabajo. Da retroalimentación útil.</h2><p>El docente puede orientar verbalmente al estudiante y, cuando lo necesite, registrar una nota individual opcional.</p><aside><b>Privacidad:</b> los datos viven en memoria y se eliminan al finalizar la sesión. No hay historial permanente.</aside></section>
+  <section class="panel" id="roles">
+    <h2>¿Cómo deseas ingresar?</h2><p class="muted">Elige el rol correspondiente a este equipo.</p>
+    <div class="choices"><button id="teacherChoice" class="choice"><b>▤ Docente</b><span>Crear y administrar la sesión</span></button><button id="studentChoice" class="choice"><b>⌘ Estudiante</b><span>Ingresar con código y alias</span></button></div>
+    <form id="teacherForm" class="hidden"><h3>Crear sesión</h3><p class="muted">Una sesión activa por servidor. Límite de referencia: 30 estudiantes.</p><button class="primary">Crear sesión temporal</button></form>
+    <form id="studentForm" class="hidden"><h3>Incorporarme a una sesión</h3><label for="code">Código de sesión</label><input id="code" maxlength="6" autocomplete="off" placeholder="Ej. 7KMP2A" required><label for="alias">Alias temporal</label><input id="alias" maxlength="32" autocomplete="off" placeholder="Ej. Estudiante 04" required><button class="primary">Ingresar a la sesión</button></form>
+    <p id="message" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="teacherView" class="panel hidden">
+    <small>PANEL DEL DOCENTE</small><h2>Sesión activa</h2>
+    <div class="code"><span>CÓDIGO PARA ESTUDIANTES</span><strong id="displayCode"></strong><button id="copyCode" type="button" class="secondary">Copiar código</button></div>
+    <div class="listHead"><h3>Participantes</h3><span id="count">0 / 30</span></div>
+    <p class="muted">Selecciona a un estudiante para revisar su pantalla o registrar una observación escrita opcional. La retroalimentación también puede darse verbalmente, sin crear una nota.</p>
+    <ul id="participants"><li class="muted">Esperando estudiantes…</li></ul>
+    <section class="subpanel"><div class="listHead"><h3>Cola de presentación</h3><span id="queueCount">0 solicitudes</span></div><p class="muted">Los alumnos solicitan turno, pero no transmiten hasta que el docente les conceda acceso. Puedes elegir a cualquier participante directamente para saltarte la cola.</p><ul id="presentationQueue"><li class="muted">No hay solicitudes pendientes.</li></ul></section>
+    <section id="teacherFeedback" class="subpanel hidden"><h3>Retroalimentación para <span id="selectedAlias"></span></h3>
+      <div class="oral-note"><b>Primero, conversa.</b><p>Explica el siguiente paso o resuelve la duda directamente. Usa la nota solo cuando ayude al estudiante a recordar una indicación.</p></div>
+      <form id="observationForm"><label for="observationText">Nota individual opcional (máximo 1,000 caracteres)</label><textarea id="observationText" maxlength="1000" rows="4" placeholder="Ej. Revisa la condición del ciclo y vuelve a probar con un valor límite."></textarea><div class="formFoot"><span id="charCount" class="muted">0 / 1000</span><button class="primary">Guardar nota temporal</button></div></form>
+      <p id="teacherMessage" role="status" aria-live="polite"></p>
+    </section>
+    <section class="subpanel"><h3>Pantalla del estudiante</h3><p id="screenStatus" class="muted">Selecciona una solicitud de la cola o elige directamente a un participante.</p><div class="videoWrap"><video id="screenVideo" autoplay playsinline></video><button id="fullscreen" class="videoControl" type="button">Pantalla completa</button></div><button id="stopPresentation" type="button" class="secondary">Detener proyección actual</button></section>
+    <button id="end" class="danger">Finalizar sesión</button>
+  </section>
+
+  <section id="studentView" class="panel hidden">
+    <small>PANEL DEL ESTUDIANTE</small><h2>Ya estás en la sesión</h2><p>Tu alias temporal: <b id="joinedAlias"></b></p>
+    <section class="subpanel"><h3>Compartir pantalla para revisión</h3><p class="muted">Para solicitar turno, autoriza la captura en el navegador. Esto no inicia la transmisión: quedarás en la cola y solo enviarás video cuando el docente te conceda acceso. El docente también puede elegirte directamente.</p><div class="actions"><button id="startShare" class="primary" type="button">Solicitar turno / autorizar pantalla</button><button id="stopShare" class="secondary" type="button" disabled>Detener captura</button></div><p id="studentScreenStatus" class="muted" role="status" aria-live="polite">No estás compartiendo pantalla.</p></section>
+    <section class="subpanel"><div class="listHead"><h3>Tus observaciones</h3><button id="refreshNotes" type="button" class="secondary">Actualizar</button></div><p class="muted">Aquí aparecen las notas escritas para ti. Si el docente da la retroalimentación solo verbalmente, esta lista puede permanecer vacía.</p><ul id="studentNotes"><li class="muted">Aún no hay observaciones escritas.</li></ul><div class="actions"><button id="copyNotes" type="button" class="secondary" disabled>Copiar notas</button><button id="downloadNotes" type="button" class="secondary" disabled>Descargar .txt</button></div><p id="exportStatus" class="muted"></p></section>
+  </section>
+  <p id="notice" class="notice hidden" role="status" aria-live="polite"></p>
+</main>
+<footer>Aplicación local · Comunicación por LAN · Sin base de datos</footer>
+>>>>>>> 73db87b (implementacion de observaciones y una cola)
 </body>
 </html>
