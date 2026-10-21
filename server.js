@@ -336,5 +336,9 @@ io.on('connection', socket => {
 });
 
 server.listen(PORT, HOST, () => console.log(`Sistema local de retroalimentación listo en http://localhost:${PORT}`));
+<<<<<<< HEAD
 module.exports = { app, server, io, store };
 >>>>>>> 73db87b (implementacion de observaciones y una cola)
+=======
+module.exports = { app, server, io, store };
+>>>>>>> b45f079 (nada)
