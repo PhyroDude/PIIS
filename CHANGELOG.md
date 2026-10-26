@@ -28,3 +28,21 @@
 - El servidor mantiene un único estudiante seleccionado y solo permite señalización WebRTC con ese estudiante que ya autorizó la captura.
 - El docente puede detener la proyección activa; detener la captura del alumno elimina su solicitud o libera el turno activo.
 - Se añadieron pruebas unitarias para cola, prioridad directa, autorización pendiente y liberación del turno.
+
+
+## Actualización documental sobre la base 0.3.0
+
+- Se documenta la decisión de arquitectura local en ADR-001: aplicación web servida desde la computadora del docente, LAN, clientes Windows previstos y estado temporal en memoria.
+- Se detalla el flujo de presentación: solicitud de turno, autorización explícita del navegador, cola por orden de llegada, concesión del docente y selección directa prioritaria.
+- Se añade un backlog específico de proyección y casos de prueba para A→B, C, detención y pantalla completa.
+- Se registra como incidencia abierta el fallo reportado al cambiar de A a B; no se declara resuelto sin prueba real entre equipos.
+- Se aclara que la base 0.3.0 sirve HTTP y necesita una terminación HTTPS confiable externa para captura de pantalla en clientes remotos. No se cambia el código ni se crea una nueva versión de la aplicación con esta actualización documental.
+
+## Incremento de interfaz: acceso separado por rol
+
+- Se separaron los formularios de creación de sesión docente y de incorporación estudiantil en pantallas de acceso distintas.
+- Se añadió navegación para volver al selector de rol antes de enviar los formularios.
+- Se definieron paletas diferenciadas: azul oscuro para docente y verde azulado para estudiante.
+- Se conserva la validación de operaciones en el servidor; el cambio visual no añade autenticación institucional.
+- Se añadieron ADR-004, documento de diseño y backlog de acceso por rol.
+- Pendiente: validar usabilidad, contraste y adaptación en escritorio y móvil.

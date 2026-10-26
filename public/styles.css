@@ -1,1 +1,41 @@
 :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033;background:#f5f7fb;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}body{margin:0}header{display:flex;align-items:center;gap:14px;padding:20px max(18px,calc((100% - 980px)/2));background:#fff;border-bottom:1px solid #e2e7ef}header h1{font-size:19px;margin:3px 0}.mark{background:#2546a8;color:white;padding:14px;border-radius:12px;font-weight:800}.status{margin-left:auto;font-size:12px;color:#667085}.status.online{color:#177245}.status.offline{color:#b42318}small{font-size:10px;font-weight:800;letter-spacing:1.2px;color:#2546a8}main{max-width:860px;width:calc(100% - 30px);margin:36px auto 55px}.intro{text-align:center;margin:0 auto 25px;max-width:760px}.intro h2{font-size:clamp(27px,5vw,38px);letter-spacing:-1px;margin:10px 0}.intro p{color:#667085;line-height:1.65}.intro aside{display:inline-block;padding:12px 16px;background:#e8f7ef;color:#175c3b;border-radius:10px;font-size:13px;line-height:1.5}.panel{background:#fff;border:1px solid #e2e7ef;border-radius:18px;padding:clamp(20px,4vw,32px);box-shadow:0 10px 35px #1720330a;margin-bottom:18px}.panel h2{margin:8px 0}.muted{color:#667085;font-size:13px;line-height:1.6}.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.choice{padding:20px;text-align:left;background:#fff;border:1px solid #dce2ed;border-radius:12px;cursor:pointer}.choice:hover{border-color:#8199e8;background:#f9faff}.choice b,.choice span{display:block}.choice span{font-size:12px;color:#667085;margin-top:8px}form{border-top:1px solid #e2e7ef;padding-top:20px;margin-top:20px}form h3{margin:0 0 12px}label{display:block;font-size:12px;font-weight:700;margin:12px 0 6px}input,textarea{width:100%;padding:12px;border:1px solid #ccd3df;border-radius:9px;font:inherit;background:#fff;color:inherit}textarea{resize:vertical;line-height:1.5}.primary,.secondary,.danger{border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer;font:inherit;font-size:13px}.primary{margin-top:14px;background:#2546a8;color:white;border:1px solid #2546a8}.secondary{background:#fff;color:#2546a8;border:1px solid #ccd6f5}.primary:hover{background:#1b3687}.secondary:hover{background:#f2f5ff}.primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none!important}#message,#teacherMessage,#exportStatus{font-size:13px;color:#667085;line-height:1.5}.error{color:#b42318!important}.code{display:flex;align-items:center;flex-direction:column;gap:12px;padding:20px;margin:20px 0;background:#edf2ff;border-radius:12px}.code span{font-size:10px;letter-spacing:1px;color:#2546a8;font-weight:800}.code strong{font-size:34px;letter-spacing:6px}.listHead{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e7ef;gap:12px}.listHead h3{font-size:15px}.listHead>span{font-size:12px;color:#667085}.listHead button{margin-bottom:8px}ul{padding-left:0;list-style:none}li{padding:12px 4px;border-bottom:1px solid #f0f1f5;font-size:13px}.participant{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{margin:0}.subpanel{margin-top:24px;padding:18px;border:1px solid #e2e7ef;border-radius:13px;background:#fcfcfe}.subpanel h3{font-size:16px;margin:0 0 8px}.oral-note{padding:12px 14px;background:#f0f5ff;border-radius:10px;color:#203a80;font-size:13px}.oral-note p{margin:5px 0 0;line-height:1.5}.formFoot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.formFoot .primary{margin-top:8px}.note p{margin:0 0 8px;white-space:pre-wrap;overflow-wrap:anywhere}.note small{color:#667085;letter-spacing:0;font-weight:500}.videoWrap{position:relative;min-height:220px;background:#101827;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}.videoWrap video{display:block;width:100%;max-height:65vh;object-fit:contain;min-height:220px}.videoControl{position:absolute;bottom:12px;right:12px;border:1px solid #ffffff70;background:#172033d9;color:white;padding:9px 12px;border-radius:8px;cursor:pointer}.danger{width:100%;margin-top:24px;border:1px solid #fecdca;background:#fff1f0;color:#b42318}.notice{padding:14px;background:#e8f7ef;color:#175c3b;border-radius:10px;font-size:13px;line-height:1.5}footer{text-align:center;color:#7b8495;font-size:11px;padding:22px;border-top:1px solid #e2e7ef}.error{color:#b42318}@media(max-width:600px){.choices{grid-template-columns:1fr}header h1{font-size:15px}header{padding:15px}.participant{align-items:flex-start;flex-direction:column}.code strong{font-size:29px}.panel{padding:20px}.videoWrap,.videoWrap video{min-height:180px}}
+
+/* Incremento de diseño: pantallas de acceso y paletas diferenciadas por rol. */
+:root{--accent:#2546a8;--accent-hover:#1b3687;--accent-soft:#edf2ff;--accent-border:#ccd6f5;--accent-ink:#203a80;--page-bg:#f5f7fb}
+body{background:var(--page-bg)}
+header .mark{background:var(--accent);transition:background-color .18s ease}
+small{color:var(--accent)}
+.primary{background:var(--accent);border-color:var(--accent)}
+.primary:hover{background:var(--accent-hover)}
+.secondary{color:var(--accent);border-color:var(--accent-border)}
+.secondary:hover{background:var(--accent-soft)}
+.code{background:var(--accent-soft)}
+.code span{color:var(--accent)}
+.oral-note{background:var(--accent-soft);color:var(--accent-ink)}
+.role-picker .choices{margin-bottom:12px}
+.choice{position:relative;min-height:150px;transition:border-color .18s ease,background-color .18s ease,transform .18s ease}
+.choice:hover{transform:translateY(-2px)}
+.choice .role-symbol,.role-heading .role-symbol{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;font-size:23px;font-weight:800;margin-bottom:14px}
+.choice b{font-size:17px}
+.role-screen{max-width:680px;margin-left:auto;margin-right:auto}
+.role-heading{display:flex;align-items:flex-start;gap:16px;margin-bottom:22px}
+.role-heading .role-symbol{flex:0 0 48px;width:48px;height:48px;margin:0}
+.role-heading h2{margin:5px 0 8px}
+.role-heading p{margin:0}
+.role-screen form{margin-top:0}
+.role-screen form .primary{width:100%;padding:13px 16px}
+.back-button{margin-top:18px;padding:9px 0;border:0;background:transparent;color:#667085;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.back-button:hover{text-decoration:underline}
+.form-message{font-size:13px;color:#667085;line-height:1.5}
+body.theme-teacher{--accent:#2546a8;--accent-hover:#1b3687;--accent-soft:#edf2ff;--accent-border:#ccd6f5;--accent-ink:#203a80;--page-bg:#f4f6fc}
+body.theme-teacher header{border-bottom-color:#d9e1fb}
+body.theme-teacher .teacher-choice{border-color:#9aaceb;background:#f3f6ff}
+body.theme-teacher .teacher-choice .role-symbol,body.theme-teacher .role-heading .role-symbol{background:#dfe7ff;color:#2546a8}
+body.theme-teacher .teacher-screen{border-top:5px solid #2546a8}
+body.theme-student{--accent:#087f8c;--accent-hover:#066773;--accent-soft:#e7f7f7;--accent-border:#a8dddd;--accent-ink:#075b63;--page-bg:#f1f9f8}
+body.theme-student header{border-bottom-color:#cce8e6}
+body.theme-student .student-choice{border-color:#8bd0ce;background:#effafa}
+body.theme-student .student-choice .role-symbol,body.theme-student .role-heading .role-symbol{background:#d4f1ef;color:#087f8c}
+body.theme-student .student-screen{border-top:5px solid #087f8c}
+body.theme-student .intro aside{background:#e7f7f0;color:#175c3b}
+@media(prefers-reduced-motion:reduce){.choice,header .mark{transition:none}.choice:hover{transform:none}}

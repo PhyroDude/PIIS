@@ -10,6 +10,7 @@
   <script src="/app.js" defer></script>
 </head>
 <body>
+<<<<<<< HEAD
   <header>
     <div class="mark">SL</div>
     <div><small>LABORATORIO DE CÓMPUTO</small><h1>Sistema local de retroalimentación</h1></div>
@@ -19,6 +20,35 @@
     <section class="intro">
       <aside><b>Datos temporales.</b> No se guarda un historial de pantallas ni de sesiones.</aside>
     </section>
+=======
+<header><div class="mark">SL</div><div><small>LABORATORIO DE CÓMPUTO</small><h1>Sistema local de retroalimentación</h1></div><span id="connection" class="status">Conectando…</span></header>
+<main>
+  <section class="intro"><small>MVP · SESIONES TEMPORALES</small><h2>Revisa el trabajo. Da retroalimentación útil.</h2><p>El docente puede orientar verbalmente al estudiante y, cuando lo necesite, registrar una nota individual opcional.</p><aside><b>Privacidad:</b> los datos viven en memoria y se eliminan al finalizar la sesión. No hay historial permanente.</aside></section>
+  <section class="panel role-picker" id="roles">
+    <small>ACCESO A LA SESIÓN</small>
+    <h2>¿Cómo deseas ingresar?</h2>
+    <p class="muted">Selecciona tu rol para abrir su pantalla de acceso.</p>
+    <div class="choices">
+      <button id="teacherChoice" class="choice teacher-choice" type="button"><span class="role-symbol" aria-hidden="true">▤</span><b>Docente</b><span>Crear y administrar una sesión</span></button>
+      <button id="studentChoice" class="choice student-choice" type="button"><span class="role-symbol" aria-hidden="true">⌘</span><b>Estudiante</b><span>Ingresar con código y alias temporal</span></button>
+    </div>
+    <p id="message" role="status" aria-live="polite"></p>
+  </section>
+>>>>>>> 2efde75 (Implementacion de roles)
+
+  <section class="panel role-screen teacher-screen hidden" id="teacherEntry">
+    <div class="role-heading"><span class="role-symbol" aria-hidden="true">▤</span><div><small>ÁREA DOCENTE</small><h2>Acceso del docente</h2><p class="muted">Crea una sesión temporal para organizar la participación del grupo.</p></div></div>
+    <form id="teacherForm"><h3>Iniciar sesión docente</h3><p class="muted">Se creará una sesión nueva. El código generado permitirá que los estudiantes se incorporen.</p><button class="primary">Crear sesión temporal</button></form>
+    <button id="backFromTeacher" class="back-button" type="button">← Volver a elegir rol</button>
+    <p id="teacherEntryMessage" class="form-message" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel role-screen student-screen hidden" id="studentEntry">
+    <div class="role-heading"><span class="role-symbol" aria-hidden="true">⌘</span><div><small>ÁREA ESTUDIANTIL</small><h2>Acceso del estudiante</h2><p class="muted">Únete a la sesión de tu docente con el código temporal y un alias.</p></div></div>
+    <form id="studentForm"><h3>Incorporarme a una sesión</h3><label for="code">Código de sesión</label><input id="code" maxlength="6" autocomplete="off" placeholder="Ej. 7KMP2A" required><label for="alias">Alias temporal</label><input id="alias" maxlength="32" autocomplete="off" placeholder="Ej. Estudiante 04" required><button class="primary">Ingresar a la sesión</button></form>
+    <button id="backFromStudent" class="back-button" type="button">← Volver a elegir rol</button>
+    <p id="studentEntryMessage" class="form-message" role="status" aria-live="polite"></p>
+  </section>
 
   <section id="teacherView" class="panel hidden">
     <small>PANEL DEL DOCENTE</small><h2>Sesión activa</h2>

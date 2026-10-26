@@ -1,33 +1,64 @@
-# Arquitectura general — MVP
+# Arquitectura general — base v0.3.0
 
-**Estado:** diseño de referencia para implementación y validación; no equivale a aprobación de despliegue productivo.
+- **Estado:** arquitectura de referencia para el MVP; las pruebas de integración entre equipos siguen pendientes.
+- **Principio rector:** aplicación local de baja complejidad, sin base de datos ni dependencia funcional de Internet durante una sesión.
+
+## Decisiones de plataforma y despliegue
+
+- Aplicación web accesible desde navegadores.
+- El servidor se ejecuta en la computadora del docente.
+- Los equipos del docente y los estudiantes se comunican por la LAN del laboratorio.
+- Los clientes objetivo son equipos Windows; el entorno de desarrollo actual es Ubuntu/Linux.
+- El estudiante se identifica mediante alias temporal y código temporal de sesión, no mediante cuenta institucional.
+- No se usa una base de datos: sesión, participantes, cola, permisos temporales y observaciones viven en memoria.
+- La versión 0.3.0 incluida crea un servidor HTTP. Para `getDisplayMedia()` desde otros equipos, los navegadores modernos exigen contexto seguro; debe colocarse una terminación HTTPS confiable delante del servidor o habilitarse una solución TLS equivalente fuera de esta base. No se debe confundir este requisito de despliegue con una implementación HTTPS incluida en el código.
+
+La decisión y sus alternativas están registradas en [ADR-001](decisiones/ADR-001-arquitectura-local.md).
+
+## Acceso e identidad visual por rol
+
+La interfaz tiene un selector inicial y dos pantallas de acceso separadas: el docente crea una sesión temporal y el estudiante se incorpora con código y alias. La paleta azul corresponde al docente y la verde azulada al estudiante. Esta separación es visual y de navegación; no añade autenticación institucional ni sustituye las validaciones de autorización del servidor. La decisión está registrada en [ADR-004](decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md).
 
 ## Componentes
 
-- **Navegador del docente:** crear/cerrar sesión, listar participantes, seleccionar estudiante, revisar pantalla, registrar nota opcional.
-- **Navegador del estudiante:** unirse por código y alias, autorizar captura explícitamente, consultar notas propias.
-- **Servidor Node.js + Express:** sirve la interfaz web y conserva la sesión temporal en memoria.
-- **Socket.IO:** eventos de sesión, participantes, observaciones y señalización para WebRTC.
-- **WebRTC:** transporta la pantalla compartida directamente entre estudiante y docente una vez seleccionada. La señalización pasa por Socket.IO; el contenido de pantalla no se almacena en el servidor.
+- **Navegador del docente:** crea/cierra sesión, muestra participantes, concede turnos, selecciona estudiantes directamente, ve la pantalla, da retroalimentación oral y registra notas opcionales.
+- **Navegador del estudiante:** se incorpora con código y alias, inicia la acción explícita de captura, espera en la cola y consulta sus notas.
+- **Servidor Node.js + Express:** sirve la interfaz y administra una sesión temporal.
+- **Socket.IO:** comunica eventos de sesión, participantes, cola, observaciones y señalización WebRTC.
+- **WebRTC:** transporta la pantalla del estudiante seleccionado directamente al navegador del docente. El servidor coordina la negociación; no almacena ni graba el vídeo.
 
-## Estado temporal
+## Flujo de captura y transmisión
 
-`src/session-store.js` concentra las reglas de sesión, participantes y observaciones. No usa base de datos ni escribe las observaciones a disco. Cerrar la sesión elimina el objeto en memoria. La desconexión de un estudiante elimina sus notas; la desconexión del docente cierra la sesión.
+1. El estudiante pulsa el botón para solicitar turno y el navegador presenta su diálogo de captura/autorización.
+2. Cuando la captura queda lista, el cliente registra su disponibilidad ante el servidor.
+3. Si el docente no lo ha seleccionado directamente, el estudiante se añade a la cola temporal por orden de llegada.
+4. Estar en cola no debe crear un `RTCPeerConnection` ni transmitir vídeo.
+5. El docente concede el turno desde la cola o selecciona directamente a cualquier participante, saltándose el orden de espera.
+6. El servidor mantiene una sola selección activa y solo reenvía señalización entre el docente y el estudiante seleccionado que autorizó la captura.
+7. Al cambiar de estudiante, parar la proyección, detener la captura o cerrar la sesión, se deben cerrar las conexiones y descartar señales pendientes de la negociación anterior.
 
-## Autorización
+**Diferencia entre decisión y código actual:** la decisión de producto inicialmente buscaba autorizar la captura al incorporarse a la sesión. En la base 0.3.0, la llamada a `getDisplayMedia()` ocurre al pulsar el botón de solicitar turno, porque el navegador requiere una acción explícita del usuario. Esta diferencia debe revisarse antes de afirmar que el requisito de autorización al incorporarse está cumplido.
 
-- El docente recibe un token temporal al crear la sesión. Las operaciones de creación de notas, selección de participante y cierre verifican ese token y el socket que creó la sesión.
-- El estudiante se identifica por su socket durante la sesión. El servidor filtra las observaciones por el identificador del socket; no ofrece una operación para consultar notas ajenas.
-- La señalización de pantalla solo se reenvía entre el docente y el estudiante seleccionado.
+## Gestión del estado
 
-**Limitación importante:** el token temporal no es autenticación institucional fuerte. Antes de desplegar en una LAN compartida, debe definirse cómo se restringe la creación del rol docente y cómo se protegen las conexiones.
+`src/session-store.js` administra una sesión activa, el docente, los estudiantes, las observaciones, la selección de pantalla, la cola y el conjunto de estudiantes con captura autorizada. Cerrar la sesión elimina el objeto en memoria. Al desconectarse un estudiante, se elimina su entrada de cola y sus observaciones; al perderse la conexión del docente, se cierra la sesión.
 
-## Captura de pantalla
+## Autorización y límites de seguridad
 
-El navegador solicita autorización mediante `getDisplayMedia()` tras una acción explícita del estudiante. El servidor no puede aceptar silenciosamente ese permiso. La aplicación mantiene la captura local y establece WebRTC cuando el docente selecciona al estudiante. Al detener captura o cerrar la sesión, se cierran pistas/conexiones.
+- El docente recibe un token temporal al crear la sesión. Las operaciones sensibles validan el token y el socket propietario.
+- El estudiante se identifica durante la sesión por su conexión temporal; las observaciones se filtran por ese identificador, no solo por alias.
+- La señalización de pantalla se limita al par docente-estudiante seleccionado.
+- El token temporal no equivale a autenticación institucional fuerte. No se recomienda desplegar en una LAN compartida sin decidir cómo restringir el rol docente.
+- No exponer el servicio directamente a Internet.
 
-`getDisplayMedia()` requiere contexto seguro en navegadores modernos. `localhost` es apto para pruebas locales; para usar la IP LAN se debe configurar HTTPS y confiar el certificado en los clientes. WebRTC debe probarse en la LAN de destino.
+## Pantalla completa
 
-## No persistencia y exportación
+La interfaz tiene un control para solicitar pantalla completa de la vista de vídeo o su contenedor, según las capacidades del navegador. La solicitud del usuario es necesaria y puede ser rechazada por el navegador. Debe comprobarse en los navegadores objetivo si cumple la expectativa de ampliar toda la ventana de presentación.
 
-Las observaciones se guardan solo en memoria durante la sesión. Copiar/descargar está detrás de `ENABLE_NOTE_EXPORT`, deshabilitado por defecto hasta validar la interpretación de RNF-002 y aprobar la decisión. Una copia exportada queda fuera del control del sistema y no puede borrarse al finalizar la sesión.
+## Observaciones y no persistencia
+
+Las observaciones escritas son opcionales y se guardan solo en memoria. Copiar/descargar está detrás de `ENABLE_NOTE_EXPORT`, deshabilitado por defecto hasta validar la interpretación de RNF-002. Una copia local queda fuera del control del sistema y no se puede borrar desde el servidor.
+
+## Defecto conocido
+
+Se ha reportado que, después de finalizar o cambiar desde la pantalla de A a la de B, la proyección de B no aparece. La arquitectura prevé cerrar la conexión anterior y crear una negociación nueva; no se declara resuelto hasta reproducirlo, corregirlo y validarlo entre dos equipos. Ver ADR-003 y el plan de pruebas.

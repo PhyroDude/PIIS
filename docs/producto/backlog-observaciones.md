@@ -1,5 +1,7 @@
 # Backlog — mejora de gestión de observaciones
 
+> **Base de referencia:** versión 0.3.0. La cola y transmisión de pantalla se documentan por separado en [`backlog-proyeccion.md`](backlog-proyeccion.md); compartir la pantalla de un estudiante no equivale a proyectar observaciones escritas al grupo.
+
 - **Versión:** 0.2
 - **Estado:** propuesta de backlog derivada de ADR-OBS-002.
 - **Nota:** las prioridades son propuestas para planificar el incremento; no alteran por sí mismas los requisitos normativos del SRS.

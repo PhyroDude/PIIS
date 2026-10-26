@@ -1,5 +1,7 @@
 # Registro de decisión de diseño — retroalimentación oral y notas opcionales
 
+> **Base de código relacionada:** 0.3.0. La plataforma local está documentada en [ADR-001](ADR-001-arquitectura-local.md); la revisión de pantalla y los turnos están en [ADR-003](ADR-003-cola-presentacion.md). Estas decisiones no modifican el SRS por sí solas.
+
 - **ID:** ADR-OBS-002
 - **Versión:** 0.2
 - **Fecha:** 2026-10-21

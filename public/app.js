@@ -33,19 +33,23 @@ function stopTeacherView(message = 'Selecciona un estudiante. Si comparte su pan
   $('screenStatus').textContent = message;
 }
 function showNotice(text) { show('notice'); $('notice').textContent = text; }
+function setTheme(role = null) { document.body.classList.remove('theme-teacher', 'theme-student'); if (role) document.body.classList.add(`theme-${role}`); }
+function showRolePicker() { hide('teacherEntry'); hide('studentEntry'); show('roles'); setTheme(); }
 
 socket.on('connect', () => { $('connection').textContent = 'Conectado'; $('connection').classList.add('online'); $('connection').classList.remove('offline'); });
 socket.on('disconnect', () => { $('connection').textContent = 'Conexión interrumpida'; $('connection').classList.add('offline'); $('connection').classList.remove('online'); });
-$('teacherChoice').onclick = () => { show('teacherForm'); hide('studentForm'); setMessage('message', ''); };
-$('studentChoice').onclick = () => { show('studentForm'); hide('teacherForm'); setMessage('message', ''); };
+$('teacherChoice').onclick = () => { hide('roles'); hide('studentEntry'); show('teacherEntry'); setTheme('teacher'); setMessage('message', ''); setMessage('teacherEntryMessage', ''); };
+$('studentChoice').onclick = () => { hide('roles'); hide('teacherEntry'); show('studentEntry'); setTheme('student'); setMessage('message', ''); setMessage('studentEntryMessage', ''); };
+$('backFromTeacher').onclick = showRolePicker;
+$('backFromStudent').onclick = showRolePicker;
 
 $('teacherForm').onsubmit = event => {
   event.preventDefault();
   socket.emit('teacher:create-session', result => {
-    if (!result.ok) return setMessage('message', result.error, true);
+    if (!result.ok) return setMessage('teacherEntryMessage', result.error, true);
     activeRole = 'teacher'; teacherToken = result.token;
     $('displayCode').textContent = result.code;
-    hide('roles'); show('teacherView');
+    hide('roles'); hide('teacherEntry'); show('teacherView');
     socket.emit('teacher:get-participants', { token: teacherToken }, r => { if (r.ok) renderParticipants(r.participants); });
   });
 };
@@ -53,10 +57,10 @@ $('teacherForm').onsubmit = event => {
 $('studentForm').onsubmit = event => {
   event.preventDefault();
   socket.emit('student:join', { code: $('code').value, alias: $('alias').value }, result => {
-    if (!result.ok) return setMessage('message', result.error, true);
+    if (!result.ok) return setMessage('studentEntryMessage', result.error, true);
     activeRole = 'student'; studentId = result.studentId;
     $('joinedAlias').textContent = result.alias;
-    hide('roles'); show('studentView'); refreshStudentNotes();
+    hide('roles'); hide('studentEntry'); show('studentView'); refreshStudentNotes();
     if (!window.APP_CONFIG?.allowNoteExport) $('exportStatus').textContent = 'Copiar y descargar están deshabilitados hasta validar formalmente su compatibilidad con el RNF-002.';
   });
 };
@@ -251,7 +255,7 @@ $('end').onclick = () => {
   socket.emit('teacher:end-session', { token: teacherToken }, result => {
     if (!result.ok) return setMessage('teacherMessage', result.error, true);
     teacherToken = null; activeRole = null; selectedStudentId = null; stopTeacherView();
-    hide('teacherView'); show('roles'); showNotice('Sesión finalizada. Se eliminó el estado temporal.');
+    hide('teacherView'); showRolePicker(); showNotice('Sesión finalizada. Se eliminó el estado temporal.');
   });
 };
 socket.on('session:ended', result => {
@@ -259,6 +263,6 @@ socket.on('session:ended', result => {
   const wasStudent = activeRole === 'student';
   activeRole = null; teacherToken = null; selectedStudentId = null;
   stopTeacherView(); stopStudentStream();
-  hide('teacherView'); hide('studentView'); show('roles'); showNotice(result.message);
+  hide('teacherView'); hide('studentView'); showRolePicker(); showNotice(result.message);
   if (wasStudent) { studentNotes = []; $('studentNotes').replaceChildren(); }
 });

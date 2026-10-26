@@ -1,14 +1,15 @@
 # Documento de alcance del MVP
 ## Sistema local de retroalimentación para laboratorios de cómputo
 
+> **Estado documental (base 0.3.0):** este documento conserva el alcance y backlog base. Para la decisión de plataforma consulta `../arquitectura/decisiones/ADR-001-arquitectura-local.md`; para el flujo de presentación consulta `backlog-proyeccion.md`, `../arquitectura/decisiones/ADR-003-cola-presentacion.md` y `../diseno/proyeccion-pantalla-y-cola.md`. La cola está implementada en el código de referencia, pero el cambio A→B tiene un defecto reportado y no se considera validado. No confundir la revisión de pantalla del estudiante con la proyección grupal de observaciones descrita por separado en el SRS. El SRS original permanece como fuente de requisitos.
+
+
 **Versión:** 1.0  
 **Fecha:** 14 de octubre de 2026  
 **Estado:** Propuesta inicial para Product Delivery  
 **Documento de referencia:** Especificación de requisitos de software (SRS) del Sistema local de retroalimentación para laboratorios de cómputo.
 
 ---
-
-> **Nota de vigencia:** este archivo conserva el documento base de alcance y backlog. Para el flujo actualizado de observaciones, consulta `backlog-observaciones.md` y `../arquitectura/decisiones/ADR-002-gestion-observaciones.md`. La decisión de priorizar la retroalimentación oral modifica la propuesta de interacción, pero no elimina RF-007/RF-008 del SRS. La copia/descarga permanece condicionada a la validación de RNF-002.
 
 ## 1. Propósito
 
@@ -146,6 +147,12 @@ El estado de la sesión, los participantes y las observaciones se administrarán
 Al finalizar la sesión, se deberá eliminar el estado temporal y evitar que permanezca disponible como información activa. También se deberá comprobar el comportamiento del sistema al reiniciarse.
 
 **Trazabilidad:** RNF-001, RNF-002, RNF-007 y RNF-008.
+
+## 5.8 Presentación de pantalla con cola (incremento 0.3.0)
+
+La base de código 0.3.0 incorpora una cola temporal de solicitudes de pantalla. El estudiante autoriza la captura mediante una acción explícita en el navegador; mientras espera no transmite vídeo. El docente concede el turno desde la cola o elige directamente a un participante, con prioridad sobre la cola. Solo un estudiante seleccionado puede negociar la transmisión WebRTC.
+
+Este flujo está descrito en `backlog-proyeccion.md` y en `../diseno/proyeccion-pantalla-y-cola.md`. La transmisión entre equipos no se considera validada: existe un defecto reportado al cambiar de A a B. La implementación también solicita el permiso de captura al pulsar el botón de turno, no automáticamente al incorporarse; esta diferencia debe revisarse frente a la decisión de producto y las limitaciones del navegador.
 
 ## 6. Funcionalidades excluidas del MVP
 

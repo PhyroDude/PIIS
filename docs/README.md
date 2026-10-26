@@ -1,39 +1,48 @@
-# Índice de documentación
+# Índice y reglas de documentación
+
+Esta carpeta documenta el Sistema local de retroalimentación. La base de código de referencia es **v0.3.0**. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
 
 ## Orden de autoridad
 
-1. **SRS**: fuente aprobada de requisitos. No se modifica indirectamente desde otros documentos.
-2. **Alcance del MVP**: define qué se implementa ahora y qué se pospone sin borrar requisitos del SRS.
-3. **Decisiones de arquitectura (ADR)**: registran decisiones técnicas o de producto relevantes, su contexto, alternativas y consecuencias.
-4. **Diseño funcional**: explica el comportamiento detallado de una función.
-5. **Backlog**: convierte el trabajo en historias verificables y priorizadas.
-6. **Pruebas**: describen cómo comprobar requisitos y registran resultados reales; un caso diseñado no equivale a una prueba aprobada.
-7. **Código**: implementa el diseño. Si contradice un requisito aprobado, no redefine el requisito: debe corregirse el código o tramitarse un cambio formal.
+1. **SRS original:** fuente de los requisitos aprobados. No se modifica indirectamente desde otros documentos.
+2. **Alcance del MVP y backlog:** organizan lo que se construye y prioriza sin eliminar requisitos del SRS.
+3. **ADR:** registran decisiones de arquitectura o producto, alternativas, consecuencias y pendientes.
+4. **Diseño funcional:** describe el comportamiento esperado con mayor detalle.
+5. **Pruebas y resultados:** definen cómo verificar y registran únicamente resultados realmente obtenidos.
+6. **Código:** implementa el comportamiento. Si contradice un requisito aprobado o una decisión confirmada, se debe revisar la implementación o tramitar el cambio formal.
 
-## Mapa
+## Mapa documental
 
-- [`requisitos/SRS-original.pdf`](requisitos/SRS-original.pdf) — copia de referencia del SRS recuperado.
-- [`producto/alcance-MVP-y-product-backlog-base.md`](producto/alcance-MVP-y-product-backlog-base.md) — alcance y backlog base previos.
-- [`producto/backlog-observaciones.md`](producto/backlog-observaciones.md) — historias específicas de observaciones orales y escritas.
-- [`arquitectura/arquitectura-general.md`](arquitectura/arquitectura-general.md) — componentes y comunicación.
-- [`arquitectura/decisiones/ADR-002-gestion-observaciones.md`](arquitectura/decisiones/ADR-002-gestion-observaciones.md) — decisión de gestión de observaciones.
-- [`diseno/observaciones-individuales.md`](diseno/observaciones-individuales.md) — reglas, datos y flujos.
-- [`pruebas/trazabilidad-y-pruebas.md`](pruebas/trazabilidad-y-pruebas.md) — trazabilidad y pruebas propuestas.
-- [`desarrollo/puesta-en-marcha.md`](desarrollo/puesta-en-marcha.md) — configuración y limitaciones.
+- [`requisitos/SRS-original.pdf`](requisitos/SRS-original.pdf) — documento original de requisitos.
+- [`producto/alcance-MVP-y-product-backlog-base.md`](producto/alcance-MVP-y-product-backlog-base.md) — alcance base y relación con el SRS.
+- [`producto/backlog-observaciones.md`](producto/backlog-observaciones.md) — historias de retroalimentación oral y notas opcionales.
+- [`producto/backlog-proyeccion.md`](producto/backlog-proyeccion.md) — historias de cola, concesión, cambio de presentador y pantalla completa.
+- [`producto/backlog-acceso-roles.md`](producto/backlog-acceso-roles.md) — historias de separación de acceso y distinción visual de roles.
+- [`arquitectura/arquitectura-general.md`](arquitectura/arquitectura-general.md) — componentes, datos, red y permisos.
+- [`arquitectura/decisiones/ADR-001-arquitectura-local.md`](arquitectura/decisiones/ADR-001-arquitectura-local.md) — aplicación web local, equipo docente y LAN.
+- [`arquitectura/decisiones/ADR-002-gestion-observaciones.md`](arquitectura/decisiones/ADR-002-gestion-observaciones.md) — oral como flujo normal y notas opcionales.
+- [`arquitectura/decisiones/ADR-003-cola-presentacion.md`](arquitectura/decisiones/ADR-003-cola-presentacion.md) — cola de presentación, selección directa y exclusividad.
+- [`arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md`](arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md) — separación de pantallas de acceso y paletas por rol.
+- [`diseno/proyeccion-pantalla-y-cola.md`](diseno/proyeccion-pantalla-y-cola.md) — flujo de solicitud, espera, concesión, cambio de estudiante y pantalla completa.
+- [`diseno/acceso-y-paletas-por-rol.md`](diseno/acceso-y-paletas-por-rol.md) — navegación, contenido, paletas y accesibilidad de los accesos.
+- [`diseno/observaciones-individuales.md`](diseno/observaciones-individuales.md) — reglas y ciclo de vida de notas.
+- [`pruebas/trazabilidad-y-pruebas.md`](pruebas/trazabilidad-y-pruebas.md) — matriz y pruebas propuestas.
+- [`pruebas/resultados/estado-inicial.md`](pruebas/resultados/estado-inicial.md) — estado de verificación de la versión de referencia.
+- [`desarrollo/puesta-en-marcha.md`](desarrollo/puesta-en-marcha.md) — instalación, contexto seguro y pruebas manuales.
 
-## Dónde registrar un cambio
+## Cómo actualizar la documentación
 
-| Si cambia… | Actualiza… | Además |
+| Cambio | Documento principal | Documentos relacionados |
 |---|---|---|
-| Un requisito | SRS mediante control de cambios | Trazabilidad, backlog, pruebas y diseño afectados |
-| Qué entra al MVP | Alcance del MVP y backlog | Revisa impacto en requisitos; no los elimines silenciosamente |
-| Una decisión importante | Un ADR nuevo o el ADR existente | Arquitectura/diseño y pruebas afectadas |
-| El comportamiento de una función | Documento de diseño funcional | Criterios de aceptación y pruebas |
-| Código sin cambiar el comportamiento esperado | Código y pruebas automatizadas | `CHANGELOG.md` cuando corresponda |
-| Resultado de una prueba | Plan o informe de resultados | Nunca marques como aprobada una prueba no ejecutada |
+| Requisito formal | SRS mediante control de cambios | Alcance, backlog, arquitectura, diseño y pruebas |
+| Decisión de plataforma o red | ADR correspondiente | Arquitectura general, README y puesta en marcha |
+| Flujo de presentación | ADR-003 y diseño de proyección | Backlog, trazabilidad y resultados de pruebas |
+| Flujo de observaciones | ADR-002 y diseño de observaciones | Backlog, trazabilidad y README |
+| Código sin cambio de alcance | `CHANGELOG.md` cuando corresponda | Pruebas y límites conocidos |
+| Resultado de prueba | `pruebas/resultados/estado-inicial.md` | Plan de pruebas, si cambia el estado |
 
-## Convención para ADR
+## Convención para decisiones
 
-Cada ADR debe incluir: estado (`Propuesta`, `Aprobada`, `Rechazada` o `Reemplazada`), fecha, contexto, decisión, alternativas, consecuencias, requisitos afectados y pasos de validación. Mantén las decisiones confirmadas separadas de las propuestas.
+Cada ADR debe indicar estado, contexto, decisión, alternativas, consecuencias, requisitos afectados y cómo se validará. Usa etiquetas explícitas: **Confirmado**, **Implementado sin validar en entorno real**, **Pendiente** o **No aprobado**.
 
-> **Nota:** `producto/alcance-MVP-y-product-backlog-base.md` conserva una versión previa del alcance/backlog para no perder trazabilidad. Para el flujo de observaciones más reciente, usa el ADR-002 y `producto/backlog-observaciones.md` como documentos de diseño de la actualización. Si se decide que el cambio debe modificar requisitos formales, tramita una revisión del SRS; no lo sustituyas silenciosamente.
+No sobrescribas el SRS para que coincida con el código. No marques WebRTC, pantalla completa o compatibilidad LAN como validados sin ejecutar las pruebas correspondientes. Los cambios de documentación deben permanecer coherentes con la versión de código sobre la que se basan.

@@ -1,5 +1,7 @@
 # Diseño funcional — gestión de observaciones v0.2
 
+> **Base de código para la integración:** 0.3.0. La pantalla compartida y la cola se describen en [`proyeccion-pantalla-y-cola.md`](proyeccion-pantalla-y-cola.md). La retroalimentación oral es el flujo normal; la nota escrita sigue siendo opcional.
+
 - **Proyecto:** Sistema local de retroalimentación para laboratorios de cómputo
 - **Estado:** propuesta de ajuste funcional; validar contra el SRS completo.
 - **Relacionado con:** ADR-OBS-002 y OBS-01 a OBS-07.

@@ -1,18 +1,49 @@
-# Estado inicial de validación
+# Estado de validación — base 0.3.0
 
-**Fecha de preparación:** 21 de octubre de 2026.
+**Versión de referencia del archivo:** 0.3.0. El campo `version` de `package.json` todavía indica `0.2.0`; esta actualización es documental y no cambia los metadatos del código.  
+**Fecha de actualización documental:** 21 de octubre de 2026.
 
-Este archivo se actualizará después de ejecutar pruebas de integración en los navegadores y equipos objetivo. Los casos descritos en `../trazabilidad-y-pruebas.md` son planes hasta que exista evidencia de ejecución.
+Este documento distingue las pruebas automatizadas de las pruebas reales entre navegadores. No registrar una prueba como aprobada sin ejecutarla y anotar entorno y resultado.
+
+## Estado conocido
+
+- **Lógica de sesión y cola:** el código incluye sesiones temporales, solicitudes de turno, selección directa y liberación de turno.
+- **Captura/WebRTC entre equipos:** pendiente de validación manual en la LAN.
+- **Cambio de presentador A→B:** defecto reportado; al seleccionar B después de A, la pantalla de B no aparece. Sigue abierto hasta reproducir, corregir y volver a probar.
+- **Pantalla completa:** existe un control, pero falta comprobar en los navegadores objetivo si amplía el área que el usuario espera (vídeo o ventana de presentación completa).
+- **HTTPS de la LAN:** la versión 0.3.0 incluida sirve HTTP; el acceso remoto con captura requiere un origen seguro configurado por separado y certificado confiable.
+- **Autorización al incorporarse:** decisión de producto por revisar frente a la implementación, que solicita la captura cuando el estudiante pulsa el botón.
+- **Exportación de notas:** deshabilitada por defecto, pendiente de validación formal con RNF-002.
 
 ## Verificaciones automáticas
 
-Pendiente de ejecutar en el entorno que recibe el proyecto.
+**Ejecutadas el 21 de octubre de 2026 sobre esta base de código:**
 
-## Verificaciones manuales pendientes
+- `node --check server.js`: aprobado.
+- `npm test`: 11 pruebas aprobadas, 0 fallidas.
+- Integridad de enlaces relativos de los documentos Markdown: sin enlaces locales rotos en la comprobación realizada.
 
-- Flujo completo docente-estudiante en dos navegadores.
-- Captura y transmisión WebRTC a través de HTTPS en la LAN.
-- Pantalla completa en los navegadores objetivo.
-- Pruebas de acceso directo a eventos del servidor.
-- Pruebas sin Internet y con desconexión temporal.
-- Validación formal de RNF-002 para copia/descarga.
+Estas verificaciones no prueban la transmisión WebRTC entre equipos ni resuelven la incidencia A→B. No inferir el resultado de las pruebas manuales a partir de las pruebas unitarias.
+
+## Registro de pruebas manuales
+
+| Fecha | Navegadores / SO | Caso | Resultado observado | Evidencia / incidencia |
+|---|---|---|---|---|
+| Pendiente | Pendiente | A se muestra correctamente | Pendiente | — |
+| Pendiente | Pendiente | Cambio A→B | Fallo reportado por el usuario; repetir tras corregir | La pantalla de B no aparece después de A |
+| Pendiente | Pendiente | Turno C / selección directa | Pendiente | — |
+| Pendiente | Pendiente | Detener captura y liberar turno | Pendiente | — |
+| Pendiente | Pendiente | Pantalla completa | Pendiente | Confirmar si se amplía vídeo o vista completa |
+| Pendiente | Pendiente | LAN con HTTPS confiable y sin Internet | Pendiente | — |
+
+## Condición para cerrar la incidencia A→B
+
+Solo cerrar la incidencia cuando A, B y C puedan presentar en secuencia en la LAN, la vista corresponda siempre al alias seleccionado, no queden transmisiones anteriores y la prueba se repita más de una vez sin fallos. Registrar los cambios de código que resuelvan la incidencia en `CHANGELOG.md` cuando se publiquen en una nueva versión.
+
+
+## Incremento de acceso por rol (2026-10-24)
+
+- **Implementado en código:** selector inicial, pantallas separadas, navegación de regreso y paletas diferenciadas para docente y estudiante.
+- **Documentación añadida:** ADR-004, diseño de acceso y backlog ACC-01 a ACC-03.
+- **Pendiente:** pruebas manuales de navegación, legibilidad, contraste, móvil y flujo de creación/incorporación.
+- **Seguridad:** este incremento no añade autenticación institucional; las operaciones sensibles deben seguir protegidas por la autorización del servidor.
