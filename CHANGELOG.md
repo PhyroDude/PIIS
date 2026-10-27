@@ -46,3 +46,35 @@
 - Se conserva la validación de operaciones en el servidor; el cambio visual no añade autenticación institucional.
 - Se añadieron ADR-004, documento de diseño y backlog de acceso por rol.
 - Pendiente: validar usabilidad, contraste y adaptación en escritorio y móvil.
+
+
+## Incremento: rutas directas y arranque docente sobre la base v0.3.0
+
+- Se añadieron las rutas `/docente` y `/alumno`, que sirven la misma aplicación y muestran directamente el acceso correspondiente al rol.
+- Se conserva `/` como selector general de rol.
+- Se añadió `npm run start:docente` para iniciar el servidor y abrir la ruta docente en el navegador del anfitrión cuando existe un abridor de URL disponible.
+- Se documentó el acceso de estudiantes mediante la IP LAN del anfitrión y `/alumno`.
+- Se añadieron ADR-005 y ADR-006; ADR-007 aclara que la paleta por rol sigue siendo provisional y pendiente de aprobación.
+- Se añadió una prueba automatizada para comprobar las respuestas HTTP de ambas rutas. La integración real entre equipos, la apertura automática y la revisión visual continúan pendientes.
+- Se mantiene la base del proyecto en v0.3.0; no se adopta una versión posterior como referencia.
+
+
+## Ajuste de despliegue LAN sobre la base v0.3.0
+
+- El servidor escucha por defecto en todas las interfaces (`0.0.0.0`) y detecta/imprime las direcciones IPv4 disponibles al iniciar.
+- `npm run start:docente` conserva la apertura automática de `/docente` en el anfitrión; la consola lista direcciones candidatas `/alumno` para clientes.
+- `/docente` devuelve HTTP 403 a solicitudes remotas; `/` y `/index.html` redirigen a `/docente` en el host y a `/alumno` en solicitudes remotas. El evento de creación de sesión docente también rechaza conexiones Socket.IO remotas.
+- Se añadieron pruebas unitarias para el descubrimiento de IP y detección de loopback.
+- Se documenta que la restricción de ruta no reemplaza la autenticación/autorización de eventos Socket.IO.
+- Sigue pendiente validar el acceso desde equipos físicos de la LAN y HTTPS confiable para captura remota.
+- Se conserva la línea base de producto v0.3.0; este incremento no se etiqueta como versión nueva.
+
+## 0.3.3 — HTTPS confiable para proyección en LAN
+
+- Se avanza el conteo de versiones desde la base 0.3.0; no se recuperan los cambios descartados posteriores a esa base.
+- El servidor usa HTTPS por defecto y requiere certificados locales en `certs/`.
+- Se añade `npm run setup:https`, que usa `mkcert` para crear un certificado para `localhost`, loopback y las IPv4 LAN detectadas.
+- `start:docente` abre la URL HTTPS del host por defecto y la consola anuncia direcciones HTTPS para alumnos.
+- Se documenta la instalación de la CA raíz en Windows y se excluyen los certificados y claves locales del control de versiones.
+- `HTTPS_ENABLED=false` queda disponible para pruebas HTTP automatizadas locales; no es una configuración válida para proyección remota.
+- Pendiente de validación real: instalación de confianza en clientes Windows, captura `getDisplayMedia()` en Firefox y proyección WebRTC en la LAN. La habilitación de HTTPS no resuelve por sí sola el defecto reportado en el cambio de A a B.

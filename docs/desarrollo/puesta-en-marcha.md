@@ -1,4 +1,4 @@
-# Puesta en marcha y verificación — base 0.3.0
+# Puesta en marcha y verificación — versión 0.3.3
 
 ## Entorno
 
@@ -7,19 +7,36 @@
 - VS Code u otro editor.
 - Navegador moderno con soporte de `getDisplayMedia()` y WebRTC.
 - Computadora del docente y equipos cliente conectados a la misma LAN.
-- Para capturar pantalla desde otros equipos, un origen HTTPS confiable en la dirección LAN. La base 0.3.0 incluida sirve HTTP y no incorpora terminación TLS propia.
+- Para captura de pantalla remota, HTTPS con certificado confiable. Esta versión incluye servidor HTTPS propio mediante certificados locales generados con `mkcert`.
 
 ## Instalar y ejecutar
 
 ```bash
 npm install
 npm test
-npm start
+npm run setup:https
+npm run start:docente
 ```
 
-En la computadora del docente, abre `http://localhost:3000`. Para probar con otros equipos, configura por separado una terminación HTTPS que reenvíe al servidor local, usa un certificado cuyo nombre/IP coincida con la dirección utilizada y confía ese certificado en los clientes Windows. La configuración exacta depende de la infraestructura disponible en el laboratorio; no cambies simplemente `localhost` por la IP esperando que la captura funcione por HTTP.
+### Preparar HTTPS confiable
 
-No abras el puerto del sistema a Internet. Limita el acceso a la LAN prevista y revisa el firewall del sistema anfitrión.
+1. Instala `mkcert` en la computadora anfitriona siguiendo la guía oficial: https://github.com/FiloSottile/mkcert.
+2. Ejecuta `npm run setup:https`. El script instala la CA local en el host y genera `certs/interlab.pem` y `certs/interlab-key.pem` para `localhost`, loopback y las IPv4 LAN detectadas.
+3. Ejecuta `mkcert -CAROOT` para localizar la carpeta de la CA. Copia únicamente `rootCA.pem` a cada equipo Windows mediante un medio confiable. **Nunca copies `rootCA-key.pem` ni la carpeta completa de la CA.**
+4. En Windows, instala `rootCA.pem` en **Usuario actual → Entidades de certificación raíz de confianza**. En equipos administrados por la universidad, sigue el procedimiento autorizado de TI.
+5. Cierra y vuelve a abrir Firefox. Comprueba que la dirección HTTPS del host no muestra error de certificado.
+6. Ejecuta `npm run start:docente`. El anfitrión abre `https://localhost:3000/docente`; los alumnos usan `https://IP-LAN-DEL-DOCENTE:3000/alumno`.
+
+El servidor escucha por defecto en `0.0.0.0`. Si el host tiene varias interfaces, elige la IP de la LAN del laboratorio. Si cambia una IP incluida en el certificado, vuelve a ejecutar `npm run setup:https`. Los certificados quedan en `certs/`, excluidos de Git. HTTPS está habilitado por defecto; `HTTPS_ENABLED=false` se reserva para pruebas HTTP automatizadas locales y no debe usarse para proyectar desde otros equipos. No abras el servicio a Internet y revisa el firewall del host.
+
+## Rutas y roles
+
+- `/docente`: acceso docente directo, permitido únicamente cuando la petición llega desde el propio host (loopback). Una petición remota recibe HTTP 403.
+- `/alumno`: acceso estudiantil directo desde la LAN.
+- `/`: redirige a `/docente` en el host y a `/alumno` para solicitudes remotas.
+- `/index.html`: redirige según el mismo criterio para no saltarse la ruta por rol.
+
+Este filtro limita la vista por HTTP, pero no es autenticación institucional. Las operaciones docentes y los eventos Socket.IO deben autorizarse en el servidor; no se debe tratar la URL como un secreto ni exponer el puerto a Internet. Las paletas por rol están implementadas provisionalmente y siguen pendientes de aprobación visual.
 
 ## Exportación de notas
 
@@ -40,6 +57,16 @@ npm test
 Estas pruebas cubren lógica de sesión y cola, pero no validan la captura ni WebRTC entre computadoras físicas.
 
 ## Lista de comprobación manual
+
+### Despliegue LAN y rutas
+
+- [ ] Al ejecutar `npm run start:docente`, el servidor escucha en `0.0.0.0` y muestra las direcciones IPv4 detectadas.
+- [ ] El host abre `https://localhost:3000/docente` sin advertencia de certificado.
+- [ ] Los clientes Windows confían en la CA y abren `https://IP-LAN-DEL-DOCENTE:3000/alumno` sin advertencia.
+- [ ] Desde otro equipo de la LAN, `/alumno` responde y permite cargar la pantalla estudiantil.
+- [ ] Desde otro equipo de la LAN, `/docente` devuelve HTTP 403.
+- [ ] Desde otro equipo, `/` y `/index.html` redirigen a `/alumno`.
+- [ ] Se comprueba el acceso con la IP correspondiente a la interfaz de red del laboratorio y se revisa el firewall del host.
 
 ### Sesión y roles
 
@@ -65,7 +92,7 @@ Estas pruebas cubren lógica de sesión y cola, pero no validan la captura ni We
 - [ ] El navegador muestra el diálogo de captura solo tras una acción explícita del estudiante.
 - [ ] La transmisión empieza únicamente después de que el docente concede/selecciona al estudiante autorizado.
 - [ ] La pantalla completa se prueba en los navegadores objetivo y se registra si se amplía el vídeo o toda la vista de presentación.
-- [ ] La captura y WebRTC funcionan con HTTPS confiable en la LAN.
+- [ ] Firefox permite `getDisplayMedia()` con HTTPS confiable en la LAN y se visualiza la pantalla por WebRTC.
 - [ ] La sesión funciona sin Internet cuando ya están disponibles los recursos y certificados requeridos.
 - [ ] Se prueba desconexión temporal y reconexión.
 - [ ] Se comprueba que eventos directos del cliente no permiten señalizar con estudiantes no seleccionados.

@@ -34,7 +34,21 @@ function stopTeacherView(message = 'Selecciona un estudiante. Si comparte su pan
 }
 function showNotice(text) { show('notice'); $('notice').textContent = text; }
 function setTheme(role = null) { document.body.classList.remove('theme-teacher', 'theme-student'); if (role) document.body.classList.add(`theme-${role}`); }
+const accessPath = window.location.pathname.replace(/\/$/, '') || '/';
+const fixedRoleRoute = accessPath === '/docente' || accessPath === '/alumno';
 function showRolePicker() { hide('teacherEntry'); hide('studentEntry'); show('roles'); setTheme(); }
+function initializeAccessRoute() {
+  if (accessPath === '/docente') {
+    hide('roles'); hide('studentEntry'); show('teacherEntry'); setTheme('teacher');
+    $('backFromTeacher').classList.add('hidden');
+  } else if (accessPath === '/alumno') {
+    hide('roles'); hide('teacherEntry'); show('studentEntry'); setTheme('student');
+    $('backFromStudent').classList.add('hidden');
+  } else {
+    showRolePicker();
+  }
+}
+initializeAccessRoute();
 
 socket.on('connect', () => { $('connection').textContent = 'Conectado'; $('connection').classList.add('online'); $('connection').classList.remove('offline'); });
 socket.on('disconnect', () => { $('connection').textContent = 'Conexión interrumpida'; $('connection').classList.add('offline'); $('connection').classList.remove('online'); });

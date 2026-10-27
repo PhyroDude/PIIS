@@ -1,6 +1,6 @@
 # ADR-004: Separación de acceso e identidad visual por rol
 
-- **Estado:** decisión de diseño adoptada para este incremento; requiere validación de usabilidad.
+- **Estado:** parcialmente vigente. Las pantallas diferenciadas y la identidad visual se conservan; las rutas directas se definen en ADR-005 y la paleta sigue pendiente de aprobación según ADR-007.
 - **Fecha de registro:** 2026-10-24.
 - **Ámbito:** entrada a la aplicación e interfaz de docente y estudiante.
 - **Base de código:** v0.3.0.
@@ -14,9 +14,7 @@ La interfaz inicial presentaba la elección de rol y ambos formularios dentro de
 1. Mantener una pantalla inicial que permita elegir entre **Docente** y **Estudiante**.
 2. Al elegir un rol, abrir una pantalla de acceso separada con texto, formulario y acciones propios de ese rol.
 3. Incluir una acción para volver a elegir el rol antes de entrar a una sesión.
-4. Aplicar una paleta diferenciada en la pantalla de acceso y durante el uso de cada panel:
-   - **Docente:** azul oscuro `#2546A8`, con fondo suave `#EDF2FF`.
-   - **Estudiante:** verde azulado `#087F8C`, con fondo suave `#E7F7F7`.
+4. Proponer una paleta diferenciada en la pantalla de acceso y durante el uso de cada panel. Los valores implementados se consideran provisionales y pendientes de aprobación; véase ADR-007.
 5. Mantener etiquetas textuales explícitas para los roles. El color complementa la identificación, pero no es el único indicador.
 6. Mantener el comportamiento funcional actual: el docente crea una sesión temporal y el estudiante se incorpora con código y alias temporal.
 7. No añadir cuentas institucionales ni contraseñas en este cambio. El acceso docente actual crea una sesión y recibe un token temporal; no equivale a autenticación institucional.
@@ -27,14 +25,14 @@ La interfaz inicial presentaba la elección de rol y ambos formularios dentro de
 | Alternativa | Ventaja | Inconveniente | Resultado |
 |---|---|---|---|
 | Mantener ambos formularios en el mismo panel | Menos navegación | Los roles se perciben como opciones de un único formulario | No elegida |
-| Crear páginas separadas por URL | Separación visual clara | Añade rutas y complejidad sin necesidad demostrada para el MVP | No elegida por ahora |
+| Crear páginas separadas por URL | Separación visual clara | Añade rutas y complejidad | Se adopta después mediante ADR-005 como rutas de entrada a la misma aplicación |
 | Mantener selector inicial y abrir pantallas de rol separadas | Flujo claro, fácil de volver y menor cambio técnico | No constituye por sí mismo autenticación | Elegida |
 
 ## Consecuencias
 
-- La pantalla inicial actúa como selector de rol.
+- La pantalla inicial `/` actúa como selector general de rol; las rutas `/docente` y `/alumno` abren directamente el acceso correspondiente, conforme a ADR-005.
 - El formulario de creación de sesión y el de incorporación quedan en paneles distintos.
-- Los colores de acento cambian de acuerdo con el rol activo, incluyendo encabezado, botones, elementos destacados y paneles relacionados.
+- La interfaz aplica provisionalmente colores de acento según el rol; su aceptación visual está pendiente conforme a ADR-007.
 - La aplicación debe conservar contraste, foco visible, etiquetas y mensajes de error accesibles.
 - El cambio no modifica el protocolo Socket.IO, el modelo temporal de datos ni el flujo WebRTC.
 

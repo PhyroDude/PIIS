@@ -1,11 +1,13 @@
 {
   "name": "sistema-local-retroalimentacion",
-  "version": "0.2.0",
+  "version": "0.3.3",
   "private": true,
   "description": "MVP local de retroalimentación para laboratorios de cómputo; estado temporal en memoria.",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "start:docente": "node start-docente.js",
+    "setup:https": "node scripts/setup-https.js"
   },
   "dependencies": {
     "express": "^5.1.0",

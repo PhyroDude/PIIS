@@ -2,7 +2,7 @@
 
 MVP de aplicación web local para apoyar la retroalimentación durante sesiones en laboratorios de cómputo. El docente crea una sesión temporal, los estudiantes se incorporan con un alias y código, y el docente puede revisar la pantalla de un estudiante seleccionado, orientar oralmente y guardar notas individuales opcionales.
 
-> **Base de trabajo:** archivo de referencia v0.3.0. El campo `version` de `package.json` conserva el valor `0.2.0`; esta actualización se limita a documentación y no cambia ese metadato. Las pruebas reales entre equipos siguen pendientes.
+> **Versión actual:** 0.3.3. El conteo parte de la base funcional 0.3.0; se mantienen descartados los cambios de las líneas posteriores que el usuario indicó no conservar. La configuración HTTPS de esta versión está implementada, pero aún requiere validación real entre equipos Windows.
 
 ## Estado y alcance
 
@@ -36,9 +36,9 @@ La selección de arquitectura y sus límites se explican en [`docs/arquitectura/
 
 ## Acceso e identidad visual por rol
 
-La interfaz distingue dos recorridos: **Docente**, con paleta azul oscuro, crea una sesión temporal; **Estudiante**, con paleta verde azulado, se incorpora mediante código y alias temporal. Cada recorrido tiene su propia pantalla de acceso y permite volver al selector antes de enviar el formulario. La distinción visual no constituye autenticación institucional ni sustituye los controles del servidor.
+La aplicación ofrece rutas directas: **`/docente`** muestra el acceso del docente y **`/alumno`** muestra el acceso del estudiante. Ambas rutas sirven la misma aplicación y comparten el servidor y el estado temporal; `/` conserva el selector general. `npm run start:docente` inicia el servidor y trata de abrir automáticamente la vista docente en el equipo anfitrión. Los estudiantes entran con la IP LAN del anfitrión y la ruta `/alumno`.
 
-La decisión se registra en [`docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md`](docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md), con el diseño en [`docs/diseno/acceso-y-paletas-por-rol.md`](docs/diseno/acceso-y-paletas-por-rol.md) y las historias en [`docs/producto/backlog-acceso-roles.md`](docs/producto/backlog-acceso-roles.md).
+Las paletas azul oscuro (docente) y verde azulado (estudiante) están implementadas provisionalmente, pero **siguen pendientes de aprobación visual**. La ruta `/docente` se bloquea para solicitudes que llegan desde una dirección remota; `/index.html` y `/` tampoco permiten saltarse la selección de ruta. Esto restringe el acceso HTTP a la vista y el inicio de la sesión docente desde clientes remotos. No equivale a autenticación institucional fuerte: los demás eventos Socket.IO deben seguir protegidos mediante autorización del servidor. No expongas el servicio fuera de la LAN prevista. Las decisiones se registran en [ADR-004](docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md), [ADR-005](docs/arquitectura/decisiones/ADR-005-rutas-por-rol.md), [ADR-006](docs/arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md) y [ADR-007](docs/arquitectura/decisiones/ADR-007-paletas-por-rol.md).
 
 ## Flujo de presentación de pantalla
 
@@ -59,15 +59,28 @@ La decisión se registra en [`docs/arquitectura/decisiones/ADR-004-acceso-y-iden
 - Navegador moderno compatible con `getDisplayMedia()` y WebRTC.
 - Equipos conectados a la misma LAN.
 
-En Ubuntu/Linux, desde la carpeta del proyecto:
+Desde la carpeta del proyecto:
 
 ```bash
 npm install
 npm test
-npm start
 ```
 
-En la computadora que ejecuta el servidor, abre `http://localhost:3000`. En la versión 0.3.0, el servidor incluido escucha por HTTP; los navegadores modernos requieren un contexto seguro para `getDisplayMedia()` en equipos remotos. Por tanto, la captura de pantalla a través de una IP LAN requiere una terminación HTTPS confiable configurada por separado (por ejemplo, un proxy TLS del laboratorio) y un certificado válido y confiable en los clientes. Esta base no incluye un servidor HTTPS propio ni convierte automáticamente HTTP en HTTPS.
+En la computadora anfitriona del docente, inicia el servicio con apertura automática del acceso docente y detección de direcciones LAN:
+
+```bash
+npm run start:docente
+```
+
+Antes de iniciar por primera vez, prepara el certificado HTTPS:
+
+```bash
+npm run setup:https
+```
+
+Este comando requiere `mkcert` instalado en la computadora anfitriona. Consulta [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md) para instalarlo y confiar la CA en los clientes Windows. Después ejecuta `npm run start:docente`: se abrirá `https://localhost:3000/docente` y la consola imprimirá direcciones `https://IP-LAN-DEL-DOCENTE:3000/alumno`. No uses `localhost` desde equipos cliente. Si cambia la IP LAN, vuelve a generar el certificado. No compartas la clave privada de la CA.
+
+HTTPS está habilitado por defecto. La variable `HTTPS_ENABLED=false` existe únicamente para las pruebas HTTP locales automatizadas; no debe usarse para la proyección desde alumnos remotos.
 
 La guía detallada está en [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md). No expongas el servicio directamente a Internet.
 
@@ -89,21 +102,27 @@ Las pruebas unitarias cubren principalmente el estado de sesión y la cola. No s
 - [`docs/arquitectura/decisiones/ADR-001-arquitectura-local.md`](docs/arquitectura/decisiones/ADR-001-arquitectura-local.md): plataforma y despliegue local.
 - [`docs/arquitectura/decisiones/ADR-002-gestion-observaciones.md`](docs/arquitectura/decisiones/ADR-002-gestion-observaciones.md): retroalimentación oral y notas opcionales.
 - [`docs/arquitectura/decisiones/ADR-003-cola-presentacion.md`](docs/arquitectura/decisiones/ADR-003-cola-presentacion.md): cola, concesión y exclusividad de presentación.
-- [`docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md`](docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md): separación de acceso y paletas por rol.
+- [`docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md`](docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md): pantallas de acceso por rol.
+- [`docs/arquitectura/decisiones/ADR-005-rutas-por-rol.md`](docs/arquitectura/decisiones/ADR-005-rutas-por-rol.md): rutas `/docente` y `/alumno`.
+- [`docs/arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md`](docs/arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md): arranque del anfitrión.
+- [`docs/arquitectura/decisiones/ADR-007-paletas-por-rol.md`](docs/arquitectura/decisiones/ADR-007-paletas-por-rol.md): paletas provisionales pendientes de aprobación.
+- [`docs/arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md`](docs/arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md): detección de IP local y restricción de la ruta docente al anfitrión.
 - [`docs/diseno/proyeccion-pantalla-y-cola.md`](docs/diseno/proyeccion-pantalla-y-cola.md): flujo detallado de presentación.
 - [`docs/diseno/acceso-y-paletas-por-rol.md`](docs/diseno/acceso-y-paletas-por-rol.md): diseño de las pantallas de acceso.
 - [`docs/diseno/observaciones-individuales.md`](docs/diseno/observaciones-individuales.md): comportamiento de las notas.
 - [`docs/pruebas/trazabilidad-y-pruebas.md`](docs/pruebas/trazabilidad-y-pruebas.md): casos de prueba propuestos.
 - [`docs/pruebas/resultados/estado-inicial.md`](docs/pruebas/resultados/estado-inicial.md): estado conocido de validación.
 - [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md): instalación y pruebas manuales.
-- [`CHANGELOG.md`](CHANGELOG.md): cambios incluidos en la base 0.3.0.
+- [`docs/arquitectura/decisiones/ADR-009-https-lan.md`](docs/arquitectura/decisiones/ADR-009-https-lan.md): HTTPS confiable para captura desde la LAN.
+- [`CHANGELOG.md`](CHANGELOG.md): historial de cambios; versión actual 0.3.3.
 
 ## Límites conocidos
 
 - No hay autenticación institucional fuerte del docente; el token de sesión no sustituye una solución de identidad institucional.
 - La captura de pantalla depende del navegador, de permisos explícitos y de un contexto seguro.
-- El servidor 0.3.0 incluido sirve HTTP; HTTPS para clientes remotos requiere infraestructura TLS externa y certificados confiables.
+- HTTPS está habilitado por defecto en la versión 0.3.3; es necesario instalar `mkcert` y confiar la CA raíz en los clientes. La integración real de Firefox/Windows sigue pendiente.
 - Se ha reportado un fallo al cambiar de la presentación de un estudiante a la de otro. Sigue pendiente de reproducción y corrección verificada.
+- Las rutas de acceso y el descubrimiento de direcciones cuentan con pruebas unitarias básicas; falta probar el bloqueo remoto de `/docente`, la apertura automática en el sistema anfitrión y el acceso real desde equipos cliente en LAN.
 - El botón de pantalla completa existe, pero debe validarse en los navegadores objetivo si satisface la expectativa de ampliar la vista de presentación completa, no solamente el elemento de vídeo.
 - Las observaciones se eliminan al finalizar la sesión; al desconectarse un estudiante se eliminan también sus notas.
 - Copiar/descargar notas queda deshabilitado por defecto hasta resolver formalmente RNF-002.

@@ -31,7 +31,7 @@ El sistema debe apoyar sesiones de laboratorio dentro de una red local, funciona
 
 - La computadora del docente debe permanecer encendida y conectada durante la sesión.
 - Debe definirse la dirección local que usarán los estudiantes y permitir el puerto del servicio únicamente en la red necesaria.
-- El servidor HTTP de la base 0.3.0 no basta por sí solo para habilitar `getDisplayMedia()` en otros equipos: los navegadores modernos exigen un contexto seguro. El despliegue remoto necesita HTTPS con certificado confiable, configurado fuera del servidor incluido en esta versión.
+- La versión 0.3.3 incluye servidor HTTPS por defecto con certificado local generado mediante `mkcert`. Cada cliente debe confiar en la CA raíz; véase ADR-009.
 - La compatibilidad de captura, WebRTC y pantalla completa depende de navegador, permisos, certificado y configuración de red.
 - El alias y el código temporal no son autenticación institucional fuerte.
 

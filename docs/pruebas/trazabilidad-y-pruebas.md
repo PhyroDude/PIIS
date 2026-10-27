@@ -127,3 +127,28 @@ No declarar validado el MVP hasta que se registren resultados reales para el flu
 | ACC-T08 | Contraste, foco de teclado y diseño móvil | Pendiente de revisión manual |
 
 Los cambios de presentación visual no deben registrarse como autenticación ni como demostración de seguridad.
+
+
+## Pruebas de rutas directas y arranque del anfitrión
+
+| Caso | Verificación | Estado |
+|---|---|---|
+| ROUTE-T01 | `GET /docente` devuelve la aplicación y muestra el acceso docente al abrirla en navegador. | Prueba automatizada de respuesta; comportamiento visual pendiente de prueba manual |
+| ROUTE-T02 | `GET /alumno` devuelve la aplicación y muestra el acceso estudiantil al abrirla en navegador. | Prueba automatizada de respuesta; comportamiento visual pendiente de prueba manual |
+| ROUTE-T03 | `/` conserva el selector general de rol. | Pendiente de prueba manual |
+| START-T01 | `npm run start:docente` inicia el servicio y abre `https://localhost:3000/docente` en el anfitrión. | Pendiente de prueba manual en el sistema operativo del anfitrión |
+| LAN-T01 | Un cliente abre `http://IP-LAN-DEL-DOCENTE:3000/alumno` y se incorpora con código y alias. | Pendiente de prueba de integración en LAN |
+| ROLE-T01 | Acceder a una ruta no permite ejecutar acciones del otro rol sin superar las validaciones del servidor. | Requiere pruebas de autorización específicas; las rutas no son control de seguridad |
+| UI-T01 | Revisar contraste, foco, legibilidad y paleta en escritorio y móvil. | Pendiente; paleta no aprobada |
+
+Las pruebas automatizadas de rutas solo verifican que el servidor responde con la aplicación; no prueban por sí solas la visibilidad de los paneles en el navegador ni el despliegue real en LAN.
+
+
+## Despliegue LAN y rutas por rol
+
+- [ ] Prueba automatizada: `getLanIPv4Addresses()` filtra loopback, IPv6 y direcciones link-local, y prioriza IPv4 privadas.
+- [ ] Prueba automatizada: se identifican loopback IPv4, IPv6 y IPv4 mapeada en IPv6.
+- [ ] Prueba de integración pendiente: `/docente` permite acceso local y bloquea peticiones remotas con HTTP 403.
+- [ ] Prueba de integración pendiente: `/` y `/index.html` redirigen según el origen de la petición.
+- [ ] Prueba manual pendiente: un cliente físico abre `/alumno` usando la IP correcta de la LAN.
+- [ ] Prueba manual pendiente: el firewall del host permite el puerto configurado únicamente dentro de la red autorizada.

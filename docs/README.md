@@ -1,6 +1,6 @@
 # Índice y reglas de documentación
 
-Esta carpeta documenta el Sistema local de retroalimentación. La base de código de referencia es **v0.3.0**. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
+Esta carpeta documenta el Sistema local de retroalimentación. La base funcional original es **v0.3.0** y la versión incremental actual es **v0.3.3**. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
 
 ## Orden de autoridad
 
@@ -22,7 +22,10 @@ Esta carpeta documenta el Sistema local de retroalimentación. La base de códig
 - [`arquitectura/decisiones/ADR-001-arquitectura-local.md`](arquitectura/decisiones/ADR-001-arquitectura-local.md) — aplicación web local, equipo docente y LAN.
 - [`arquitectura/decisiones/ADR-002-gestion-observaciones.md`](arquitectura/decisiones/ADR-002-gestion-observaciones.md) — oral como flujo normal y notas opcionales.
 - [`arquitectura/decisiones/ADR-003-cola-presentacion.md`](arquitectura/decisiones/ADR-003-cola-presentacion.md) — cola de presentación, selección directa y exclusividad.
-- [`arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md`](arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md) — separación de pantallas de acceso y paletas por rol.
+- [`arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md`](arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md) — pantallas de acceso e identidad visual por rol.
+- [`arquitectura/decisiones/ADR-005-rutas-por-rol.md`](arquitectura/decisiones/ADR-005-rutas-por-rol.md) — rutas directas `/docente` y `/alumno`.
+- [`arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md`](arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md) — apertura automática de la vista docente en el anfitrión.
+- [`arquitectura/decisiones/ADR-007-paletas-por-rol.md`](arquitectura/decisiones/ADR-007-paletas-por-rol.md) — estado provisional de la paleta por rol.
 - [`diseno/proyeccion-pantalla-y-cola.md`](diseno/proyeccion-pantalla-y-cola.md) — flujo de solicitud, espera, concesión, cambio de estudiante y pantalla completa.
 - [`diseno/acceso-y-paletas-por-rol.md`](diseno/acceso-y-paletas-por-rol.md) — navegación, contenido, paletas y accesibilidad de los accesos.
 - [`diseno/observaciones-individuales.md`](diseno/observaciones-individuales.md) — reglas y ciclo de vida de notas.
@@ -38,6 +41,9 @@ Esta carpeta documenta el Sistema local de retroalimentación. La base de códig
 | Decisión de plataforma o red | ADR correspondiente | Arquitectura general, README y puesta en marcha |
 | Flujo de presentación | ADR-003 y diseño de proyección | Backlog, trazabilidad y resultados de pruebas |
 | Flujo de observaciones | ADR-002 y diseño de observaciones | Backlog, trazabilidad y README |
+| Acceso por rol y arranque | ADR-005 y ADR-006 | Arquitectura, puesta en marcha, backlog y pruebas |
+| HTTPS y certificados LAN | ADR-009 | Arquitectura, puesta en marcha, README, changelog y pruebas |
+| Identidad visual | ADR-007 | Diseño de acceso y pruebas de usabilidad |
 | Código sin cambio de alcance | `CHANGELOG.md` cuando corresponda | Pruebas y límites conocidos |
 | Resultado de prueba | `pruebas/resultados/estado-inicial.md` | Plan de pruebas, si cambia el estado |
 
@@ -46,3 +52,5 @@ Esta carpeta documenta el Sistema local de retroalimentación. La base de códig
 Cada ADR debe indicar estado, contexto, decisión, alternativas, consecuencias, requisitos afectados y cómo se validará. Usa etiquetas explícitas: **Confirmado**, **Implementado sin validar en entorno real**, **Pendiente** o **No aprobado**.
 
 No sobrescribas el SRS para que coincida con el código. No marques WebRTC, pantalla completa o compatibilidad LAN como validados sin ejecutar las pruebas correspondientes. Los cambios de documentación deben permanecer coherentes con la versión de código sobre la que se basan.
+
+- [`arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md`](arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md): detección de IP local y limitación de la ruta docente al anfitrión.

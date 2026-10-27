@@ -1,16 +1,49 @@
 const express = require('express');
 const http = require('http');
+const https = require('https');
+const fs = require('fs');
 const path = require('path');
 const { Server } = require('socket.io');
 const { SessionStore, MAX_STUDENTS } = require('./src/session-store');
+const { getLanIPv4Addresses, isLoopbackAddress } = require('./src/network-addresses');
 
 const app = express();
-const server = http.createServer(app);
+const HTTPS_ENABLED = process.env.HTTPS_ENABLED !== 'false';
+const certDir = path.join(__dirname, 'certs');
+let server;
+if (HTTPS_ENABLED) {
+  const certFile = path.join(certDir, 'interlab.pem');
+  const keyFile = path.join(certDir, 'interlab-key.pem');
+  if (!fs.existsSync(certFile) || !fs.existsSync(keyFile)) {
+    console.error('Faltan los certificados HTTPS. Ejecuta primero: npm run setup:https');
+    process.exit(1);
+  }
+  server = https.createServer({ cert: fs.readFileSync(certFile), key: fs.readFileSync(keyFile) }, app);
+} else {
+  server = http.createServer(app);
+}
 const io = new Server(server);
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '0.0.0.0';
 const ENABLE_NOTE_EXPORT = process.env.ENABLE_NOTE_EXPORT === 'true';
 const store = new SessionStore();
+
+// La vista docente solo se sirve a conexiones locales del anfitrión. Los equipos
+// cliente de la LAN deben entrar por /alumno. Esto limita la ruta, pero no sustituye
+// una autenticación docente robusta ni la autorización de cada evento Socket.IO.
+function sendApp(res) {
+  return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+}
+app.get('/docente', (req, res) => {
+  if (!isLoopbackAddress(req.socket.remoteAddress)) {
+    return res.status(403).type('text/plain').send('Acceso denegado. La vista docente solo está disponible en la computadora anfitriona.');
+  }
+  return sendApp(res);
+});
+app.get('/alumno', (_req, res) => sendApp(res));
+app.get('/', (req, res) => res.redirect(302, isLoopbackAddress(req.socket.remoteAddress) ? '/docente' : '/alumno'));
+// Evita que /index.html permita saltarse la selección de ruta por rol.
+app.get('/index.html', (req, res) => res.redirect(302, isLoopbackAddress(req.socket.remoteAddress) ? '/docente' : '/alumno'));
 
 app.get('/config.js', (_req, res) => {
   res.type('application/javascript').send(`window.APP_CONFIG = ${JSON.stringify({ allowNoteExport: ENABLE_NOTE_EXPORT })};`);
@@ -33,6 +66,8 @@ function endActiveSession(message) {
 
 io.on('connection', socket => {
   socket.on('teacher:create-session', callback => {
+    // Solo un navegador ejecutado en el propio host puede crear la sesión docente.
+    if (!isLoopbackAddress(socket.handshake.address)) return reply(callback, { ok: false, error: 'La sesión docente solo puede iniciarse desde la computadora anfitriona.' });
     if (store.getRole(socket.id)) return reply(callback, { ok: false, error: 'Este navegador ya tiene un rol asignado en la sesión.' });
     reply(callback, store.createSession(socket.id));
   });
@@ -146,5 +181,16 @@ io.on('connection', socket => {
   });
 });
 
-server.listen(PORT, HOST, () => console.log(`Sistema local de retroalimentación listo en http://localhost:${PORT}`));
+server.listen(PORT, HOST, () => {
+  console.log(`Sistema local de retroalimentación listo en ${HOST}:${PORT}.`);
+  const protocol = HTTPS_ENABLED ? 'https' : 'http';
+  console.log(`Vista docente (solo en el anfitrión): ${protocol}://localhost:${PORT}/docente`);
+  const addresses = getLanIPv4Addresses();
+  if (addresses.length) {
+    console.log('Direcciones para los equipos cliente (elige la que pertenezca a la LAN del laboratorio):');
+    for (const item of addresses) console.log(`  ${item.interfaceName}: ${protocol}://${item.address}:${PORT}/alumno`);
+  } else {
+    console.log('No se detectó una dirección IPv4 LAN. Comprueba la conexión de red del anfitrión.');
+  }
+});
 module.exports = { app, server, io, store };
