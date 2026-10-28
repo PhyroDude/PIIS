@@ -1,18 +1,3 @@
-# InterLAB — Historial de cambios
-
-## 0.4.0 (beta) — Módulo temporal de archivos
-
-- **Nueva base oficial:** `PIIS(1).zip`, asignado por el responsable a **InterLAB v0.3.4**, reemplaza el punto de partida anterior. Se preservan HTTPS, rutas, control de sesión, cola y WebRTC.
-- Resolución de conflictos Git presentes en el ZIP de origen. `package.json` y lockfile normalizados a 0.4.0. Código de sesión heredado: cuatro dígitos del 1 al 9.
-- Gestión temporal de archivos con HTTP streaming, permisos de docente/estudiante, cuota compartida, carga múltiple, cola/progreso, descargas individuales y ZIP sin compresión, búsqueda y orden, actualización por Socket.IO, limpieza al cierre y restricción de caudal durante proyección.
-- Se incluyen el alcance v1.1 en Markdown y Word, requisitos consolidados v0.1, ADR-011 a ADR-014, diagramas y pruebas.
-- **Seguridad:** credenciales temporales para API, tickets de descarga de un uso, archivos fuera de `public/`, sin claves/certificados incluidos. La generación HTTPS usa OpenSSL en Linux por defecto y mantiene mkcert alternativo.
-- Pruebas automatizadas de la beta: 23 aprobadas en entorno local. Pendientes: pruebas de LAN real/Windows/HTTPS, caudal WebRTC, A→B, fallos severos y limpieza de huérfanos.
-
----
-
-> **Nota sobre historial heredado:** `PIIS(1).zip` tenía versiones y documentación en conflicto (0.3.3, 0.3.4 y 0.3.5). Por decisión del responsable, se considera conjuntamente **v0.3.4** como línea base; los encabezados históricos siguientes se conservan por trazabilidad, **no** como nuevas bases oficiales.
-
 ## 0.3.4
 
 - Se incorpora `scripts/setup-https-linux.sh` para automatizar en Linux la preparación de la CA local de `mkcert` y la generación de certificados HTTPS para localhost y las IPv4 LAN detectadas.

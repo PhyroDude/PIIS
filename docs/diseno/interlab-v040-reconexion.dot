@@ -1,0 +1,16 @@
+digraph G {
+ graph [bgcolor=white,rankdir=LR,pad="0.3",nodesep="0.4",ranksep="0.55",fontname="DejaVu Sans",label="Docente desconectado | El tiempo corre en el servidor",labelloc=t,fontsize=19];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,margin=".15,.18",color="#c6d1dc"];
+ edge [fontname="DejaVu Sans",fontsize=10,color="#53677c"];
+ conectado [label="Docente conectado\nVideo docente o alumno",fillcolor="#dff7e9"];
+ espera [label="0–29 s\nEsperando conexión",fillcolor="#e9f1fa"];
+ timer [label="30–89 s\nEsperando conexión\nTemporizador 01:00→00:00",fillcolor="#fff1d6"];
+ vencido [label="90 s o más\nTiempo concluido\nEsperando nuevo docente",fillcolor="#fde7e7"];
+ nuevo [label="Nuevo primer acceso\nRecupera rol\nMisma sesión",fillcolor="#dff7e9"];
+ conectado -> espera [label="Desconexión detectada"];
+ espera -> timer [label="t = 30 s"];
+ timer -> vencido [label="t = 90 s / revocar"];
+ espera -> conectado [label="Misma credencial válida",constraint=false,color="#2f855a"];
+ timer -> conectado [label="Reconexión a tiempo",constraint=false,color="#2f855a"];
+ vencido -> nuevo [label="Primer navegador /docente"];
+}

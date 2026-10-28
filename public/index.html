@@ -3,17 +3,16 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Aplicación web local para retroalimentación durante sesiones de laboratorio.">
-  <title>InterLAB v0.4.0</title>
+  <title>Sistema local de retroalimentación</title>
   <link rel="stylesheet" href="/styles.css">
   <script src="/socket.io/socket.io.js" defer></script>
   <script src="/config.js" defer></script>
   <script src="/app.js" defer></script>
-  <script src="/files.js" defer></script>
 </head>
 <body>
-<header><div class="mark">IL</div><div><small>LABORATORIO DE CÓMPUTO</small><h1>InterLAB</h1></div><span id="connection" class="status">Conectando…</span></header>
+<header><div class="mark">SL</div><div><small>LABORATORIO DE CÓMPUTO</small><h1>Sistema local de retroalimentación</h1></div><span id="connection" class="status">Conectando…</span></header>
 <main>
-  <section class="intro"><small>MVP · SESIONES TEMPORALES</small><h2>Revisa el trabajo. Da retroalimentación útil.</h2><p>El docente puede orientar verbalmente al estudiante y, cuando lo necesite, registrar una nota individual opcional.</p><aside><b>Privacidad:</b> las observaciones se conservan en memoria y los archivos compartidos, temporalmente en disco. Todo se elimina al finalizar la sesión; no hay historial permanente.</aside></section>
+  <section class="intro"><small>MVP · SESIONES TEMPORALES</small><h2>Revisa el trabajo. Da retroalimentación útil.</h2><p>El docente puede orientar verbalmente al estudiante y, cuando lo necesite, registrar una nota individual opcional.</p><aside><b>Privacidad:</b> los datos viven en memoria y se eliminan al finalizar la sesión. No hay historial permanente.</aside></section>
   <section class="panel role-picker" id="roles">
     <small>ACCESO A LA SESIÓN</small>
     <h2>¿Cómo deseas ingresar?</h2>
@@ -34,7 +33,7 @@
 
   <section class="panel role-screen student-screen hidden" id="studentEntry">
     <div class="role-heading"><span class="role-symbol" aria-hidden="true">⌘</span><div><small>ÁREA ESTUDIANTIL</small><h2>Acceso del estudiante</h2><p class="muted">Únete a la sesión de tu docente con el código temporal y un alias.</p></div></div>
-    <form id="studentForm"><h3>Incorporarme a una sesión</h3><label for="code">Código de sesión</label><input id="code" maxlength="4" inputmode="numeric" pattern="[1-9]{4}" autocomplete="off" placeholder="Ej. 1234" required><label for="alias">Alias temporal</label><input id="alias" maxlength="32" autocomplete="off" placeholder="Ej. Estudiante 04" required><button class="primary">Ingresar a la sesión</button></form>
+    <form id="studentForm"><h3>Incorporarme a una sesión</h3><label for="code">Código de sesión</label><input id="code" maxlength="6" autocomplete="off" placeholder="Ej. 7KMP2A" required><label for="alias">Alias temporal</label><input id="alias" maxlength="32" autocomplete="off" placeholder="Ej. Estudiante 04" required><button class="primary">Ingresar a la sesión</button></form>
     <button id="backFromStudent" class="back-button" type="button">← Volver a elegir rol</button>
     <p id="studentEntryMessage" class="form-message" role="status" aria-live="polite"></p>
   </section>
@@ -52,23 +51,6 @@
       <p id="teacherMessage" role="status" aria-live="polite"></p>
     </section>
     <section class="subpanel"><h3>Pantalla del estudiante</h3><p id="screenStatus" class="muted">Selecciona una solicitud de la cola o elige directamente a un participante.</p><div class="videoWrap"><video id="screenVideo" autoplay playsinline></video><button id="fullscreen" class="videoControl" type="button">Pantalla completa</button></div><button id="stopPresentation" type="button" class="secondary">Detener proyección actual</button></section>
-    <section class="subpanel file-manager" id="teacherFiles">
-      <div class="listHead"><h3>Archivos compartidos</h3><span>Solo durante esta sesión</span></div>
-      <p class="muted">Comparte documentos con tu grupo. Puedes eliminar archivos propios o de los estudiantes.</p>
-      <p id="teacherSpaceWarning" class="storage-warning hidden" role="alert">No hay espacio suficiente para la última operación de carga. Elimina archivos que ya no necesites.</p>
-      <label for="teacherUpload">Seleccionar archivos (máximo 50 MB por archivo y 200 MB por selección)</label>
-      <input id="teacherUpload" type="file" multiple>
-      <button id="teacherUploadButton" class="primary" type="button">Subir archivos</button>
-      <div class="upload-queue" id="teacherUploadQueue" aria-live="polite"></div>
-      <div class="file-tabs" id="teacherFileTabs" role="tablist" aria-label="Secciones de archivos"></div>
-      <div class="file-filters hidden" id="teacherFileFilters">
-        <label for="teacherFileSearch">Buscar por nombre (comienza con)</label><input id="teacherFileSearch" placeholder="Escribe el inicio del nombre">
-        <div class="actions"><button type="button" class="secondary" data-file-sort="name">Nombre Z→A</button><button type="button" class="secondary" data-file-sort="alias">Alias Z→A</button><button type="button" class="secondary" data-file-sort="date">Fecha: más antiguos</button></div>
-      </div>
-      <div id="teacherFileList" class="file-list"></div>
-      <button id="teacherZip" class="secondary" type="button" disabled>Descargar seleccionados como ZIP</button>
-      <p id="teacherFileStatus" class="muted" role="status" aria-live="polite"></p>
-    </section>
     <button id="end" class="danger">Finalizar sesión</button>
   </section>
 
@@ -76,22 +58,6 @@
     <small>PANEL DEL ESTUDIANTE</small><h2>Ya estás en la sesión</h2><p>Tu alias temporal: <b id="joinedAlias"></b></p>
     <section class="subpanel"><h3>Compartir pantalla para revisión</h3><p class="muted">Para solicitar turno, autoriza la captura en el navegador. Esto no inicia la transmisión: quedarás en la cola y solo enviarás video cuando el docente te conceda acceso. El docente también puede elegirte directamente.</p><div class="actions"><button id="startShare" class="primary" type="button">Solicitar turno / autorizar pantalla</button><button id="stopShare" class="secondary" type="button" disabled>Detener captura</button></div><p id="studentScreenStatus" class="muted" role="status" aria-live="polite">No estás compartiendo pantalla.</p></section>
     <section class="subpanel"><div class="listHead"><h3>Tus observaciones</h3><button id="refreshNotes" type="button" class="secondary">Actualizar</button></div><p class="muted">Aquí aparecen las notas escritas para ti. Si el docente da la retroalimentación solo verbalmente, esta lista puede permanecer vacía.</p><ul id="studentNotes"><li class="muted">Aún no hay observaciones escritas.</li></ul><div class="actions"><button id="copyNotes" type="button" class="secondary" disabled>Copiar notas</button><button id="downloadNotes" type="button" class="secondary" disabled>Descargar .txt</button></div><p id="exportStatus" class="muted"></p></section>
-    <section class="subpanel file-manager" id="studentFiles">
-      <div class="listHead"><h3>Archivos compartidos</h3><span>Solo durante esta sesión</span></div>
-      <p class="muted">Puedes descargar los archivos del grupo y eliminar únicamente los que subiste tú.</p>
-      <label for="studentUpload">Seleccionar archivos (máximo 50 MB por archivo y 200 MB por selección)</label>
-      <input id="studentUpload" type="file" multiple>
-      <button id="studentUploadButton" class="primary" type="button">Subir archivos</button>
-      <div class="upload-queue" id="studentUploadQueue" aria-live="polite"></div>
-      <div class="file-tabs" id="studentFileTabs" role="tablist" aria-label="Secciones de archivos"></div>
-      <div class="file-filters hidden" id="studentFileFilters">
-        <label for="studentFileSearch">Buscar por nombre (comienza con)</label><input id="studentFileSearch" placeholder="Escribe el inicio del nombre">
-        <div class="actions"><button type="button" class="secondary" data-file-sort="name">Nombre Z→A</button><button type="button" class="secondary" data-file-sort="alias">Alias Z→A</button><button type="button" class="secondary" data-file-sort="date">Fecha: más antiguos</button></div>
-      </div>
-      <div id="studentFileList" class="file-list"></div>
-      <button id="studentZip" class="secondary" type="button" disabled>Descargar seleccionados como ZIP</button>
-      <p id="studentFileStatus" class="muted" role="status" aria-live="polite"></p>
-    </section>
   </section>
   <p id="notice" class="notice hidden" role="status" aria-live="polite"></p>
 </main>

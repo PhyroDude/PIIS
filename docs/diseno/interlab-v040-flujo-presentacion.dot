@@ -1,0 +1,16 @@
+digraph G {
+ graph [bgcolor=white,rankdir=LR,pad="0.3",nodesep=".4",ranksep=".60",fontname="DejaVu Sans",label="Arbitraje de video | Una fuente WebRTC a la vez",labelloc=t,fontsize=19];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#bfccd8",margin=".16,.16"];
+ edge [fontname="DejaVu Sans",fontsize=10,color="#5d7085"];
+ maestro [label="Docente transmitiendo\nFuente predeterminada",fillcolor="#dceeff"];
+ cola [label="Alumno solicita turno\nSolo Socket.IO / sin video",fillcolor="#f2f5f8"];
+ permiso [label="Docente autoriza\nAlumno acepta captura",fillcolor="#fff0d3"];
+ alumno [label="Alumno transmitiendo\nDocente sin envío",fillcolor="#e4f8e9"];
+ espera [label="Esperando conexión /\nEsperando nuevo docente",fillcolor="#f6e9ee"];
+ maestro -> cola [label="Solicitud"];
+ cola -> permiso [label="Concesión explícita"];
+ permiso -> alumno [label="Negociación WebRTC"];
+ alumno -> maestro [label="Termina / docente disponible",constraint=false];
+ alumno -> espera [label="Termina / docente ausente"];
+ espera -> maestro [label="Docente vuelve y comparte"];
+}

@@ -46,6 +46,6 @@ test('las rutas /docente y /alumno sirven la aplicación', async t => {
   for (const route of ['/docente', '/alumno']) {
     const response = await get(`${base}${route}`);
     assert.equal(response.status, 200, `${route} debe responder HTTP 200`);
-    assert.match(response.body, /InterLAB/);
+    assert.match(response.body, /Sistema local de retroalimentación/);
   }
 });

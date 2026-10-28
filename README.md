@@ -1,12 +1,16 @@
-# InterLAB — Sistema local de retroalimentación para laboratorios de cómputo
+# Sistema local de retroalimentación para laboratorios de cómputo
 
 MVP de aplicación web local para apoyar la retroalimentación durante sesiones en laboratorios de cómputo. El docente crea una sesión temporal, los estudiantes se incorporan con un alias y código, y el docente puede revisar la pantalla de un estudiante seleccionado, orientar oralmente y guardar notas individuales opcionales.
 
-> **Versión actual: 0.4.0 beta.** Base oficial: `PIIS(1).zip` adoptado como **InterLAB v0.3.4**. Se conservaron HTTPS, rutas y flujo WebRTC de la base, y se añadió el módulo temporal de archivos. Las pruebas sobre LAN real siguen pendientes.
+<<<<<<< HEAD
+> **Versión actual:** 0.3.3. El conteo parte de la base funcional 0.3.0; se mantienen descartados los cambios de las líneas posteriores que el usuario indicó no conservar. La configuración HTTPS de esta versión está implementada, pero aún requiere validación real entre equipos Windows.
+=======
+> **Versión actual:** 0.3.5. El conteo parte de la base funcional 0.3.0; se mantienen descartados los cambios de las líneas posteriores que el usuario indicó no conservar. La configuración HTTPS de esta versión está implementada, pero aún requiere validación real entre equipos Windows.
+>>>>>>> 2f7796c (Integración de credenciales)
 
 ## Estado y alcance
 
-### Funcionalidad heredada de la base InterLAB 0.3.4
+### Incluido en la base 0.3.0
 
 - Una sesión activa por proceso del servidor y hasta 30 estudiantes.
 - Pantallas de acceso separadas para docente y estudiante, con paletas visuales diferenciadas.
@@ -33,17 +37,6 @@ MVP de aplicación web local para apoyar la retroalimentación durante sesiones 
 - **Exportación de notas:** copiar/descargar está deshabilitado por defecto hasta validar su compatibilidad con RNF-002.
 
 La selección de arquitectura y sus límites se explican en [`docs/arquitectura/arquitectura-general.md`](docs/arquitectura/arquitectura-general.md) y los ADR enlazados desde [`docs/README.md`](docs/README.md).
-
-## Incremento beta v0.4.0: archivos temporales
-
-El docente y los estudiantes pueden **subir, consultar y descargar archivos durante la sesión**, con pestañas y permisos diferenciados. Los archivos se guardan temporalmente en el disco del anfitrión y se eliminan al cerrar la sesión; no existe historial permanente ni base de datos. La proyección sigue siendo prioritaria.
-
-- **Límites:** 50 MB por archivo, 200 MB por selección, 10 GB por sesión y dos transferencias simultáneas por participante.
-- **Transferencias:** HTTP con progreso de subida, descargas individuales o varios archivos como ZIP; notificaciones de cambios por Socket.IO. Carga fallida = reintento manual desde el inicio.
-- **Privacidad:** las rutas HTTP requieren token temporal de sesión; el docente elimina cualquiera y el estudiante solo los suyos. Los archivos no se ofrecen mediante el directorio público.
-- **Limitaciones:** el ajuste de caudal durante la proyección es experimental y requiere pruebas reales; la limpieza tras un cierre forzoso y el cambio de proyección A→B siguen pendientes de validación.
-
-Consulta la [arquitectura implementada del módulo](docs/arquitectura/modulo-archivos-v0.4.0.md), el [alcance v1.1](docs/producto/alcance-MVP-y-product-backlog-base-v1.1.md) y los [resultados de pruebas v0.4.0](docs/pruebas/resultado-beta-040.md).
 
 ## Acceso e identidad visual por rol
 
@@ -83,13 +76,21 @@ En la computadora anfitriona del docente, inicia el servicio con apertura autom�
 npm run start:docente
 ```
 
+<<<<<<< HEAD
 Antes de iniciar por primera vez, prepara el certificado HTTPS:
+=======
+Antes de iniciar por primera vez, prepara el certificado HTTPS desde Linux:
+>>>>>>> 2f7796c (Integración de credenciales)
 
 ```bash
 npm run setup:https
 ```
 
-Este comando utiliza OpenSSL en Linux de forma predeterminada. También puedes usar `INTERLAB_CERT_PROVIDER=mkcert npm run setup:https` si tienes mkcert instalado. Consulta [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md). Después ejecuta `npm run start:docente`: se abrirá `https://localhost:3000/docente` y la consola imprimirá direcciones `https://IP-LAN-DEL-DOCENTE:3000/alumno`. No uses `localhost` desde equipos cliente. Si cambia la IP LAN, vuelve a generar el certificado. No compartas ninguna clave privada.
+<<<<<<< HEAD
+Este comando requiere `mkcert` instalado en la computadora anfitriona. Consulta [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md) para instalarlo y confiar la CA en los clientes Windows. Después ejecuta `npm run start:docente`: se abrirá `https://localhost:3000/docente` y la consola imprimirá direcciones `https://IP-LAN-DEL-DOCENTE:3000/alumno`. No uses `localhost` desde equipos cliente. Si cambia la IP LAN, vuelve a generar el certificado. No compartas la clave privada de la CA.
+=======
+Este comando ejecuta `scripts/setup-https-linux.sh` y genera `certs/interlab.pem` y `certs/interlab-key.pem` con OpenSSL; no requiere mkcert ni instalar una CA. El certificado incluye localhost y las IPv4 LAN detectadas. Consulta [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md). Después ejecuta `npm run start:docente`: se abrirá `https://localhost:3000/docente` y la consola imprimirá direcciones `https://IP-LAN-DEL-DOCENTE:3000/alumno`. No uses `localhost` desde equipos cliente. Si cambia la IP LAN, vuelve a generar el certificado. No compartas la clave privada `certs/interlab-key.pem`.
+>>>>>>> 2f7796c (Integración de credenciales)
 
 HTTPS está habilitado por defecto. La variable `HTTPS_ENABLED=false` existe únicamente para las pruebas HTTP locales automatizadas; no debe usarse para la proyección desde alumnos remotos.
 
@@ -101,7 +102,7 @@ La guía detallada está en [`docs/desarrollo/puesta-en-marcha.md`](docs/desarro
 npm test
 ```
 
-Las 23 pruebas automatizadas incluidas cubren sesión, roles, red, cola y operaciones del módulo de archivos. No sustituyen las pruebas manuales de captura de pantalla, WebRTC, cambio de A a B, permisos del navegador, pantalla completa, desconexiones y funcionamiento real en la LAN.
+Las pruebas unitarias cubren principalmente el estado de sesión y la cola. No sustituyen las pruebas manuales de captura de pantalla, WebRTC, cambio de A a B, permisos del navegador, pantalla completa, desconexiones y funcionamiento real en la LAN.
 
 ## Documentación
 
@@ -125,13 +126,21 @@ Las 23 pruebas automatizadas incluidas cubren sesión, roles, red, cola y operac
 - [`docs/pruebas/resultados/estado-inicial.md`](docs/pruebas/resultados/estado-inicial.md): estado conocido de validación.
 - [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md): instalación y pruebas manuales.
 - [`docs/arquitectura/decisiones/ADR-009-https-lan.md`](docs/arquitectura/decisiones/ADR-009-https-lan.md): HTTPS confiable para captura desde la LAN.
-- [`CHANGELOG.md`](CHANGELOG.md): historial de cambios; versión actual 0.4.0.
+<<<<<<< HEAD
+- [`CHANGELOG.md`](CHANGELOG.md): historial de cambios; versión actual 0.3.3.
+=======
+- [`CHANGELOG.md`](CHANGELOG.md): historial de cambios; versión actual 0.3.5.
+>>>>>>> 2f7796c (Integración de credenciales)
 
 ## Límites conocidos
 
 - No hay autenticación institucional fuerte del docente; el token de sesión no sustituye una solución de identidad institucional.
 - La captura de pantalla depende del navegador, de permisos explícitos y de un contexto seguro.
-- HTTPS sigue habilitado por defecto en v0.4.0; el generador OpenSSL produce un certificado autofirmado y la confianza en los clientes debe revisarse. mkcert está disponible como alternativa. La integración real de Firefox/Windows sigue pendiente.
+<<<<<<< HEAD
+- HTTPS está habilitado por defecto en la versión 0.3.3; es necesario instalar `mkcert` y confiar la CA raíz en los clientes. La integración real de Firefox/Windows sigue pendiente.
+=======
+- HTTPS está habilitado por defecto. El certificado OpenSSL es autofirmado y el navegador mostrará una advertencia; aceptar la excepción no garantiza por sí solo que todos los navegadores consideren seguro el contexto para `getDisplayMedia()`. La integración real de Firefox/Windows sigue pendiente.
+>>>>>>> 2f7796c (Integración de credenciales)
 - Se ha reportado un fallo al cambiar de la presentación de un estudiante a la de otro. Sigue pendiente de reproducción y corrección verificada.
 - Las rutas de acceso y el descubrimiento de direcciones cuentan con pruebas unitarias básicas; falta probar el bloqueo remoto de `/docente`, la apertura automática en el sistema anfitrión y el acceso real desde equipos cliente en LAN.
 - El botón de pantalla completa existe, pero debe validarse en los navegadores objetivo si satisface la expectativa de ampliar la vista de presentación completa, no solamente el elemento de vídeo.

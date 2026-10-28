@@ -1,0 +1,18 @@
+digraph G {
+  graph [bgcolor="white", rankdir=TB, pad="0.35", nodesep="0.5", ranksep="0.65", fontname="DejaVu Sans", label="InterLAB 0.4.0 | Componentes y redes", labelloc=t, fontsize=20];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, penwidth=1.2, color="#b7c7d6", fillcolor="#f3f7fa", margin="0.20,0.14"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#435b75", arrowsize=.75];
+  docente [label="Laptop del docente\n/docente + captura WebRTC", fillcolor="#dff1ff"];
+  alumnos [label="Equipos alumnos\n/alumno + cola + captura autorizada", fillcolor="#e9f9ec"];
+  subgraph cluster_host {label="Computadora fija del laboratorio"; style="rounded"; color="#879bb3";
+    servidor [label="Servidor InterLAB\nNode.js / Express / Socket.IO\nSesión, rol, cola, archivos", fillcolor="#e9e7ff"];
+    receptor [label="Vista receptora /proyeccion\nNavegador fullscreen\nDecodifica WebRTC", fillcolor="#fff1d9"];
+  }
+  proyector [label="Proyector físico del salón", fillcolor="#fff3ef"];
+  docente -> servidor [label="HTTPS + Socket.IO", dir=both];
+  alumnos -> servidor [label="HTTPS + Socket.IO", dir=both];
+  servidor -> receptor [label="Control / señalización", dir=both];
+  docente -> receptor [label="Video WebRTC (predeterminado)", color="#0876b9", penwidth=2];
+  alumnos -> receptor [label="Video WebRTC (solo turno autorizado)", color="#188049", penwidth=2];
+  receptor -> proyector [label="Video físico HDMI/DP", color="#a26b20", penwidth=2];
+}
