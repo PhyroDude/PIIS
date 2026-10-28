@@ -78,6 +78,16 @@ class FileStore {
     // Nunca borrar arbitrariamente la ruta configurada: podría contener otros datos.
     fs.mkdirSync(rootDir, { recursive: true, mode: 0o700 });
   }
+  cleanupStaleSessions() {
+    // Solamente se borran directorios cuyo nombre sea un UUID de sesión anterior;
+    // los archivos no relacionados permanecen intactos.
+    for (const entry of fs.readdirSync(this.rootDir, { withFileTypes:true })) {
+      if (!entry.isDirectory() || !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(entry.name)) continue;
+      const target=path.join(this.rootDir,entry.name);
+      if (fs.lstatSync(target).isSymbolicLink()) continue;
+      fs.rmSync(target,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+    }
+  }
   startSession(sessionId) {
     if (this.state) throw failure('ACTIVE', 'Ya existe una sesión de archivos.');
     const directory = path.join(this.rootDir, sessionId);

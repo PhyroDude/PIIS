@@ -3,13 +3,5 @@
 <title>InterLAB · Proyección</title><link rel="stylesheet" href="/proyeccion.css">
 <script src="/socket.io/socket.io.js" defer></script><script src="/proyeccion.js" defer></script></head>
 <body><main id="stage"><video id="screen" autoplay muted playsinline></video>
-<section id="waiting" aria-live="polite"><div class="logo">InterLAB</div><h1 id="title">Esperando al docente</h1><p id="subtitle">Servidor preparado para recibir una presentación</p><div id="timer" hidden>01:00</div><p id="diagnostic" class="diagnostic">Verificando conexión con InterLAB…</p></section>
-<button id="resume-video" class="resume-video" type="button" hidden>▶ Reproducir video</button>
-<section id="rtc-diagnostic-panel" class="rtc-diagnostic-panel hidden" aria-label="Diagnóstico WebRTC" role="region">
-  <div class="rtc-diagnostic-heading"><strong id="rtc-diagnostic-heading">Error en la transmisión</strong><button id="rtc-diagnostic-hide" type="button" aria-label="Ocultar diagnóstico">Ocultar</button></div>
-  <p id="rtc-diagnostic-error" class="rtc-diagnostic-error"></p>
-  <p class="rtc-diagnostic-hint">Este mensaje permanecerá visible. Pulsa «Copiar diagnóstico» para compartir los detalles; no contiene el código de sesión ni las credenciales.</p>
-  <div class="rtc-diagnostic-actions"><button id="rtc-diagnostic-copy" type="button">Copiar diagnóstico</button><button id="rtc-diagnostic-details-toggle" type="button" aria-expanded="false">Ver eventos</button></div>
-  <pre id="rtc-diagnostic-details" hidden></pre>
-</section><button id="rtc-diagnostic-open" class="rtc-diagnostic-open" type="button" hidden>Ver diagnóstico del receptor</button>
+<section id="waiting" aria-live="polite"><div class="logo">InterLAB</div><h1 id="title">Esperando al docente</h1><p id="subtitle">Servidor preparado para recibir una presentación</p><div id="timer" hidden>01:00</div></section>
 </main></body></html>

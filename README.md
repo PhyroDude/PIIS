@@ -1,140 +1,66 @@
 # InterLAB — Sistema local de retroalimentación para laboratorios de cómputo
 
-MVP de aplicación web local para apoyar la retroalimentación durante sesiones en laboratorios de cómputo. El docente crea una sesión temporal, los estudiantes se incorporan con un alias y código, y el docente puede revisar la pantalla de un estudiante seleccionado, orientar oralmente y guardar notas individuales opcionales.
+Aplicación web LAN para sesiones temporales de clase, retroalimentación, proyección de pantalla por WebRTC y archivos compartidos. **Versión actual: 0.5.0 beta**. La base histórica es `PIIS(1).zip` = v0.3.4; v0.4.0 incorporó los archivos temporales, y **v0.5.0 rediseñó el servidor y la proyección**.
 
-> **Versión actual: 0.4.0 beta.** Base oficial: `PIIS(1).zip` adoptado como **InterLAB v0.3.4**. Se conservaron HTTPS, rutas y flujo WebRTC de la base, y se añadió el módulo temporal de archivos. Las pruebas sobre LAN real siguen pendientes.
+> El código incluye mecanismos de reconexión y exclusividad, pero **todavía no se ha validado la recepción de video entre equipos reales ni el arranque automático en una computadora de laboratorio**. Los tests locales no equivalen a una certificación de uso en clase.
 
 ## Estado y alcance
 
-### Funcionalidad heredada de la base InterLAB 0.3.4
+- **Servidor:** computadora fija, única instancia Node.js con una sesión activa en memoria; el proyector físico está conectado a esta computadora. El navegador local `/proyeccion` muestra el video recibido; cerrar la ventana no termina la sesión.
+- **Docente:** entra desde su laptop a `https://IP-DEL-SERVIDOR:3000/docente`, adquiere el rol si está libre (primer acceso), pulsa «Compartir pantalla» y crea/recupera la sesión. El código de ingreso permanece visible; la credencial administrativa es privada y se guarda en cookie `HttpOnly`.
+- **Alumno:** entra a `/alumno` con código y alias. Puede solicitar turno sin iniciar WebRTC ni abrir el selector de pantalla; solo tras permiso docente recibe aviso y autoriza la captura.
+- **Proyección:** exclusivamente la pantalla del docente o de un alumno autorizado se envía al receptor local por WebRTC. El servidor coordina SDP/ICE con Socket.IO y no almacena video.
+- **Reconexión docente:** 90 segundos desde la desconexión; aviso simple durante los primeros 30 s, luego cuenta regresiva de 60 s. Un alumno que ya proyectaba puede continuar. Tras la expiración se libera el rol, sin eliminar alumnos, cola ni archivos.
+- **Reinicio de servidor:** finaliza la sesión anterior y limpia temporales propios al arrancar; no guarda historial permanente. Hasta 30 alumnos por sesión.
 
-- Una sesión activa por proceso del servidor y hasta 30 estudiantes.
-- Pantallas de acceso separadas para docente y estudiante, con paletas visuales diferenciadas.
-- Incorporación mediante dirección local, código temporal y alias temporal.
-- Panel del docente con lista de participantes y selección directa.
-- Cola temporal de presentación: el estudiante solicita turno; el docente concede el acceso.
-- Selección directa del docente con prioridad sobre la cola.
-- Un solo estudiante seleccionado para negociar una transmisión de pantalla a la vez.
-- Captura de pantalla con autorización explícita del navegador y transmisión WebRTC bajo demanda.
-- Retroalimentación oral como flujo principal y notas individuales opcionales de hasta 1,000 caracteres.
-- Consulta de notas propias durante la sesión.
-- Control de pantalla completa para la vista de pantalla compartida.
-- Estado en memoria; el cierre de sesión elimina participantes, cola y observaciones.
-
-### Decisiones de producto y arquitectura
-
-- **Plataforma:** aplicación web local, servida desde la computadora del docente.
-- **Red:** LAN del laboratorio; las funciones principales no deben depender de Internet.
-- **Clientes previstos:** navegadores en equipos Windows; el entorno de desarrollo usado por el responsable es Ubuntu/Linux.
-- **Identificación:** alias temporal, no identidad académica persistente.
-- **Transmisión:** la captura y el permiso dependen del navegador; el estudiante debe realizar una acción explícita para autorizarla. El vídeo no debe enviarse mientras el estudiante espera en la cola.
-- **Transporte de pantalla:** WebRTC entre navegadores; Socket.IO coordina la sesión y la señalización. El servidor no actúa como grabador ni almacena vídeo.
-- **Datos:** no hay base de datos ni historial permanente.
-- **Exportación de notas:** copiar/descargar está deshabilitado por defecto hasta validar su compatibilidad con RNF-002.
-
-La selección de arquitectura y sus límites se explican en [`docs/arquitectura/arquitectura-general.md`](docs/arquitectura/arquitectura-general.md) y los ADR enlazados desde [`docs/README.md`](docs/README.md).
+Para detalle, consulta [la arquitectura implementada](docs/arquitectura/implementacion-v0.5.0.md), el [alcance revisado](docs/producto/alcance-MVP-redisenio-v1.2.md) y la [enmienda al SRS](docs/requisitos/SRS-enmienda-modelo-servidor-proyeccion-v0.4.0.md).
 
 ## Incremento beta v0.4.0: archivos temporales
 
-El docente y los estudiantes pueden **subir, consultar y descargar archivos durante la sesión**, con pestañas y permisos diferenciados. Los archivos se guardan temporalmente en el disco del anfitrión y se eliminan al cerrar la sesión; no existe historial permanente ni base de datos. La proyección sigue siendo prioritaria.
-
-- **Límites:** 50 MB por archivo, 200 MB por selección, 10 GB por sesión y dos transferencias simultáneas por participante.
-- **Transferencias:** HTTP con progreso de subida, descargas individuales o varios archivos como ZIP; notificaciones de cambios por Socket.IO. Carga fallida = reintento manual desde el inicio.
-- **Privacidad:** las rutas HTTP requieren token temporal de sesión; el docente elimina cualquiera y el estudiante solo los suyos. Los archivos no se ofrecen mediante el directorio público.
-- **Limitaciones:** el ajuste de caudal durante la proyección es experimental y requiere pruebas reales; la limpieza tras un cierre forzoso y el cambio de proyección A→B siguen pendientes de validación.
-
-Consulta la [arquitectura implementada del módulo](docs/arquitectura/modulo-archivos-v0.4.0.md), el [alcance v1.1](docs/producto/alcance-MVP-y-product-backlog-base-v1.1.md) y los [resultados de pruebas v0.4.0](docs/pruebas/resultado-beta-040.md).
+Se conserva la gestión de archivos de v0.4.0: máximo 50 MB por archivo, 200 MB por selección, 10 GB por sesión, dos transferencias simultáneas por usuario, descargas individuales y ZIP, permisos de eliminación por rol y actualizaciones con Socket.IO. El docente y los alumnos pueden utilizar archivos incluso cuando no hay docente conectado. Las descargas ahora se inician sin navegar fuera de `/docente`. Consulta [arquitectura de archivos](docs/arquitectura/modulo-archivos-v0.4.0.md).
 
 ## Acceso e identidad visual por rol
 
-La aplicación ofrece rutas directas: **`/docente`** muestra el acceso del docente y **`/alumno`** muestra el acceso del estudiante. Ambas rutas sirven la misma aplicación y comparten el servidor y el estado temporal; `/` conserva el selector general. `npm run start:docente` inicia el servidor y trata de abrir automáticamente la vista docente en el equipo anfitrión. Los estudiantes entran con la IP LAN del anfitrión y la ruta `/alumno`.
-
-Las paletas azul oscuro (docente) y verde azulado (estudiante) están implementadas provisionalmente, pero **siguen pendientes de aprobación visual**. La ruta `/docente` se bloquea para solicitudes que llegan desde una dirección remota; `/index.html` y `/` tampoco permiten saltarse la selección de ruta. Esto restringe el acceso HTTP a la vista y el inicio de la sesión docente desde clientes remotos. No equivale a autenticación institucional fuerte: los demás eventos Socket.IO deben seguir protegidos mediante autorización del servidor. No expongas el servicio fuera de la LAN prevista. Las decisiones se registran en [ADR-004](docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md), [ADR-005](docs/arquitectura/decisiones/ADR-005-rutas-por-rol.md), [ADR-006](docs/arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md) y [ADR-007](docs/arquitectura/decisiones/ADR-007-paletas-por-rol.md).
+- `/docente`: accesible desde la LAN; el **primer navegador** obtiene el control cuando está libre. Un acceso nuevo sin credencial recibe HTTP 423 si está ocupado. No existe contraseña docente, por decisión del producto: **otra persona en la LAN puede apropiarse del rol si llega primero**.
+- `/alumno`: ingreso mediante código y alias.
+- `/proyeccion`: disponible **solo por loopback** desde la computadora fija y abierta en modo quiosco. No expone la transmisión a estaciones remotas.
+- `/`: redirige a `/alumno`. Credencial docente privada en cookie `HttpOnly; SameSite=Strict` y `Secure` en HTTPS; el código de clase no da permisos administrativos.
 
 ## Flujo de presentación de pantalla
 
-1. El estudiante entra a la sesión con el código y un alias temporal.
-2. Cuando desea solicitar turno, pulsa **Solicitar turno / autorizar pantalla** y acepta la selección de captura en el navegador.
-3. La solicitud se añade a la cola por orden de llegada. Mientras espera, no debe existir transmisión de vídeo.
-4. El docente concede el turno desde la cola, o selecciona directamente a cualquier participante para darle prioridad.
-5. Solo el estudiante seleccionado y que ya autorizó la captura negocia WebRTC con el docente.
-6. Al cambiar de estudiante, detener la proyección o terminar la captura, se debe cerrar la conexión anterior y evitar que el estudiante anterior siga transmitiendo.
-7. Al terminar su presentación, el estudiante puede volver a solicitar turno si desea presentar otra vez.
+1. Docente autoriza su captura una vez mediante un gesto del navegador y el receptor del servidor muestra su pantalla predeterminada.
+2. Alumno solicita entrar a la cola sin capturar ni transmitir video; el docente autoriza desde la cola o elige directamente.
+3. El alumno recibe un aviso y pulsa «Autorizar pantalla» o «Rechazar». El navegador solicita permiso de captura solo si acepta.
+4. El servidor autoriza una fuente exclusiva y cambia la negociación WebRTC hacia `/proyeccion`. Al detener el estudiante o perderse su conexión, vuelve a la pantalla del docente si está disponible.
+5. Si el docente pierde conexión, continúa cualquier presentación estudiantil ya autorizada; las solicitudes siguientes permanecen en cola pero nadie recibe permiso automáticamente.
+6. Al cerrar explícitamente la sesión se invalidan credenciales, cortan transferencias y elimina contenido temporal.
 
-**Defecto conocido por validar:** se reportó que, después de mostrar correctamente al estudiante A y pasar al estudiante B, la proyección de B no aparece. La cola y la exclusividad están implementadas en el código, pero ese cambio de turno no debe considerarse resuelto hasta completar una prueba real y corregir el problema si se reproduce. Consulta [`docs/arquitectura/decisiones/ADR-003-cola-presentacion.md`](docs/arquitectura/decisiones/ADR-003-cola-presentacion.md).
+**Importante:** la incidencia histórica de cambio de alumno A→B requiere prueba de WebRTC y proyector físicos antes de considerarse corregida.
 
 ## Requisitos y puesta en marcha
 
-- Node.js 20 o posterior recomendado.
-- npm.
-- Navegador moderno compatible con `getDisplayMedia()` y WebRTC.
-- Equipos conectados a la misma LAN.
-
-Desde la carpeta del proyecto:
+Se requiere Node.js 20+, npm, certificados confiables en la LAN y navegador Chromium/Chrome/Edge en el equipo fijo. Los clientes remotos deben confiar en HTTPS antes de utilizar `getDisplayMedia`.
 
 ```bash
-npm install
+npm ci
 npm test
-```
-
-En la computadora anfitriona del docente, inicia el servicio con apertura automática del acceso docente y detección de direcciones LAN:
-
-```bash
-npm run start:docente
-```
-
-Antes de iniciar por primera vez, prepara el certificado HTTPS:
-
-```bash
 npm run setup:https
+npm run start:servidor
 ```
 
-Este comando utiliza OpenSSL en Linux de forma predeterminada. También puedes usar `INTERLAB_CERT_PROVIDER=mkcert npm run setup:https` si tienes mkcert instalado. Consulta [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md). Después ejecuta `npm run start:docente`: se abrirá `https://localhost:3000/docente` y la consola imprimirá direcciones `https://IP-LAN-DEL-DOCENTE:3000/alumno`. No uses `localhost` desde equipos cliente. Si cambia la IP LAN, vuelve a generar el certificado. No compartas ninguna clave privada.
-
-HTTPS está habilitado por defecto. La variable `HTTPS_ENABLED=false` existe únicamente para las pruebas HTTP locales automatizadas; no debe usarse para la proyección desde alumnos remotos.
-
-La guía detallada está en [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md). No expongas el servicio directamente a Internet.
+En otra terminal **del equipo fijo** ejecuta `npm run start:receptor` para abrir la pantalla de espera en modo quiosco. Para lanzar ambos procesos en una prueba local, el alias heredado `npm run start:docente` ahora **abre `/proyeccion`, no `/docente`**. En Linux se incluye `bash scripts/install-linux-autostart.sh` para configurar autoarranque de servicio y receptor gráfico al iniciar la sesión. Se requiere configuración del SO, sesión gráfica y ubicación de la ventana sobre el proyector. Consulta [guía de despliegue v0.5.0](docs/desarrollo/despliegue-servidor-fijo-v0.5.0.md).
 
 ## Pruebas
 
-```bash
-npm test
-```
-
-Las 23 pruebas automatizadas incluidas cubren sesión, roles, red, cola y operaciones del módulo de archivos. No sustituyen las pruebas manuales de captura de pantalla, WebRTC, cambio de A a B, permisos del navegador, pantalla completa, desconexiones y funcionamiento real en la LAN.
+`npm test` ejecuta tests unitarios e integraciones HTTP/Socket.IO: identidad docente, 90 s, cola, concesión, cambio de fuente, archivos y limpieza al arrancar. Se necesitan pruebas manuales adicionales en la LAN, Windows, proyección real, caudal y cortes de red. Consulta [resultado verificado](docs/pruebas/resultado-beta-050.md).
 
 ## Documentación
 
-- [`docs/README.md`](docs/README.md): índice, autoridad documental y reglas de actualización.
-- [`docs/requisitos/SRS-original.pdf`](docs/requisitos/SRS-original.pdf): fuente original de requisitos.
-- [`docs/producto/alcance-MVP-y-product-backlog-base.md`](docs/producto/alcance-MVP-y-product-backlog-base.md): alcance y trazabilidad con el SRS.
-- [`docs/producto/backlog-observaciones.md`](docs/producto/backlog-observaciones.md): historias de retroalimentación oral y notas.
-- [`docs/arquitectura/arquitectura-general.md`](docs/arquitectura/arquitectura-general.md): componentes y límites técnicos.
-- [`docs/arquitectura/decisiones/ADR-001-arquitectura-local.md`](docs/arquitectura/decisiones/ADR-001-arquitectura-local.md): plataforma y despliegue local.
-- [`docs/arquitectura/decisiones/ADR-002-gestion-observaciones.md`](docs/arquitectura/decisiones/ADR-002-gestion-observaciones.md): retroalimentación oral y notas opcionales.
-- [`docs/arquitectura/decisiones/ADR-003-cola-presentacion.md`](docs/arquitectura/decisiones/ADR-003-cola-presentacion.md): cola, concesión y exclusividad de presentación.
-- [`docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md`](docs/arquitectura/decisiones/ADR-004-acceso-y-identidad-visual-por-rol.md): pantallas de acceso por rol.
-- [`docs/arquitectura/decisiones/ADR-005-rutas-por-rol.md`](docs/arquitectura/decisiones/ADR-005-rutas-por-rol.md): rutas `/docente` y `/alumno`.
-- [`docs/arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md`](docs/arquitectura/decisiones/ADR-006-apertura-automatica-vista-docente.md): arranque del anfitrión.
-- [`docs/arquitectura/decisiones/ADR-007-paletas-por-rol.md`](docs/arquitectura/decisiones/ADR-007-paletas-por-rol.md): paletas provisionales pendientes de aprobación.
-- [`docs/arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md`](docs/arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md): detección de IP local y restricción de la ruta docente al anfitrión.
-- [`docs/diseno/proyeccion-pantalla-y-cola.md`](docs/diseno/proyeccion-pantalla-y-cola.md): flujo detallado de presentación.
-- [`docs/diseno/acceso-y-paletas-por-rol.md`](docs/diseno/acceso-y-paletas-por-rol.md): diseño de las pantallas de acceso.
-- [`docs/diseno/observaciones-individuales.md`](docs/diseno/observaciones-individuales.md): comportamiento de las notas.
-- [`docs/pruebas/trazabilidad-y-pruebas.md`](docs/pruebas/trazabilidad-y-pruebas.md): casos de prueba propuestos.
-- [`docs/pruebas/resultados/estado-inicial.md`](docs/pruebas/resultados/estado-inicial.md): estado conocido de validación.
-- [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md): instalación y pruebas manuales.
-- [`docs/arquitectura/decisiones/ADR-009-https-lan.md`](docs/arquitectura/decisiones/ADR-009-https-lan.md): HTTPS confiable para captura desde la LAN.
-- [`CHANGELOG.md`](CHANGELOG.md): historial de cambios; versión actual 0.4.0.
+Índice principal: [`docs/README.md`](docs/README.md). Se conserva la organización `docs/requisitos`, `docs/producto`, `docs/arquitectura`, `docs/diseno`, `docs/pruebas` y `docs/desarrollo`, junto con los documentos Word del rediseño y los documentos de alcance v1.1. El SRS original no ha sido sobrescrito.
 
 ## Límites conocidos
 
-- No hay autenticación institucional fuerte del docente; el token de sesión no sustituye una solución de identidad institucional.
-- La captura de pantalla depende del navegador, de permisos explícitos y de un contexto seguro.
-- HTTPS sigue habilitado por defecto en v0.4.0; el generador OpenSSL produce un certificado autofirmado y la confianza en los clientes debe revisarse. mkcert está disponible como alternativa. La integración real de Firefox/Windows sigue pendiente.
-- Se ha reportado un fallo al cambiar de la presentación de un estudiante a la de otro. Sigue pendiente de reproducción y corrección verificada.
-- Las rutas de acceso y el descubrimiento de direcciones cuentan con pruebas unitarias básicas; falta probar el bloqueo remoto de `/docente`, la apertura automática en el sistema anfitrión y el acceso real desde equipos cliente en LAN.
-- El botón de pantalla completa existe, pero debe validarse en los navegadores objetivo si satisface la expectativa de ampliar la vista de presentación completa, no solamente el elemento de vídeo.
-- Las observaciones se eliminan al finalizar la sesión; al desconectarse un estudiante se eliminan también sus notas.
-- Copiar/descargar notas queda deshabilitado por defecto hasta resolver formalmente RNF-002.
-- No hay base de datos, historial de sesiones ni integración con plataformas académicas.
+- El primer acceso sin contraseña **no comprueba que sea realmente un profesor**; utilizar solo una LAN confiable y una configuración operativa controlada.
+- El navegador no puede compartir automáticamente pantalla sin acción del usuario; al cerrar la pestaña será necesario autorizar de nuevo la captura.
+- El alumno que se desconecta debe reincorporarse y puede perder capacidad de eliminar archivos de su conexión anterior (el docente sí podrá hacerlo).
+- No se incluye grabación, base de datos, servidor de medios ni soporte WAN. Los clientes Windows y el proyector físico requieren validación de laboratorio.

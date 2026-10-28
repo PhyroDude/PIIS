@@ -1,5 +1,5 @@
 'use strict';
-// InterLAB v0.4.0: ninguna credencial se escribe en el DOM ni en almacenamiento persistente.
+// InterLAB v0.5.0: ninguna credencial se escribe en el DOM ni en almacenamiento persistente.
 let fileToken = null;
 let currentFiles = [];
 let currentFileRole = null;
@@ -110,8 +110,10 @@ function setZipState() {if(currentFileRole)$(`${filePrefix()}Zip`).disabled=file
 async function downloadFiles(ids) {
   try{
     const result=await filesRequest('/tickets',{method:'POST',body:{ids}});
-    const link=document.createElement('a');link.href=result.url;link.rel='noreferrer';
-    document.body.append(link);link.click();link.remove();
+    // Una descarga nunca debe navegar fuera de /docente ni interrumpir su sesión.
+    const frame=document.createElement('iframe');frame.hidden=true;
+    frame.setAttribute('aria-hidden','true');frame.src=result.url;
+    document.body.append(frame);
     fileStatus(ids.length===1?'Descarga iniciada en el navegador.':'El navegador inició la descarga ZIP.');
   }catch(error){fileStatus(error.message,true);}
 }

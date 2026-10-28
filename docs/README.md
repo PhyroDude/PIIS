@@ -1,6 +1,6 @@
 # Índice y reglas de documentación
 
-Esta carpeta documenta el Sistema local de retroalimentación. La base funcional original es **v0.3.0** y la versión actual es **InterLAB v0.4.0 beta**, construida sobre PIIS **v0.3.4**. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
+Esta carpeta documenta el Sistema local de retroalimentación. La base histórica adoptada es **PIIS v0.3.4**; la versión actual de código es **InterLAB v0.5.0 beta**, posterior a la beta v0.4.0. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
 
 ## Orden de autoridad
 
@@ -43,6 +43,19 @@ Esta carpeta documenta el Sistema local de retroalimentación. La base funcional
 - [Diagramas: componentes](diseno/arquitectura-archivos-componentes.png) y [flujos](diseno/arquitectura-archivos-flujos.png).
 - [Plan de pruebas](pruebas/plan-pruebas-arquitectura-archivos.md) y [resultado beta](pruebas/resultado-beta-040.md).
 - [Integración documental de v0.4.0](desarrollo/INTEGRACION-v0.4.0.md).
+
+
+## Implementación beta v0.5.0 — servidor y receptor independientes
+
+- [Arquitectura implementada](arquitectura/implementacion-v0.5.0.md) — sesión independiente de pestaña, credencial docente, recuperación, receptor y permisos exclusivos WebRTC.
+- [Arquitectura objetivo del rediseño](arquitectura/arquitectura-objetivo-servidor-y-proyeccion-v0.4.0.md) — referencia del diseño preparado antes de la implementación.
+- [Enmienda al SRS](requisitos/SRS-enmienda-modelo-servidor-proyeccion-v0.4.0.md), [alcance v1.2](producto/alcance-MVP-redisenio-v1.2.md) y [backlog de rediseño](producto/backlog-redisenio-v0.4.0.md).
+- [Alcance implementado v0.5.0](producto/alcance-implementado-v0.5.0.md) — distingue requisitos, código y validaciones pendientes.
+- [ADR-015 a ADR-020](arquitectura/registro-decisiones-redisenio-v0.4.0.md) — decisiones confirmadas de servidor fijo, credenciales, turnos, cola y limpieza.
+- [Despliegue y autoarranque](desarrollo/despliegue-servidor-fijo-v0.5.0.md) y [pruebas de v0.5.0](pruebas/resultado-beta-050.md).
+- Se conservan en `documentos_word/` el SRS enmendado, el alcance y la arquitectura del rediseño (preparados previamente), además de las referencias del módulo de archivos y alcance v1.1.
+
+Los documentos que describen el *modelo objetivo para futura implementación* se conservan como historial de decisiones; para el estado funcional ver la arquitectura implementada de v0.5.0.
 
 ## Cómo actualizar la documentación
 

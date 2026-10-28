@@ -1,13 +1,16 @@
 {
   "name": "interlab",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
-  "description": "InterLAB 0.4.0 — proyección en LAN y módulo beta de archivos temporales.",
+  "description": "InterLAB v0.5.0 — servidor independiente, recuperación docente y proyección WebRTC en receptor fijo.",
   "scripts": {
     "start": "node server.js",
     "test": "node --test",
     "start:docente": "node start-docente.js",
-    "setup:https": "node scripts/setup-https.js"
+    "setup:https": "node scripts/setup-https.js",
+    "start:servidor": "node server.js",
+    "start:receptor": "node scripts/open-receptor.js",
+    "release:docente": "node scripts/release-docente.js"
   },
   "dependencies": {
     "express": "^5.1.0",

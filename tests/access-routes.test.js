@@ -43,9 +43,13 @@ test('las rutas /docente y /alumno sirven la aplicación', async t => {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   assert.equal(ready, true, 'el servidor debe iniciar');
-  for (const route of ['/docente', '/alumno']) {
-    const response = await get(`${base}${route}`);
-    assert.equal(response.status, 200, `${route} debe responder HTTP 200`);
-    assert.match(response.body, /InterLAB/);
+  // El primer acceso docente ya reservó una credencial; los otros navegadores
+  // no pueden apropiarse del rol mediante una nueva petición sin cookie.
+  const denied=await get(`${base}/docente`);
+  assert.equal(denied.status,423);
+  for(const route of ['/alumno','/proyeccion']){
+    const response=await get(`${base}${route}`);
+    assert.equal(response.status,200);
+    assert.match(response.body,/InterLAB/);
   }
 });

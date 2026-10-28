@@ -6,6 +6,7 @@ const os=require('node:os');
 const path=require('node:path');
 const {spawn}=require('node:child_process');
 const net=require('node:net');
+const WS=require('ws');
 
 async function freePort(){return new Promise((resolve,reject)=>{const s=net.createServer();s.on('error',reject);s.listen(0,'127.0.0.1',()=>{const {port}=s.address();s.close(error=>error?reject(error):resolve(port));});});}
 class SocketClient {
@@ -21,8 +22,8 @@ class SocketClient {
       }
     });
   }
-  static connect(base){return new Promise((resolve,reject)=>{
-    const ws=new WebSocket(`${base.replace(/^http/,'ws')}/socket.io/?EIO=4&transport=websocket`);
+  static connect(base,cookie){return new Promise((resolve,reject)=>{
+    const ws=new WS(`${base.replace(/^http/,'ws')}/socket.io/?EIO=4&transport=websocket`,{headers:cookie?{Cookie:cookie}:{}});
     const client=new SocketClient(ws);client.ready=()=>resolve(client);
     ws.onerror=()=>reject(Error('No se pudo conectar socket.io'));
   });}
@@ -46,11 +47,13 @@ test('API HTTP autenticada: roles, límites, descargas, ZIP, limpieza y revocaci
   const base=`http://127.0.0.1:${port}`;
   const sockets=[];
   t.after(async()=>{for(const s of sockets)s.close();child.kill('SIGTERM');await new Promise(resolve=>child.once('exit',resolve));await fs.promises.rm(root,{recursive:true,force:true});});
-  let available=false;
-  for(let i=0;i<70;i++)try{const response=await fetch(base+'/docente');if(response.ok){available=true;break;}}catch{await new Promise(resolve=>setTimeout(resolve,60));}
+  let available=false,docResponse=null;
+  for(let i=0;i<70;i++)try{docResponse=await fetch(base+'/docente');if(docResponse.ok){available=true;break;}}catch{await new Promise(resolve=>setTimeout(resolve,60));}
   assert.equal(available,true,output);
   const unauthorized=await fetch(base+'/api/files');assert.equal(unauthorized.status,401);
-  const teacher=await SocketClient.connect(base);sockets.push(teacher);
+  const cookie=docResponse.headers.get('set-cookie').split(';')[0];
+  const teacher=await SocketClient.connect(base,cookie);sockets.push(teacher);
+  assert.equal((await teacher.emit('teacher:attach',{})).ok,true);
   const created=await teacher.emit('teacher:create-session');assert.equal(created.ok,true);
   const studentA=await SocketClient.connect(base);sockets.push(studentA);
   const joinedA=await studentA.emit('student:join',{code:created.code,alias:'Ana'});assert.equal(joinedA.ok,true);
@@ -78,5 +81,5 @@ test('API HTTP autenticada: roles, límites, descargas, ZIP, limpieza y revocaci
   const old=await api(base,joinedB.fileToken,'/');assert.equal(old.status,401);
   await new Promise(resolve=>setTimeout(resolve,100));
   const rootDirs=fs.existsSync(path.join(root,'files'))?fs.readdirSync(path.join(root,'files')):[];
-  assert.deepEqual(rootDirs,[]);
+  assert.equal(rootDirs.some(x=>/^[a-f0-9]{8}-/.test(x)),false);
 });

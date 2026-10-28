@@ -1,5 +1,17 @@
 # InterLAB — Historial de cambios
 
+## 0.5.0 (beta) — Servidor fijo, receptor y recuperación docente
+
+- Rediseño sobre v0.4.0 y documentos de rediseño v0.4.0: equipo fijo ejecuta Node.js y una vista receptora `/proyeccion` conectada al proyector. La laptop del profesor utiliza `/docente` desde la LAN, sin restricciones loopback.
+- Primer acceso adquiere la credencial administrativa privada `HttpOnly; SameSite=Strict; Secure` cuando opera HTTPS. Recuperación automática de sesión del mismo navegador, reconexión docente 90 s (30 s sin temporizador + 60 s con cuenta regresiva), rotación de credencial al expirar y permanencia de la sesión.
+- Docente es fuente WebRTC predeterminada; el alumno solicita turno **sin capturar** y autoriza la captura solamente después de concesión, con aviso de aceptación/rechazo. El servidor valida época y emisor único para señalización hacia el receptor local.
+- Se permiten ingreso y operaciones de archivos sin docente, y se mantiene una proyección estudiantil ya autorizada; ninguna petición nueva se autoriza sin docente. Desconexión estudiantil retira turno y cola.
+- Limpieza de directorios temporales UUID huérfanos al arrancar; recuperación administrativa excepcional por comando local protegido con secreto en disco 0600.
+- Fix de descargas: `iframe` oculto para no abandonar `/docente`. Conserva archivos, notas y documentación histórica; incluye nuevas pruebas y guía Linux para autoarranque.
+- **No verificado físicamente:** HTTPS confiable y WebRTC en LAN Windows, A→B, salida al proyector, desempeño, inicio gráfico tras encendido, seguridad operativa del primer acceso.
+
+---
+
 ## 0.4.0 (beta) — Módulo temporal de archivos
 
 - **Nueva base oficial:** `PIIS(1).zip`, asignado por el responsable a **InterLAB v0.3.4**, reemplaza el punto de partida anterior. Se preservan HTTPS, rutas, control de sesión, cola y WebRTC.

@@ -93,7 +93,7 @@ test('limpia archivos y reserva al cerrar la sesión, incluso con una carga rese
   assert.throws(()=>store.list(student),/sesión activa/);
 });
 test('identidad HTTP temporal: token docente o estudiante, inválido tras desconexión',()=>{
-  const sessions=new SessionStore();const created=sessions.createSession('teacher');
+  const sessions=new SessionStore();const claim=sessions.claimTeacher();sessions.attachTeacher('teacher',claim.credential);const created=sessions.createSession('teacher');
   const joined=sessions.joinStudent('student1',created.code,'Ana');
   assert.equal(sessions.fileActor(created.token).role,'teacher');
   assert.equal(sessions.fileActor(joined.fileToken).role,'student');
