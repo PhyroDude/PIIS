@@ -6,7 +6,7 @@ test('crea una sesión con código temporal y no permite una segunda sesión', (
   const store = new SessionStore();
   const created = store.createSession('teacher-1');
   assert.equal(created.ok, true);
-  assert.match(created.code, /^[A-HJ-NP-Z2-9]{6}$/);
+  assert.match(created.code, /^[1-9]{4}$/);
   assert.equal(store.createSession('teacher-2').ok, false);
 });
 

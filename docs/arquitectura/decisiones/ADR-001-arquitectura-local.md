@@ -31,11 +31,7 @@ El sistema debe apoyar sesiones de laboratorio dentro de una red local, funciona
 
 - La computadora del docente debe permanecer encendida y conectada durante la sesión.
 - Debe definirse la dirección local que usarán los estudiantes y permitir el puerto del servicio únicamente en la red necesaria.
-<<<<<<< HEAD
 - La versión 0.3.3 incluye servidor HTTPS por defecto con certificado local generado mediante `mkcert`. Cada cliente debe confiar en la CA raíz; véase ADR-009.
-=======
-- La versión 0.3.5 incluye servidor HTTPS por defecto con certificado autofirmado generado mediante OpenSSL; véase ADR-009.
->>>>>>> 2f7796c (Integración de credenciales)
 - La compatibilidad de captura, WebRTC y pantalla completa depende de navegador, permisos, certificado y configuración de red.
 - El alias y el código temporal no son autenticación institucional fuerte.
 

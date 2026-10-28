@@ -61,7 +61,7 @@ $('teacherForm').onsubmit = event => {
   event.preventDefault();
   socket.emit('teacher:create-session', result => {
     if (!result.ok) return setMessage('teacherEntryMessage', result.error, true);
-    activeRole = 'teacher'; teacherToken = result.token;
+    activeRole = 'teacher'; teacherToken = result.token; fileToken = result.token; initializeFileModule('teacher');
     $('displayCode').textContent = result.code;
     hide('roles'); hide('teacherEntry'); show('teacherView');
     socket.emit('teacher:get-participants', { token: teacherToken }, r => { if (r.ok) renderParticipants(r.participants); });
@@ -72,7 +72,7 @@ $('studentForm').onsubmit = event => {
   event.preventDefault();
   socket.emit('student:join', { code: $('code').value, alias: $('alias').value }, result => {
     if (!result.ok) return setMessage('studentEntryMessage', result.error, true);
-    activeRole = 'student'; studentId = result.studentId;
+    activeRole = 'student'; studentId = result.studentId; fileToken = result.fileToken; initializeFileModule('student');
     $('joinedAlias').textContent = result.alias;
     hide('roles'); hide('studentEntry'); show('studentView'); refreshStudentNotes();
     if (!window.APP_CONFIG?.allowNoteExport) $('exportStatus').textContent = 'Copiar y descargar están deshabilitados hasta validar formalmente su compatibilidad con el RNF-002.';
@@ -265,17 +265,17 @@ $('fullscreen').onclick = async () => {
 };
 
 $('end').onclick = () => {
-  if (!confirm('¿Finalizar la sesión? Todas las observaciones temporales se eliminarán.')) return;
+  if (!confirm('¿Finalizar la sesión? Se interrumpirán todas las transferencias y se eliminarán los archivos y observaciones temporales del servidor.')) return;
   socket.emit('teacher:end-session', { token: teacherToken }, result => {
     if (!result.ok) return setMessage('teacherMessage', result.error, true);
-    teacherToken = null; activeRole = null; selectedStudentId = null; stopTeacherView();
+    teacherToken = null; activeRole = null; selectedStudentId = null; clearFileModule(); stopTeacherView();
     hide('teacherView'); showRolePicker(); showNotice('Sesión finalizada. Se eliminó el estado temporal.');
   });
 };
 socket.on('session:ended', result => {
   if (!activeRole) return;
   const wasStudent = activeRole === 'student';
-  activeRole = null; teacherToken = null; selectedStudentId = null;
+  activeRole = null; teacherToken = null; selectedStudentId = null; clearFileModule();
   stopTeacherView(); stopStudentStream();
   hide('teacherView'); hide('studentView'); showRolePicker(); showNotice(result.message);
   if (wasStudent) { studentNotes = []; $('studentNotes').replaceChildren(); }

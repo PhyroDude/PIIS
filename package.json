@@ -1,13 +1,13 @@
 {
-  "name": "sistema-local-retroalimentacion",
-  "version": "0.3.5",
+  "name": "interlab",
+  "version": "0.4.0",
   "private": true,
-  "description": "MVP local de retroalimentación para laboratorios de cómputo; estado temporal en memoria.",
+  "description": "InterLAB 0.4.0 — proyección en LAN y módulo beta de archivos temporales.",
   "scripts": {
     "start": "node server.js",
     "test": "node --test",
     "start:docente": "node start-docente.js",
-    "setup:https": "bash scripts/setup-https-linux.sh"
+    "setup:https": "node scripts/setup-https.js"
   },
   "dependencies": {
     "express": "^5.1.0",

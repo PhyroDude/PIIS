@@ -11,11 +11,7 @@ Este documento distingue las pruebas automatizadas de las pruebas reales entre n
 - **Captura/WebRTC entre equipos:** pendiente de validación manual en la LAN.
 - **Cambio de presentador A→B:** defecto reportado; al seleccionar B después de A, la pantalla de B no aparece. Sigue abierto hasta reproducir, corregir y volver a probar.
 - **Pantalla completa:** existe un control, pero falta comprobar en los navegadores objetivo si amplía el área que el usuario espera (vídeo o ventana de presentación completa).
-<<<<<<< HEAD
 - **HTTPS de la LAN:** la versión 0.3.3 incluye HTTPS con `mkcert`; queda pendiente validar la confianza del certificado y la captura en equipos Windows/Firefox reales.
-=======
-- **HTTPS de la LAN:** la versión 0.3.5 incluye HTTPS con certificado autofirmado de OpenSSL; queda pendiente validar el contexto seguro y la captura en equipos Windows/Firefox reales.
->>>>>>> 2f7796c (Integración de credenciales)
 - **Autorización al incorporarse:** decisión de producto por revisar frente a la implementación, que solicita la captura cuando el estudiante pulsa el botón.
 - **Exportación de notas:** deshabilitada por defecto, pendiente de validación formal con RNF-002.
 

@@ -3,8 +3,10 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { Server } = require('socket.io');
 const { SessionStore, MAX_STUDENTS } = require('./src/session-store');
+const { FileStore } = require('./src/file-store');
 const { getLanIPv4Addresses, isLoopbackAddress } = require('./src/network-addresses');
 
 const app = express();
@@ -27,6 +29,18 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '0.0.0.0';
 const ENABLE_NOTE_EXPORT = process.env.ENABLE_NOTE_EXPORT === 'true';
 const store = new SessionStore();
+const fileStore = new FileStore({
+  rootDir: process.env.INTERLAB_FILES_DIR || path.join(os.tmpdir(), 'interlab-temp-files', String(process.pid)),
+  onChange: () => io.emit('files:changed'),
+  isOwnerConnected: (owner,sid) => { const [role,id]=owner.split(':'); return store.getRole(id)?.sid===sid && store.getRole(id)?.role===role; },
+  onCapacity: warning => { if (store.session) io.to(store.session.teacher).emit('files:capacity-alert', { warning }); },
+  isProjectionActive: () => Boolean(store.session?.selectedStudent && store.session?.screenReady.has(store.session.selectedStudent)),
+  projectionBytesPerSecond: Number(process.env.INTERLAB_FILE_BPS_DURING_PROJECTION || 1024 * 1024)
+});
+
+
+const fileCleanupTimer = setInterval(() => fileStore.expireBatches(),60_000);
+fileCleanupTimer.unref();
 
 // La vista docente solo se sirve a conexiones locales del anfitrión. Los equipos
 // cliente de la LAN deben entrar por /alumno. Esto limita la ruta, pero no sustituye
@@ -48,6 +62,43 @@ app.get('/index.html', (req, res) => res.redirect(302, isLoopbackAddress(req.soc
 app.get('/config.js', (_req, res) => {
   res.type('application/javascript').send(`window.APP_CONFIG = ${JSON.stringify({ allowNoteExport: ENABLE_NOTE_EXPORT })};`);
 });
+// API de archivos: credenciales efímeras en cabecera Authorization; los binarios
+// se almacenan fuera de public/ y no se serializan mediante Socket.IO.
+const filesApi = express.Router();
+filesApi.use(express.json({ limit: '64kb' }));
+filesApi.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  const token = /^Bearer (.{1,200})$/i.exec(req.get('Authorization') || '')?.[1];
+  const actor = store.fileActor(token);
+  if (!actor) return res.status(401).json({ ok: false, error: 'Acceso a archivos no autorizado.' });
+  req.fileActor = actor;
+  next();
+});
+function apiError(res, error) {
+  if (res.destroyed || res.headersSent) { if (!res.destroyed) res.destroy(); return; }
+  const status = error?.status && Number.isInteger(error.status) ? error.status : 500;
+  if (status === 500) console.error('Error del módulo de archivos:', error);
+  res.status(status).json({ ok:false, code:error?.code || 'ERROR', error:status===500?'No se pudo completar la operación.':error.message });
+}
+function runApi(handler) { return (req,res) => {
+  try {
+    const work = Promise.resolve(handler(req,res));
+    fileStore.track(work).catch(error => apiError(res,error));
+  } catch(error) { apiError(res,error); }
+}; }
+filesApi.get('/', runApi((req,res) => res.json({ok:true,files:fileStore.list(req.fileActor)})));
+filesApi.post('/batches', runApi((req,res) => res.json({ok:true,...fileStore.reserve(req.fileActor,req.body?.files)})));
+filesApi.put('/batches/:batch/:file', runApi(async(req,res) => {
+  const result = await fileStore.upload(req.fileActor,req.params.batch,req.params.file,req,res);
+  if(!res.destroyed)res.json(result);
+}));
+filesApi.delete('/:id', runApi(async(req,res) => res.json(await fileStore.delete(req.fileActor,req.params.id))));
+filesApi.post('/tickets', runApi((req,res) => res.json({ok:true,...fileStore.ticket(req.fileActor,req.body?.ids)})));
+// El ticket de descarga es aleatorio, caduca en 60 s y se consume una sola vez.
+app.get('/api/files/download/:ticket', runApi(async(req,res) => fileStore.download(req.params.ticket,req,res)));
+app.use('/api/files', filesApi);
 app.use(express.static(path.join(__dirname, 'public')));
 
 function reply(callback, result) { if (typeof callback === 'function') callback(result); }
@@ -61,6 +112,7 @@ function endActiveSession(message) {
   if (!current) return;
   io.emit('session:ended', { message });
   io.emit('screen:stop');
+  fileStore.endSession().catch(error => console.error('Error al limpiar los archivos temporales:', error));
   store.endSession();
 }
 
@@ -69,7 +121,9 @@ io.on('connection', socket => {
     // Solo un navegador ejecutado en el propio host puede crear la sesión docente.
     if (!isLoopbackAddress(socket.handshake.address)) return reply(callback, { ok: false, error: 'La sesión docente solo puede iniciarse desde la computadora anfitriona.' });
     if (store.getRole(socket.id)) return reply(callback, { ok: false, error: 'Este navegador ya tiene un rol asignado en la sesión.' });
-    reply(callback, store.createSession(socket.id));
+    const result = store.createSession(socket.id);
+    if (result.ok) fileStore.startSession(store.session.id);
+    reply(callback, result);
   });
 
   socket.on('student:join', (payload = {}, callback) => {
@@ -174,6 +228,7 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     if (store.session?.selectedStudent === socket.id) io.to(store.session.teacher).emit('screen:student-stopped');
+    fileStore.disconnectOwner(socket.id);
     const result = store.removeSocket(socket.id);
     if (!result.changed) return;
     if (result.ended) endActiveSession('Se perdió la conexión del docente; la sesión se cerró.');
@@ -193,4 +248,17 @@ server.listen(PORT, HOST, () => {
     console.log('No se detectó una dirección IPv4 LAN. Comprueba la conexión de red del anfitrión.');
   }
 });
-module.exports = { app, server, io, store };
+// Liberar temporales al detener normalmente el proceso (Ctrl+C, cierre del servicio).
+let shuttingDown = false;
+async function gracefulShutdown() {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  try { await fileStore.endSession(); }
+  catch (error) { console.error('No se pudo limpiar el almacenamiento temporal:', error); }
+  io.close();
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 1500).unref();
+}
+for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, gracefulShutdown);
+
+module.exports = { app, server, io, store, fileStore };
