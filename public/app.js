@@ -192,7 +192,6 @@ $('startShare').onclick = async () => {
 $('stopShare').onclick = stopStudentStream;
 socket.on('screen:stop', () => {
   if (activeRole === 'student') {
-    closeProjectionNotice();
     // Cerrar el peer corta el envío de paquetes de vídeo; conservamos la captura
     // autorizada para no pedir al alumno permiso otra vez en cada selección.
     studentHasSelection = false;
@@ -206,42 +205,10 @@ socket.on('screen:cleared', () => { if (activeRole === 'teacher') { selectedStud
 $('stopPresentation').onclick = () => socket.emit('teacher:stop-presentation', { token: teacherToken }, result => {
   if (!result?.ok) setMessage('teacherMessage', result?.error || 'No se pudo detener la proyección.', true);
 });
-function closeProjectionNotice() {
-  hide('projectionNotice');
-}
-
-$('projectionNoticeClose').onclick = closeProjectionNotice;
-
-$('projectionNoticeAction').onclick = () => {
-  const needsPermission = !studentStream;
-
-  closeProjectionNotice();
-
-  if (needsPermission) {
-    $('startShare').click();
-  }
-};
-
 socket.on('screen:requested', () => {
-  if (activeRole !== 'student') return;
-
   studentHasSelection = true;
-
-  const needsPermission = !studentStream;
-
-  $('projectionNoticeText').textContent = needsPermission
-    ? 'Tu docente solicita que presentes tu pantalla. Pulsa «Autorizar pantalla» para elegir qué compartir.'
-    : 'Tu docente te ha seleccionado para presentar. Tu captura ya está autorizada y la proyección comenzará.';
-
-  $('projectionNoticeAction').textContent = needsPermission
-    ? 'Autorizar pantalla'
-    : 'Entendido';
-
-  show('projectionNotice');
-
-  $('studentScreenStatus').textContent = needsPermission
-    ? 'El docente te seleccionó, pero primero debes autorizar la captura de pantalla.'
-    : 'El docente está revisando tu pantalla.';
+  if (!studentStream) { $('studentScreenStatus').textContent = 'El docente te seleccionó, pero primero debes autorizar la captura de pantalla.'; return; }
+  $('studentScreenStatus').textContent = 'El docente está revisando tu pantalla.';
 });
 
 socket.on('screen:selected', ({ studentId: targetId, alias, waitingForAuthorization }) => {
@@ -306,7 +273,6 @@ $('end').onclick = () => {
   });
 };
 socket.on('session:ended', result => {
-  closeProjectionNotice();
   if (!activeRole) return;
   const wasStudent = activeRole === 'student';
   activeRole = null; teacherToken = null; selectedStudentId = null; clearFileModule();

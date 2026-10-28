@@ -1,6 +1,6 @@
 # InterLAB — Requisitos consolidados del módulo de gestión de archivos
 
-**Baseline del proyecto:** v0.3.0  
+**Baseline del proyecto:** InterLAB v0.3.4 (`PIIS(1).zip`); **versión de implementación del módulo:** v0.4.0  
 **Versión del documento:** 0.1  
 **Estado:** borrador consolidado para revisión  
 **Fecha:** 28 de octubre de 2026

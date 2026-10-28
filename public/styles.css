@@ -54,38 +54,3 @@ body.theme-student .intro aside{background:#e7f7f0;color:#175c3b}
 .storage-warning{background:#fff5e5;border:1px solid #f9be68;border-radius:8px;padding:12px;color:#8b4a00;font-size:13px}
 .file-empty{padding:20px;text-align:center;color:#64748b;border:1px solid #e2e8f0;border-radius:8px}
 .file-manager button:disabled{opacity:.45;cursor:not-allowed}
-/* Notificación de solicitud de proyección */
-
-.projection-notice {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-
-  width: min(380px, calc(100vw - 40px));
-  padding: 18px;
-
-  border: 2px solid #087f8c;
-  border-radius: 14px;
-
-  background: #fff;
-  color: #172033;
-
-  box-shadow: 0 12px 35px #17203340;
-  z-index: 1000;
-}
-
-.projection-notice p {
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 10px 0;
-}
-
-.projection-notice-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.projection-notice-actions button {
-  margin: 0;
-}

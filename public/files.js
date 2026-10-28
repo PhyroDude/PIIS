@@ -108,30 +108,12 @@ function renderFiles() {
 }
 function setZipState() {if(currentFileRole)$(`${filePrefix()}Zip`).disabled=fileSelected.size<2;}
 async function downloadFiles(ids) {
-  try {
-    const result = await filesRequest('/tickets', {
-      method: 'POST',
-      body: { ids }
-    });
-
-    // Iniciar la descarga sin navegar fuera de InterLAB.
-    const iframe = document.createElement('iframe');
-
-    iframe.style.display = 'none';
-    iframe.setAttribute('aria-hidden', 'true');
-    iframe.src = result.url;
-
-    document.body.appendChild(iframe);
-
-    fileStatus(
-      ids.length === 1
-        ? 'Descarga iniciada en el navegador.'
-        : 'El navegador inició la descarga ZIP.'
-    );
-
-  } catch (error) {
-    fileStatus(error.message, true);
-  }
+  try{
+    const result=await filesRequest('/tickets',{method:'POST',body:{ids}});
+    const link=document.createElement('a');link.href=result.url;link.rel='noreferrer';
+    document.body.append(link);link.click();link.remove();
+    fileStatus(ids.length===1?'Descarga iniciada en el navegador.':'El navegador inició la descarga ZIP.');
+  }catch(error){fileStatus(error.message,true);}
 }
 async function deleteFile(file) {
   if(!confirm(`¿Eliminar «${file.name}» de esta sesión?`))return;
