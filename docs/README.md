@@ -88,3 +88,7 @@ No sobrescribas el SRS para que coincida con el código. No marques WebRTC, pant
 
 - [Modal de notas personales (1000 caracteres)](desarrollo/modal-notas-personales-v0.5.0.md) — flujo de apertura, cancelación, envío y validación.
 - [Vista previa estática del panel docente](diseno/vista-previa-ui-docente.html) — incluye ejemplo interactivo del modal con datos ficticios.
+
+## Inicio automático del docente (ajuste v0.5.0)
+
+- [Acceso `/docente` y generación automática de sesión](producto/inicio-automatico-sesion-docente-v0.5.0.md): primera conexión, recuperación de sesión, cierre y captura voluntaria.

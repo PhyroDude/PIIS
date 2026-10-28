@@ -26,10 +26,10 @@
   </section>
 
   <section class="panel role-screen teacher-screen hidden" id="teacherEntry">
-    <div class="role-heading"><span class="role-symbol" aria-hidden="true">▤</span><div><small>ÁREA DOCENTE</small><h2>Acceso del docente</h2><p class="muted">Crea una sesión temporal para organizar la participación del grupo.</p></div></div>
-    <button id="teacherShareEntry" type="button" class="secondary" aria-pressed="false">Compartir pantalla de mi laptop</button><form id="teacherForm"><h3>Iniciar sesión docente</h3><p class="muted">Se creará una sesión nueva. El código generado permitirá que los estudiantes se incorporen.</p><button class="primary">Crear sesión temporal</button></form>
-    <button id="backFromTeacher" class="back-button" type="button">← Volver a elegir rol</button>
-    <p id="teacherEntryMessage" class="form-message" role="status" aria-live="polite"></p>
+    <div class="role-heading"><span class="role-symbol" aria-hidden="true">▤</span><div><small>ÁREA DOCENTE</small><h2>Conectando con InterLAB</h2><p class="muted">El servidor prepara automáticamente tu sesión y recupera la existente si vuelves a entrar.</p></div></div>
+    <p id="teacherEntryMessage" class="form-message" role="status" aria-live="polite">Estableciendo conexión con el servidor…</p>
+    <a id="reenterTeacher" href="/docente" class="secondary hidden">Entrar de nuevo a /docente</a>
+    <button id="backFromTeacher" class="back-button hidden" type="button">← Volver a elegir rol</button>
   </section>
 
   <section class="panel role-screen student-screen hidden" id="studentEntry">

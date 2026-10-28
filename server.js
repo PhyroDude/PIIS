@@ -161,17 +161,33 @@ io.on('connection',socket=>{
     receiverSocket=socket.id;socket.data.projectionReceiver=true;
     reply(callback,{ok:true});broadcastProjection();
   });
+  // La primera conexión docente autorizada crea automáticamente la sesión.
+  // Si ya existe (recarga, reconexión o reemplazo de docente), se recupera
+  // sin rotar el código, perder alumnos ni borrar archivos.
+  function ensureTeacherSession(){
+    if(store.session)return {ok:true,code:store.session.code,token:store.session.token,existing:true};
+    const created=store.createSession(socket.id);
+    if(created.ok)fileStore.startSession(store.session.id);
+    return created;
+  }
   socket.on('teacher:attach',(_payload,callback)=>{
     const result=store.attachTeacher(socket.id,cookies(socket.handshake.headers.cookie)[cookieName]);
     if(result.ok){
+      const session=ensureTeacherSession();
+      if(!session.ok)return reply(callback,session);
+      result.session={code:session.code,token:session.token,participants:store.roster(),queue:store.presentationQueueRoster()};
       if(result.replacedSocketId)io.to(result.replacedSocketId).emit('teacher:revoked');
       clearReconnectTimers();updateRoster();broadcastProjection();
     }
     reply(callback,result);
   });
+  // Compatibilidad con clientes anteriores: la creación es idempotente.
+  // El panel nuevo ya no necesita emitir este evento.
   socket.on('teacher:create-session',callback=>{
-    const result=store.createSession(socket.id);
-    if(result.ok){fileStore.startSession(store.session.id);broadcastProjection();}
+    if(!store.teacherConnected()||store.session?.teacher!==socket.id)
+      return reply(callback,{ok:false,error:'Docente no autorizado.'});
+    const result=ensureTeacherSession();
+    if(result.ok)broadcastProjection();
     reply(callback,result);
   });
   socket.on('student:join',(payload={},callback)=>{

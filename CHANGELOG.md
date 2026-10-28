@@ -1,3 +1,12 @@
+## Ajuste de v0.5.0 — inicio automático de sesión docente (28-10-2026)
+
+- El primer ingreso autorizado a `/docente` crea una sesión automáticamente al conectarse Socket.IO.
+- El panel docente se muestra directamente con el código de incorporación.
+- Actualizar `/docente` recupera la sesión sin duplicarla ni cambiar el código.
+- Se elimina el formulario manual «Crear sesión temporal» de la vista docente.
+- Finalizar una sesión sigue requiriendo confirmación; para iniciar otra se vuelve a visitar `/docente`.
+- Se conserva el evento `teacher:create-session` como compatibilidad idempotente para clientes anteriores.
+
 ## Ajuste de UI — Alternar captura docente (InterLAB v0.5.0)
 
 - «Compartir mi pantalla» cambia a «Dejar de compartir mi pantalla» mientras la captura local está activa; la segunda pulsación termina la captura.

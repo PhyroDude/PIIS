@@ -33,7 +33,7 @@ function theme(role){document.body.classList.remove('theme-teacher','theme-stude
 function entry(){
   document.body.classList.remove('dashboard-active');
   hide('roles');hide('teacherEntry');hide('studentEntry');hide('teacherView');hide('studentView');
-  if(accessPath==='/docente'){show('teacherEntry');theme('teacher');hide('backFromTeacher');}
+  if(accessPath==='/docente'){show('teacherEntry');theme('teacher');hide('backFromTeacher');hide('reenterTeacher');}
   else if(accessPath==='/alumno'){show('studentEntry');theme('student');hide('backFromStudent');}
   else{show('roles');theme();}
 }
@@ -43,7 +43,7 @@ $('studentChoice').onclick=()=>{hide('roles');show('studentEntry');theme('studen
 $('backFromTeacher').onclick=entry;$('backFromStudent').onclick=entry;
 function teacherSessionReady(session){
   activeRole='teacher';teacherToken=session.token;fileToken=session.token;document.body.classList.add('dashboard-active');
-  $('displayCode').textContent=session.code;hide('teacherEntry');hide('roles');show('teacherView');
+  $('displayCode').textContent=session.code;hide('teacherEntry');hide('roles');hide('reenterTeacher');show('teacherView');
   initializeFileModule('teacher');renderParticipants(session.participants||[]);renderPresentationQueue(session.queue||[]);
   if(teacherStream)announceTeacherCapture();
   updateTeacherShareButtons();
@@ -57,12 +57,16 @@ function attachTeacher(){
       updateTeacherShareButtons();
       entry();
       setMessage('teacherEntryMessage',`${result?.error||'No se pudo recuperar el control docente.'} Recarga /docente cuando el control esté disponible.`,true);
+      show('reenterTeacher');
       return;
     }
     teacherAttached=true;
     if(result.session)teacherSessionReady(result.session);
-    else if(activeRole==='teacher'){clearFileModule();activeRole=null;teacherToken=null;entry();}
-    else setMessage('teacherEntryMessage','Control docente adquirido. Puedes compartir tu pantalla y crear la sesión.');
+    else {
+      entry();
+      setMessage('teacherEntryMessage','El servidor no devolvió una sesión. Actualiza /docente para volver a conectar.',true);
+      show('reenterTeacher');
+    }
   });
 }
 socket.on('connect',()=>{
@@ -84,15 +88,8 @@ socket.on('teacher:revoked',()=>{
   updateTeacherShareButtons();
   clearFileModule();teacherToken=null;teacherAttached=false;activeRole=null;entry();
   setMessage('teacherEntryMessage','Se liberó o sustituyó el control docente. Vuelve a abrir /docente cuando esté disponible.',true);
+  show('reenterTeacher');
 });
-$('teacherForm').onsubmit=event=>{
-  event.preventDefault();
-  if(!teacherAttached)return setMessage('teacherEntryMessage','Esperando autorización del servidor.',true);
-  socket.emit('teacher:create-session',result=>{
-    if(!result?.ok)return setMessage('teacherEntryMessage',result?.error||'No se pudo crear la sesión.',true);
-    teacherSessionReady({...result,participants:[],queue:[]});
-  });
-};
 $('studentForm').onsubmit=event=>{
   event.preventDefault();
   socket.emit('student:join',{code:$('code').value,alias:$('alias').value,isPhone:studentOnPhone},result=>{
@@ -109,10 +106,7 @@ $('studentForm').onsubmit=event=>{
 // presenta, la captura puede permanecer autorizada aunque no se envíe video.
 function updateTeacherShareButtons(){
   const sharing=Boolean(teacherStream?.getVideoTracks().some(track=>track.readyState==='live'));
-  const entryButton=$('teacherShareEntry');
   const dashboardButton=$('teacherShareActive');
-  entryButton.textContent=sharing?'Dejar de compartir mi pantalla':'Compartir pantalla de mi laptop';
-  entryButton.setAttribute('aria-pressed',String(sharing));
   dashboardButton.querySelector('strong').textContent=sharing?'Dejar de compartir mi pantalla':'Compartir mi pantalla';
   dashboardButton.querySelector('small').textContent=sharing?'Detener la captura de mi laptop':'Proyectar mi equipo en el laboratorio';
   dashboardButton.setAttribute('aria-pressed',String(sharing));
@@ -127,19 +121,17 @@ function stopTeacherCapture(){
   if(teacherToken&&socket.connected)socket.emit('teacher:screen-ended',{token:teacherToken});
   updateTeacherShareButtons();
   setMessage('teacherScreenStatus','Has dejado de compartir tu pantalla. Puedes volver a autorizarla cuando quieras.');
-  setMessage('teacherEntryMessage','Captura detenida. Puedes iniciar una nueva captura.');
 }
 let teacherCapturePending=false;
 async function captureTeacher(){
   if(teacherCapturePending)return;
   if(teacherStream){stopTeacherCapture();return;}
-  if(!teacherAttached)return setMessage('teacherEntryMessage','Aún no se ha adquirido el rol docente.',true);
+  if(!teacherAttached)return setMessage('teacherScreenStatus','Aún no se ha adquirido el rol docente.',true);
   if(!navigator.mediaDevices?.getDisplayMedia){
-    setMessage(activeRole==='teacher'?'teacherScreenStatus':'teacherEntryMessage','Para compartir pantalla se requiere HTTPS confiable.',true);
+    setMessage('teacherScreenStatus','Para compartir pantalla se requiere HTTPS confiable.',true);
     return;
   }
   teacherCapturePending=true;
-  $('teacherShareEntry').disabled=true;
   $('teacherShareActive').disabled=true;
   try{
     const stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:12,max:20}},audio:false});
@@ -149,19 +141,16 @@ async function captureTeacher(){
     },{once:true});
     updateTeacherShareButtons();
     setMessage('teacherScreenStatus','Captura autorizada. El servidor la utilizará como presentación predeterminada.');
-    setMessage('teacherEntryMessage','Captura autorizada. Ahora puedes crear la sesión.');
     announceTeacherCapture();
   }catch(error){
-    setMessage(activeRole==='teacher'?'teacherScreenStatus':'teacherEntryMessage',error.name==='NotAllowedError'?'No autorizaste la captura.':error.message,true);
+    setMessage('teacherScreenStatus',error.name==='NotAllowedError'?'No autorizaste la captura.':error.message,true);
   }finally{
     teacherCapturePending=false;
-    $('teacherShareEntry').disabled=false;
     $('teacherShareActive').disabled=false;
     updateTeacherShareButtons();
   }
 }
 function announceTeacherCapture(){if(teacherToken&&socket.connected)socket.emit('teacher:screen-ready',{token:teacherToken},result=>{if(!result?.ok)setMessage('teacherScreenStatus',result?.error||'Error de captura.',true);});}
-$('teacherShareEntry').onclick=captureTeacher;
 $('teacherShareActive').onclick=captureTeacher;
 updateTeacherShareButtons();
 
@@ -478,4 +467,5 @@ socket.on('session:ended',result=>{
   activeRole=null;teacherToken=null;teacherAttached=false;studentId=null;selectedStudentId=null;
   entry();
   setMessage(accessPath==='/alumno'?'studentEntryMessage':'teacherEntryMessage',`${result.message} Vuelve a abrir /docente si necesitas iniciar otra sesión.`);
+  if(accessPath==='/docente')show('reenterTeacher');
 });

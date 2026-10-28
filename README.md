@@ -64,3 +64,7 @@ En otra terminal **del equipo fijo** ejecuta `npm run start:receptor` para abrir
 - El navegador no puede compartir automáticamente pantalla sin acción del usuario; al cerrar la pestaña será necesario autorizar de nuevo la captura.
 - El alumno que se desconecta debe reincorporarse y puede perder capacidad de eliminar archivos de su conexión anterior (el docente sí podrá hacerlo).
 - No se incluye grabación, base de datos, servidor de medios ni soporte WAN. Los clientes Windows y el proyector físico requieren validación de laboratorio.
+
+### Inicio automático de sesión docente (ajuste v0.5.0)
+
+Al acceder a `/docente` desde el navegador autorizado, el servidor inicia la sesión de clase automáticamente al establecerse la conexión Socket.IO y muestra de inmediato el panel con el código de incorporación. No hay botón «Crear sesión». Una recarga recupera la misma sesión; «Finalizar sesión» sigue borrando los recursos temporales con confirmación. La captura de pantalla continúa requiriendo pulsar «Compartir mi pantalla». Consulta [el cambio funcional](docs/producto/inicio-automatico-sesion-docente-v0.5.0.md).
