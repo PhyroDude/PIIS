@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
@@ -41,3 +42,16 @@ console.log('\nCertificado HTTPS generado. Direcciones LAN incluidas:');
 for (const address of addresses) console.log(`  https://${address}:3000/alumno`);
 console.log('\nPara Windows, exporta solo rootCA.pem desde `mkcert -CAROOT` e instálalo en “Entidades de certificación raíz de confianza”.');
 console.log('NO compartas rootCA-key.pem. Si cambia la IP LAN, vuelve a ejecutar npm run setup:https.');
+=======
+// Compatibilidad para ejecutar la preparación HTTPS desde Node.js.
+// La generación real del certificado se realiza con OpenSSL en Linux.
+const { spawnSync } = require('node:child_process');
+const path = require('node:path');
+const script = path.join(__dirname, 'setup-https-linux.sh');
+const result = spawnSync('bash', [script], { stdio: 'inherit' });
+if (result.error) {
+  console.error(`No se pudo ejecutar el script HTTPS: ${result.error.message}`);
+  process.exit(1);
+}
+process.exit(result.status ?? 1);
+>>>>>>> 2f7796c (Integración de credenciales)

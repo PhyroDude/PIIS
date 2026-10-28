@@ -1,4 +1,18 @@
+## 0.3.4
+
+- Se incorpora `scripts/setup-https-linux.sh` para automatizar en Linux la preparación de la CA local de `mkcert` y la generación de certificados HTTPS para localhost y las IPv4 LAN detectadas.
+- `npm run setup:https` invoca el script Bash; se actualizan instrucciones de puesta en marcha.
+- La confianza en los equipos cliente sigue requiriendo distribución del certificado raíz por un procedimiento autorizado; la clave privada de la CA nunca debe compartirse.
+
 # Changelog
+
+## 0.3.5
+
+- Se sustituye la generación HTTPS con mkcert por OpenSSL, sin requerir una CA local.
+- El script genera un certificado autofirmado con SAN para localhost y las IPv4 LAN detectadas.
+- Se actualizan la guía de puesta en marcha, README, arquitectura y ADR-009 para explicar la advertencia y la verificación del contexto seguro.
+- La captura desde navegadores cliente sigue pendiente de validación manual; si `window.isSecureContext` es `false`, deberá configurarse confianza explícita del certificado.
+
 
 ## 0.2.0 — Integración de gestión de observaciones
 

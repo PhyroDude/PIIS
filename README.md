@@ -2,7 +2,11 @@
 
 MVP de aplicación web local para apoyar la retroalimentación durante sesiones en laboratorios de cómputo. El docente crea una sesión temporal, los estudiantes se incorporan con un alias y código, y el docente puede revisar la pantalla de un estudiante seleccionado, orientar oralmente y guardar notas individuales opcionales.
 
+<<<<<<< HEAD
 > **Versión actual:** 0.3.3. El conteo parte de la base funcional 0.3.0; se mantienen descartados los cambios de las líneas posteriores que el usuario indicó no conservar. La configuración HTTPS de esta versión está implementada, pero aún requiere validación real entre equipos Windows.
+=======
+> **Versión actual:** 0.3.5. El conteo parte de la base funcional 0.3.0; se mantienen descartados los cambios de las líneas posteriores que el usuario indicó no conservar. La configuración HTTPS de esta versión está implementada, pero aún requiere validación real entre equipos Windows.
+>>>>>>> 2f7796c (Integración de credenciales)
 
 ## Estado y alcance
 
@@ -72,13 +76,21 @@ En la computadora anfitriona del docente, inicia el servicio con apertura autom�
 npm run start:docente
 ```
 
+<<<<<<< HEAD
 Antes de iniciar por primera vez, prepara el certificado HTTPS:
+=======
+Antes de iniciar por primera vez, prepara el certificado HTTPS desde Linux:
+>>>>>>> 2f7796c (Integración de credenciales)
 
 ```bash
 npm run setup:https
 ```
 
+<<<<<<< HEAD
 Este comando requiere `mkcert` instalado en la computadora anfitriona. Consulta [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md) para instalarlo y confiar la CA en los clientes Windows. Después ejecuta `npm run start:docente`: se abrirá `https://localhost:3000/docente` y la consola imprimirá direcciones `https://IP-LAN-DEL-DOCENTE:3000/alumno`. No uses `localhost` desde equipos cliente. Si cambia la IP LAN, vuelve a generar el certificado. No compartas la clave privada de la CA.
+=======
+Este comando ejecuta `scripts/setup-https-linux.sh` y genera `certs/interlab.pem` y `certs/interlab-key.pem` con OpenSSL; no requiere mkcert ni instalar una CA. El certificado incluye localhost y las IPv4 LAN detectadas. Consulta [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md). Después ejecuta `npm run start:docente`: se abrirá `https://localhost:3000/docente` y la consola imprimirá direcciones `https://IP-LAN-DEL-DOCENTE:3000/alumno`. No uses `localhost` desde equipos cliente. Si cambia la IP LAN, vuelve a generar el certificado. No compartas la clave privada `certs/interlab-key.pem`.
+>>>>>>> 2f7796c (Integración de credenciales)
 
 HTTPS está habilitado por defecto. La variable `HTTPS_ENABLED=false` existe únicamente para las pruebas HTTP locales automatizadas; no debe usarse para la proyección desde alumnos remotos.
 
@@ -114,13 +126,21 @@ Las pruebas unitarias cubren principalmente el estado de sesión y la cola. No s
 - [`docs/pruebas/resultados/estado-inicial.md`](docs/pruebas/resultados/estado-inicial.md): estado conocido de validación.
 - [`docs/desarrollo/puesta-en-marcha.md`](docs/desarrollo/puesta-en-marcha.md): instalación y pruebas manuales.
 - [`docs/arquitectura/decisiones/ADR-009-https-lan.md`](docs/arquitectura/decisiones/ADR-009-https-lan.md): HTTPS confiable para captura desde la LAN.
+<<<<<<< HEAD
 - [`CHANGELOG.md`](CHANGELOG.md): historial de cambios; versión actual 0.3.3.
+=======
+- [`CHANGELOG.md`](CHANGELOG.md): historial de cambios; versión actual 0.3.5.
+>>>>>>> 2f7796c (Integración de credenciales)
 
 ## Límites conocidos
 
 - No hay autenticación institucional fuerte del docente; el token de sesión no sustituye una solución de identidad institucional.
 - La captura de pantalla depende del navegador, de permisos explícitos y de un contexto seguro.
+<<<<<<< HEAD
 - HTTPS está habilitado por defecto en la versión 0.3.3; es necesario instalar `mkcert` y confiar la CA raíz en los clientes. La integración real de Firefox/Windows sigue pendiente.
+=======
+- HTTPS está habilitado por defecto. El certificado OpenSSL es autofirmado y el navegador mostrará una advertencia; aceptar la excepción no garantiza por sí solo que todos los navegadores consideren seguro el contexto para `getDisplayMedia()`. La integración real de Firefox/Windows sigue pendiente.
+>>>>>>> 2f7796c (Integración de credenciales)
 - Se ha reportado un fallo al cambiar de la presentación de un estudiante a la de otro. Sigue pendiente de reproducción y corrección verificada.
 - Las rutas de acceso y el descubrimiento de direcciones cuentan con pruebas unitarias básicas; falta probar el bloqueo remoto de `/docente`, la apertura automática en el sistema anfitrión y el acceso real desde equipos cliente en LAN.
 - El botón de pantalla completa existe, pero debe validarse en los navegadores objetivo si satisface la expectativa de ampliar la vista de presentación completa, no solamente el elemento de vídeo.

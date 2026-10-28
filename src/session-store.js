@@ -1,11 +1,11 @@
 const crypto = require('node:crypto');
 
-const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const ALPHABET = '123456789';
 const MAX_STUDENTS = 30;
 const MAX_NOTE_LENGTH = 1000;
 
 function makeCode() {
-  return Array.from({ length: 6 }, () => ALPHABET[crypto.randomInt(ALPHABET.length)]).join('');
+  return Array.from({ length: 4 }, () => ALPHABET[crypto.randomInt(ALPHABET.length)]).join('');
 }
 function makeToken() { return crypto.randomBytes(24).toString('hex'); }
 

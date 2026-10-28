@@ -11,7 +11,11 @@
 - Los clientes objetivo son equipos Windows; el entorno de desarrollo actual es Ubuntu/Linux.
 - El estudiante se identifica mediante alias temporal y código temporal de sesión, no mediante cuenta institucional.
 - No se usa una base de datos: sesión, participantes, cola, permisos temporales y observaciones viven en memoria.
+<<<<<<< HEAD
 - La versión 0.3.3 sirve HTTPS por defecto mediante certificados generados localmente con `mkcert`. El certificado incluye `localhost`, loopback y las IPv4 LAN detectadas. Cada cliente Windows debe confiar en la CA raíz local para que Firefox permita `getDisplayMedia()` sin advertencias. Véase [ADR-009](decisiones/ADR-009-https-lan.md).
+=======
+- La versión 0.3.5 sirve HTTPS por defecto mediante un certificado autofirmado generado con OpenSSL. Incluye `localhost`, `127.0.0.1` y las IPv4 LAN detectadas. El navegador mostrará una advertencia; aceptar la excepción no garantiza que `getDisplayMedia()` esté habilitado en todos los clientes. Véase [ADR-009](decisiones/ADR-009-https-lan.md).
+>>>>>>> 2f7796c (Integración de credenciales)
 
 La decisión y sus alternativas están registradas en [ADR-001](decisiones/ADR-001-arquitectura-local.md).
 
@@ -68,4 +72,8 @@ Se ha reportado que, después de finalizar o cambiar desde la pantalla de A a la
 
 El servidor Express escucha por defecto en `0.0.0.0:3000`, configurable mediante `HOST` y `PORT`. Al empezar a escuchar, consulta las interfaces IPv4 del sistema y muestra las direcciones candidatas para que los estudiantes abran `/alumno`. Se priorizan las direcciones IPv4 privadas; si existen varias interfaces, el operador debe escoger la que corresponda a la LAN del laboratorio.
 
+<<<<<<< HEAD
 La ruta `/docente` solo sirve la aplicación a peticiones locales del anfitrión; las peticiones remotas reciben HTTP 403. `/` y `/index.html` redirigen a `/docente` en loopback y a `/alumno` en conexiones remotas. Esta separación protege la ruta de vista y el evento de creación de sesión docente se rechaza si la conexión Socket.IO no proviene de loopback. No constituye autenticación institucional robusta; la autorización de los demás eventos Socket.IO sigue siendo una responsabilidad independiente. La versión 0.3.3 sirve HTTPS por defecto. La captura remota requiere que los navegadores cliente confíen en la CA y que la dirección usada esté incluida en el certificado.
+=======
+La ruta `/docente` solo sirve la aplicación a peticiones locales del anfitrión; las peticiones remotas reciben HTTP 403. `/` y `/index.html` redirigen a `/docente` en loopback y a `/alumno` en conexiones remotas. Esta separación protege la ruta de vista y el evento de creación de sesión docente se rechaza si la conexión Socket.IO no proviene de loopback. No constituye autenticación institucional robusta; la autorización de los demás eventos Socket.IO sigue siendo una responsabilidad independiente. La versión 0.3.5 sirve HTTPS por defecto con certificado autofirmado. La captura remota requiere que el navegador considere seguro el contexto y que la dirección usada esté incluida en el certificado.
+>>>>>>> 2f7796c (Integración de credenciales)
