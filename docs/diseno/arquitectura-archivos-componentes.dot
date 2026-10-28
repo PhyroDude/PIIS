@@ -1,0 +1,33 @@
+digraph InterLAB {
+ graph [label="InterLAB · Arquitectura propuesta del módulo de archivos\nBase v0.3.0 · Documento de diseño (NO implementado)", labelloc=t, fontsize=20, fontname="DejaVu Sans", fontcolor="#152947", bgcolor="#FFFFFF", ranksep=0.70, nodesep=0.55, pad=0.35, splines=polyline];
+ node [shape=box, style="rounded,filled", fillcolor="#F3F7FB", color="#A8B6C8", penwidth=1.4, fontname="DejaVu Sans", fontsize=11, fontcolor="#16233C", margin="0.22,0.15"];
+ edge [color="#4C617B", fontname="DejaVu Sans", fontsize=10, arrowsize=0.8, fontcolor="#4C617B", penwidth=1.4];
+ subgraph cluster_clients {
+  label="Navegadores · LAN"; color="#C4DBE0"; style="rounded,filled"; fillcolor="#F1F8FA"; fontname="DejaVu Sans"; fontcolor="#126A75";
+  teacher [label="Docente\n/docente\nPestañas · permisos\nProyección", fillcolor="#D5E9FF", color="#7AB0E2"];
+  student [label="Estudiantes\n/alumno\nSubir · buscar · descargar", fillcolor="#D8F3E8", color="#7BC8B0"];
+ }
+ subgraph cluster_host {
+  label="Equipo del docente · un proceso Node.js"; color="#91A7C1"; style="rounded,filled"; fillcolor="#F7F9FC"; fontname="DejaVu Sans"; fontcolor="#213D60";
+  express [label="Express · Rutas HTTP\nCarga y descarga por streaming", fillcolor="#E3ECFA"];
+  socket [label="Socket.IO\nEventos y actualización de listas", fillcolor="#E3ECFA"];
+  transfer [label="TransferManager\nConcurrencia (2 por usuario)\nControl de velocidad", fillcolor="#FFF0D5", color="#D6B264"];
+  files [label="FileCatalog + QuotaManager\nIDs · propietario · cuota\nEstado de la sesión", fillcolor="#FFF0D5", color="#D6B264"];
+  store [label="FileStorage\nGuardado por fragmentos\nPublicación / eliminación", fillcolor="#FFF0D5", color="#D6B264"];
+  disk [label="Disco temporal PRIVADO\nstaging/ · ready/\nFuera de public/", shape=cylinder, fillcolor="#E9E3FF", color="#B3A3DE"];
+  base [label="SessionStore existente\nSesión · docente · estudiantes\nCola · proyección", fillcolor="#E3ECFA"];
+ }
+  {rank=same; teacher; student;}
+  teacher -> socket [label="eventos"];
+  student -> socket [label="eventos"];
+  student -> express [label="archivos HTTP"];
+  teacher -> express [label="archivos HTTP"];
+  socket -> files [label="metadatos"];
+  socket -> base [label="sesión y roles"];
+  express -> transfer [label="streams"];
+  transfer -> files [label="reservar / validar"];
+  transfer -> store [label="leer / escribir"];
+  store -> disk [label="bytes"];
+  base -> transfer [label="prioridad de proyección", style=dashed];
+  teacher -> student [dir=both, label="WebRTC · vídeo directo", color="#168C95", fontcolor="#168C95", penwidth=2.0, constraint=false];
+}

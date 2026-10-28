@@ -1,6 +1,6 @@
 # Índice y reglas de documentación
 
-Esta carpeta documenta el Sistema local de retroalimentación. La base funcional original es **v0.3.0** y la versión incremental actual es **v0.3.3**. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
+Esta carpeta documenta el Sistema local de retroalimentación. La base funcional original es **v0.3.0** y la versión actual es **InterLAB v0.4.0 beta**, construida sobre PIIS **v0.3.4**. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
 
 ## Orden de autoridad
 
@@ -32,6 +32,17 @@ Esta carpeta documenta el Sistema local de retroalimentación. La base funcional
 - [`pruebas/trazabilidad-y-pruebas.md`](pruebas/trazabilidad-y-pruebas.md) — matriz y pruebas propuestas.
 - [`pruebas/resultados/estado-inicial.md`](pruebas/resultados/estado-inicial.md) — estado de verificación de la versión de referencia.
 - [`desarrollo/puesta-en-marcha.md`](desarrollo/puesta-en-marcha.md) — instalación, contexto seguro y pruebas manuales.
+
+## Incorporaciones de v0.4.0
+
+- [Adopción de PIIS como v0.3.4](producto/adopcion-baseline-interlab-034.md).
+- [Alcance y Product Backlog v1.1 — Markdown](producto/alcance-MVP-y-product-backlog-base-v1.1.md) y [Word](producto/alcance-MVP-y-product-backlog-base-v1.1.docx).
+- [Requisitos del módulo de archivos v0.1](requisitos/InterLAB_Requisitos_Modulo_Archivos_v0.1.md).
+- [Arquitectura implementada de archivos](arquitectura/modulo-archivos-v0.4.0.md).
+- [ADR-011: almacenamiento](arquitectura/decisiones/ADR-011-almacenamiento-temporal-y-catalogo.md), [ADR-012: HTTP/ZIP](arquitectura/decisiones/ADR-012-transferencias-http-y-zip.md), [ADR-013: prioridad/cierre](arquitectura/decisiones/ADR-013-prioridad-proyeccion-y-cierre.md), [ADR-014: certificados](arquitectura/decisiones/ADR-014-seleccion-generador-certificados.md).
+- [Diagramas: componentes](diseno/arquitectura-archivos-componentes.png) y [flujos](diseno/arquitectura-archivos-flujos.png).
+- [Plan de pruebas](pruebas/plan-pruebas-arquitectura-archivos.md) y [resultado beta](pruebas/resultado-beta-040.md).
+- [Integración documental de v0.4.0](desarrollo/INTEGRACION-v0.4.0.md).
 
 ## Cómo actualizar la documentación
 

@@ -1,0 +1,17 @@
+digraph Flujos {
+ graph [label="InterLAB · Flujos críticos de archivos temporales\nDiseño propuesto, pendiente de aprobación y pruebas", labelloc=t, fontsize=20, fontname="DejaVu Sans", fontcolor="#152947", bgcolor=white, ranksep=0.6, nodesep=0.32, pad=0.3, splines=ortho];
+ node [shape=box, style="rounded,filled", fillcolor="#F1F5FB", color="#9FB0C8", penwidth=1.2, fontname="DejaVu Sans", fontsize=10.5, margin="0.18,0.12"];
+ edge [color="#607490", penwidth=1.3, arrowsize=0.7];
+ subgraph cluster_upload {label="A · CARGAR ARCHIVO"; color="#AED1E9"; style="rounded,filled"; fillcolor="#F3F9FF"; fontname="DejaVu Sans"; fontcolor="#235681";
+  u1 [label="Seleccionar archivos\n≤50 MB cada uno"]; u2 [label="Autorizar usuario\ny operación ≤200 MB"]; u3 [label="Reservar cuota\n(10 GB compartidos)"]; u4 [label="Transmitir en HTTP\nhasta 2 por usuario"]; u5 [label="Guardar parcial\nen staging/"]; u6 [label="Verificar sesión\ny tamaño real"]; u7 [label="Publicar en ready/\ny avisar por Socket.IO", fillcolor="#D9F4E5", color="#75BE95"];
+  u1 -> u2 -> u3 -> u4 -> u5 -> u6 -> u7;
+ }
+ subgraph cluster_download {label="B · DESCARGAR / BORRAR"; color="#AED1E9"; style="rounded,filled"; fillcolor="#F3F9FF"; fontname="DejaVu Sans"; fontcolor="#235681";
+  d1 [label="Solicitar IDs\nde archivos"]; d2 [label="Validar sesión\ny ticket temporal"]; d3 [label="Enviar archivo\no ZIP en streaming"]; d4 [label="Si se borra:\nno aceptar nuevos lectores"]; d5 [label="Lecturas previas\npueden terminar", fillcolor="#D9F4E5", color="#75BE95"];
+  d1 -> d2 -> d3 -> d4 -> d5;
+ }
+ subgraph cluster_close {label="C · CERRAR SESIÓN"; color="#E2BCA9"; style="rounded,filled"; fillcolor="#FFF8F4"; fontname="DejaVu Sans"; fontcolor="#A45231";
+  c1 [label="Docente confirma\ncierre"]; c2 [label="CLOSING + nueva\ngeneración", fillcolor="#FFE3DA", color="#D39A83"]; c3 [label="Revocar permisos\ny nuevas transferencias"]; c4 [label="Abortar cargas,\ndescargas y ZIP"]; c5 [label="Cerrar flujos\ny limpiar disco"]; c6 [label="CLOSED\nSin publicación tardía", fillcolor="#FFE3DA", color="#D39A83"];
+  c1 -> c2 -> c3 -> c4 -> c5 -> c6;
+ }
+}

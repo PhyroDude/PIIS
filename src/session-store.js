@@ -32,10 +32,10 @@ class SessionStore {
     if (!normalizedAlias) return { ok: false, error: 'Escribe un alias.' };
     if (this.session.students.size >= MAX_STUDENTS) return { ok: false, error: 'La sesión está llena (30 estudiantes).' };
     if ([...this.session.students.values()].some(p => p.alias.toLowerCase() === normalizedAlias.toLowerCase())) return { ok: false, error: 'Ese alias ya está en uso.' };
-    const student = { id: socketId, alias: normalizedAlias };
+    const student = { id: socketId, alias: normalizedAlias, fileToken: makeToken() };
     this.session.students.set(socketId, student);
     this.roles.set(socketId, { role: 'student', sid: this.session.id });
-    return { ok: true, alias: normalizedAlias, studentId: socketId };
+    return { ok: true, alias: normalizedAlias, studentId: socketId, fileToken: student.fileToken };
   }
 
   roster() {
@@ -91,6 +91,18 @@ class SessionStore {
     return Boolean(this.session && role?.role === 'teacher' && role.sid === this.session.id && socketId === this.session.teacher && token === this.session.token);
   }
 
+  fileActor(token) {
+    if (!this.session || typeof token !== 'string') return null;
+    if (token === this.session.token && this.authorizeTeacher(this.session.teacher, token)) {
+      return { role: 'teacher', id: this.session.teacher, alias: 'Docente', sessionId: this.session.id };
+    }
+    for (const student of this.session.students.values()) {
+      if (token === student.fileToken && this.isStudentInSession(student.id)) {
+        return { role: 'student', id: student.id, alias: student.alias, sessionId: this.session.id };
+      }
+    }
+    return null;
+  }
   getRole(socketId) { return this.roles.get(socketId) || null; }
   isStudentInSession(socketId) { return Boolean(this.session?.students.has(socketId) && this.roles.get(socketId)?.sid === this.session.id); }
 
