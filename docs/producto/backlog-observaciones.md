@@ -1,5 +1,7 @@
 # Backlog — mejora de gestión de observaciones
 
+> **Actualización de la UI en v0.5.0:** las notas personales mantienen el límite original de **1000 caracteres**, con [modal y validación en cliente y servidor](../desarrollo/modal-notas-personales-v0.5.0.md).
+
 > **Base de referencia:** versión 0.3.0. La cola y transmisión de pantalla se documentan por separado en [`backlog-proyeccion.md`](backlog-proyeccion.md); compartir la pantalla de un estudiante no equivale a proyectar observaciones escritas al grupo.
 
 - **Versión:** 0.2

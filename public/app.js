@@ -31,6 +31,7 @@ function closePeer(){
 }
 function theme(role){document.body.classList.remove('theme-teacher','theme-student');if(role)document.body.classList.add(`theme-${role}`);}
 function entry(){
+  document.body.classList.remove('dashboard-active');
   hide('roles');hide('teacherEntry');hide('studentEntry');hide('teacherView');hide('studentView');
   if(accessPath==='/docente'){show('teacherEntry');theme('teacher');hide('backFromTeacher');}
   else if(accessPath==='/alumno'){show('studentEntry');theme('student');hide('backFromStudent');}
@@ -41,10 +42,11 @@ $('teacherChoice').onclick=()=>{hide('roles');show('teacherEntry');theme('teache
 $('studentChoice').onclick=()=>{hide('roles');show('studentEntry');theme('student');};
 $('backFromTeacher').onclick=entry;$('backFromStudent').onclick=entry;
 function teacherSessionReady(session){
-  activeRole='teacher';teacherToken=session.token;fileToken=session.token;
+  activeRole='teacher';teacherToken=session.token;fileToken=session.token;document.body.classList.add('dashboard-active');
   $('displayCode').textContent=session.code;hide('teacherEntry');hide('roles');show('teacherView');
   initializeFileModule('teacher');renderParticipants(session.participants||[]);renderPresentationQueue(session.queue||[]);
   if(teacherStream)announceTeacherCapture();
+  updateTeacherShareButtons();
   setMessage('teacherScreenStatus',teacherStream?'Captura local autorizada. Transmisión disponible para el receptor.':'Pulsa «Compartir mi pantalla» para iniciar el video en el proyector.');
 }
 function attachTeacher(){
@@ -52,6 +54,7 @@ function attachTeacher(){
     if(!result?.ok){
       teacherAttached=false;teacherToken=null;activeRole=null;closePeer();clearFileModule();
       if(teacherStream){teacherStream.getTracks().forEach(t=>t.stop());teacherStream=null;}
+      updateTeacherShareButtons();
       entry();
       setMessage('teacherEntryMessage',`${result?.error||'No se pudo recuperar el control docente.'} Recarga /docente cuando el control esté disponible.`,true);
       return;
@@ -76,7 +79,9 @@ socket.on('disconnect',()=>{
   closePeer();if(activeRole==='teacher')setMessage('teacherScreenStatus','Sin conexión al servidor. La sesión continúa en InterLAB.');
 });
 socket.on('teacher:revoked',()=>{
+  closeTeacherFeedback();
   closePeer();if(teacherStream){teacherStream.getTracks().forEach(t=>t.stop());teacherStream=null;}
+  updateTeacherShareButtons();
   clearFileModule();teacherToken=null;teacherAttached=false;activeRole=null;entry();
   setMessage('teacherEntryMessage','Se liberó o sustituyó el control docente. Vuelve a abrir /docente cuando esté disponible.',true);
 });
@@ -90,7 +95,7 @@ $('teacherForm').onsubmit=event=>{
 };
 $('studentForm').onsubmit=event=>{
   event.preventDefault();
-  socket.emit('student:join',{code:$('code').value,alias:$('alias').value},result=>{
+  socket.emit('student:join',{code:$('code').value,alias:$('alias').value,isPhone:studentOnPhone},result=>{
     if(!result?.ok)return setMessage('studentEntryMessage',result?.error||'No se pudo ingresar.',true);
     activeRole='student';studentId=result.studentId;fileToken=result.fileToken;
     initializeFileModule('student');$('joinedAlias').textContent=result.alias;
@@ -100,76 +105,232 @@ $('studentForm').onsubmit=event=>{
   });
 };
 
+// El botón refleja el estado de la captura LOCAL del docente. Si un alumno
+// presenta, la captura puede permanecer autorizada aunque no se envíe video.
+function updateTeacherShareButtons(){
+  const sharing=Boolean(teacherStream?.getVideoTracks().some(track=>track.readyState==='live'));
+  const entryButton=$('teacherShareEntry');
+  const dashboardButton=$('teacherShareActive');
+  entryButton.textContent=sharing?'Dejar de compartir mi pantalla':'Compartir pantalla de mi laptop';
+  entryButton.setAttribute('aria-pressed',String(sharing));
+  dashboardButton.querySelector('strong').textContent=sharing?'Dejar de compartir mi pantalla':'Compartir mi pantalla';
+  dashboardButton.querySelector('small').textContent=sharing?'Detener la captura de mi laptop':'Proyectar mi equipo en el laboratorio';
+  dashboardButton.setAttribute('aria-pressed',String(sharing));
+  dashboardButton.classList.toggle('is-sharing',sharing);
+}
+function stopTeacherCapture(){
+  const stream=teacherStream;
+  if(!stream)return;
+  teacherStream=null; // Evita que el evento ended de una captura antigua afecte a otra.
+  for(const track of stream.getTracks())track.stop();
+  closePeer();
+  if(teacherToken&&socket.connected)socket.emit('teacher:screen-ended',{token:teacherToken});
+  updateTeacherShareButtons();
+  setMessage('teacherScreenStatus','Has dejado de compartir tu pantalla. Puedes volver a autorizarla cuando quieras.');
+  setMessage('teacherEntryMessage','Captura detenida. Puedes iniciar una nueva captura.');
+}
+let teacherCapturePending=false;
 async function captureTeacher(){
+  if(teacherCapturePending)return;
+  if(teacherStream){stopTeacherCapture();return;}
   if(!teacherAttached)return setMessage('teacherEntryMessage','Aún no se ha adquirido el rol docente.',true);
-  if(!navigator.mediaDevices?.getDisplayMedia)return setMessage('teacherEntryMessage','Para compartir pantalla se requiere HTTPS confiable.',true);
+  if(!navigator.mediaDevices?.getDisplayMedia){
+    setMessage(activeRole==='teacher'?'teacherScreenStatus':'teacherEntryMessage','Para compartir pantalla se requiere HTTPS confiable.',true);
+    return;
+  }
+  teacherCapturePending=true;
+  $('teacherShareEntry').disabled=true;
+  $('teacherShareActive').disabled=true;
   try{
-    if(teacherStream)teacherStream.getTracks().forEach(t=>t.stop());
-    teacherStream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:12,max:20}},audio:false});
-    teacherStream.getVideoTracks()[0].addEventListener('ended',()=>{
-      teacherStream=null;closePeer();
-      if(teacherToken)socket.emit('teacher:screen-ended',{token:teacherToken});
-      setMessage('teacherScreenStatus','Captura finalizada. Puedes autorizarla nuevamente.');
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:12,max:20}},audio:false});
+    teacherStream=stream;
+    stream.getVideoTracks()[0].addEventListener('ended',()=>{
+      if(teacherStream===stream)stopTeacherCapture();
     },{once:true});
+    updateTeacherShareButtons();
     setMessage('teacherScreenStatus','Captura autorizada. El servidor la utilizará como presentación predeterminada.');
     setMessage('teacherEntryMessage','Captura autorizada. Ahora puedes crear la sesión.');
     announceTeacherCapture();
-  }catch(error){setMessage('teacherEntryMessage',error.name==='NotAllowedError'?'No autorizaste la captura.':error.message,true);}
+  }catch(error){
+    setMessage(activeRole==='teacher'?'teacherScreenStatus':'teacherEntryMessage',error.name==='NotAllowedError'?'No autorizaste la captura.':error.message,true);
+  }finally{
+    teacherCapturePending=false;
+    $('teacherShareEntry').disabled=false;
+    $('teacherShareActive').disabled=false;
+    updateTeacherShareButtons();
+  }
 }
 function announceTeacherCapture(){if(teacherToken&&socket.connected)socket.emit('teacher:screen-ready',{token:teacherToken},result=>{if(!result?.ok)setMessage('teacherScreenStatus',result?.error||'Error de captura.',true);});}
 $('teacherShareEntry').onclick=captureTeacher;
 $('teacherShareActive').onclick=captureTeacher;
+updateTeacherShareButtons();
 
+// Diseño docente 16:9: listas accesibles, filtro local y selección sin iniciar una proyección.
+let participantRoster=[];
+let participantDescending=false;
+let selectedPerson=null;
+function dashboardCell(row,text,className=''){
+  const cell=document.createElement('td');cell.textContent=text;
+  if(className)cell.className=className;
+  row.append(cell);return cell;
+}
+function dashboardAction(label,handler,{disabled=false,secondary=false,title=''}={}){
+  const btn=document.createElement('button');btn.type='button';btn.textContent=label;
+  if(secondary)btn.className='secondary';btn.disabled=disabled;btn.title=title;
+  if(!disabled)btn.onclick=handler;
+  return btn;
+}
+function updateSelectedStudent(){
+  $('selectedStudentName').textContent=selectedPerson?.alias||'Ninguno';
+  $('selectedDeviceBadge').classList.toggle('hidden',!selectedPerson?.isPhone);
+  $('selectedProjectionRequest').disabled=!selectedPerson||selectedPerson.isPhone===true;
+  $('selectedNoteButton').disabled=!selectedPerson;
+  $('selectedStudentHint').textContent=!selectedPerson
+    ?'Selecciona un participante para solicitar su proyección o darle una nota.'
+    :selectedPerson.isPhone
+      ?'La proyección de pantalla no está disponible desde teléfonos. Puedes enviarle una nota.'
+      :'Estudiante disponible para solicitar proyección o recibir una nota individual.';
+}
+function pickStudent(person){
+  selectedPerson=person;selectedStudentId=person.id;
+  $('selectedAlias').textContent=person.alias;
+  updateSelectedStudent();renderParticipants(participantRoster);
+}
 function renderParticipants(people){
-  $('count').textContent=`${people.length} / 30`;const list=$('participants');list.replaceChildren();
-  if(!people.length){const li=document.createElement('li');li.className='muted';li.textContent='Esperando estudiantes…';list.append(li);return;}
-  people.forEach((person,i)=>{
-    const li=document.createElement('li');li.className='participant';
-    const label=document.createElement('span');label.textContent=`${String(i+1).padStart(2,'0')} · ${person.alias}`;
-    const actions=document.createElement('div');actions.className='actions';
-    const select=document.createElement('button');select.type='button';select.className='secondary';select.textContent='Solicitar presentación';select.onclick=()=>selectStudent(person);
-    const note=document.createElement('button');note.type='button';note.className='secondary';note.textContent='Dar nota';note.onclick=()=>selectStudent(person,{focusNote:true});
-    actions.append(select,note);li.append(label,actions);list.append(li);
+  participantRoster=Array.isArray(people)?people:[];
+  $('count').textContent=`${participantRoster.length} / 30`;
+  if(selectedPerson){
+    const current=participantRoster.find(person=>person.id===selectedPerson.id);
+    selectedPerson=current||null;
+    if(!current){selectedStudentId=null;closeTeacherFeedback();}
+  }
+  updateSelectedStudent();
+  const query=$('teacherParticipantSearch').value.trim().toLocaleLowerCase();
+  const filtered=participantRoster.filter(person=>person.alias.toLocaleLowerCase().includes(query));
+  filtered.sort((a,b)=>(participantDescending?-1:1)*a.alias.localeCompare(b.alias,'es',{sensitivity:'base',numeric:true}));
+  const list=$('participants');list.replaceChildren();
+  if(!filtered.length){const tr=document.createElement('tr');dashboardCell(tr,participantRoster.length?'No hay coincidencias.':'Esperando estudiantes…','table-empty').colSpan=5;list.append(tr);return;}
+  filtered.forEach((person,i)=>{
+    const tr=document.createElement('tr');if(selectedPerson?.id===person.id)tr.className='is-selected';
+    dashboardCell(tr,String(i+1));
+    const aliasCell=document.createElement('td');const aliasButton=dashboardAction(person.alias,()=>pickStudent(person));aliasButton.className='participant-alias';aliasCell.append(aliasButton);tr.append(aliasCell);
+    const device=dashboardCell(tr,person.isPhone?'▯  Teléfono':'▣  Equipo');device.className='device-type';
+    dashboardCell(tr,'●  Conectado','participant-online');
+    const actions=document.createElement('td');const group=document.createElement('div');group.className='dash-row-actions';
+    const request=dashboardAction(person.isPhone?'No disponible':'Solicitar proyección',()=>selectStudent(person),{
+      disabled:person.isPhone===true,title:person.isPhone?'No se puede compartir pantalla desde teléfonos.':''
+    });
+    const note=dashboardAction('▤',()=>chooseStudentForFeedback(person),{secondary:true,title:'Dar nota personal'});note.classList.add('note-action');note.setAttribute('aria-label',`Dar nota personal a ${person.alias}`);
+    group.append(request,note);actions.append(group);tr.append(actions);list.append(tr);
   });
 }
 socket.on('participants:update',renderParticipants);
+$('teacherParticipantSearch').addEventListener('input',()=>renderParticipants(participantRoster));
+$('teacherParticipantSort').onclick=()=>{
+  participantDescending=!participantDescending;
+  $('teacherParticipantSort').textContent=participantDescending?'Z–A':'A–Z';
+  renderParticipants(participantRoster);
+};
 function renderPresentationQueue(queue){
   presentationQueue=Array.isArray(queue)?queue:[];
-  $('queueCount').textContent=`${presentationQueue.length} solicitud${presentationQueue.length===1?'':'es'}`;
+  $('queueCount').textContent=String(presentationQueue.length);
+  const query=$('teacherQueueSearch').value.trim().toLocaleLowerCase();
+  const entries=presentationQueue.filter(person=>person.alias.toLocaleLowerCase().includes(query));
   const list=$('presentationQueue');list.replaceChildren();
-  if(!presentationQueue.length){const li=document.createElement('li');li.className='muted';li.textContent='No hay solicitudes pendientes.';list.append(li);return;}
-  for(const person of presentationQueue){
-    const li=document.createElement('li');li.className='participant';const text=document.createElement('span');text.textContent=`${person.position}. ${person.alias}`;
-    const actions=document.createElement('div');actions.className='actions';
-    const button=document.createElement('button');button.className='primary';button.type='button';button.textContent='Conceder acceso';button.onclick=()=>selectStudent(person);
-    const reject=document.createElement('button');reject.className='secondary';reject.type='button';reject.textContent='Rechazar';
-    reject.onclick=()=>socket.emit('teacher:reject-request',{token:teacherToken,studentId:person.id},result=>{
+  if(!entries.length){const tr=document.createElement('tr');dashboardCell(tr,presentationQueue.length?'No hay coincidencias.':'No hay solicitudes pendientes.','table-empty').colSpan=5;list.append(tr);return;}
+  entries.forEach(person=>{
+    const tr=document.createElement('tr');dashboardCell(tr,String(person.position));
+    const alias=dashboardCell(tr,person.alias);alias.style.fontWeight='700';
+    dashboardCell(tr,'—');const status=dashboardCell(tr,'En cola');status.className='queue-state-cell';
+    const group=document.createElement('div');group.className='dash-row-actions';
+    const grant=dashboardAction('Conceder',()=>selectStudent(person),{disabled:person.isPhone===true,title:person.isPhone?'Proyección no disponible desde teléfonos.':'Conceder ahora, saltando la cola'});
+    const reject=dashboardAction('Rechazar',()=>socket.emit('teacher:reject-request',{token:teacherToken,studentId:person.id},result=>{
       if(!result?.ok)setMessage('teacherMessage',result?.error||'No se pudo rechazar.',true);
-    });
-    actions.append(button,reject);li.append(text,actions);list.append(li);
-  }
+    }),{secondary:true});
+    group.append(grant,reject);const actions=document.createElement('td');actions.append(group);tr.append(actions);list.append(tr);
+  });
 }
 socket.on('presentation:queue-update',renderPresentationQueue);
-function selectStudent(person,options={}){
-  selectedStudentId=person.id;$('selectedAlias').textContent=person.alias;show('teacherFeedback');
-  $('observationText').value='';$('charCount').textContent='0 / 1000';
+$('teacherQueueSearch').addEventListener('input',()=>renderPresentationQueue(presentationQueue));
+const MAX_NOTE_LENGTH=1000;
+const noteDialog=$('teacherFeedback');
+let noteRecipientId=null;
+let noteReturnFocus=null;
+let noteSending=false;
+function updateNoteCount(){
+  const count=$('observationText').value.length;
+  $('charCount').textContent=`${count} / ${MAX_NOTE_LENGTH} caracteres`;
+  $('charCount').classList.toggle('note-limit-exceeded',count>MAX_NOTE_LENGTH);
+  $('sendObservation').disabled=noteSending||!$('observationText').value.trim()||count>MAX_NOTE_LENGTH;
+  $('observationError').textContent=count>MAX_NOTE_LENGTH
+    ?`La nota supera el límite de ${MAX_NOTE_LENGTH} caracteres. Reduce el texto antes de enviarla.`:'';
+}
+function closeTeacherFeedback(){
+  if(noteDialog.open)noteDialog.close();
+}
+function chooseStudentForFeedback(person){
+  if(!person)return;
+  pickStudent(person);
+  noteRecipientId=person.id;
+  noteReturnFocus=$('selectedNoteButton');
+  $('observationText').value='';
+  $('observationError').textContent='';
+  updateNoteCount();
+  if(!noteDialog.open)noteDialog.showModal();
+  $('observationText').focus();
+}
+function selectStudent(person){
+  pickStudent(person);
+  if(person.isPhone===true)return setMessage('teacherMessage','La proyección de pantalla no está disponible desde teléfonos.',true);
   socket.emit('teacher:select-student',{token:teacherToken,studentId:person.id},result=>{
     if(!result?.ok)setMessage('teacherMessage',result?.error||'No se pudo seleccionar.',true);
-    else if(options.focusNote)$('observationText').focus();
     else setMessage('teacherMessage',`Solicitud enviada a ${person.alias}. Esperando su autorización de captura.`);
   });
 }
+$('selectedProjectionRequest').onclick=()=>{if(selectedPerson)selectStudent(selectedPerson);};
+$('selectedNoteButton').onclick=()=>{if(selectedPerson)chooseStudentForFeedback(selectedPerson);};
+$('closeTeacherFeedback').onclick=closeTeacherFeedback;
+$('cancelTeacherFeedback').onclick=closeTeacherFeedback;
+noteDialog.addEventListener('cancel',event=>{
+  if(noteSending)event.preventDefault();
+});
+noteDialog.addEventListener('close',()=>{
+  $('observationText').value='';
+  $('observationError').textContent='';
+  noteRecipientId=null;
+  updateNoteCount();
+  if(noteReturnFocus?.isConnected && !noteReturnFocus.disabled)noteReturnFocus.focus();
+  noteReturnFocus=null;
+});
+$('observationText').addEventListener('input',updateNoteCount);
+$('observationForm').onsubmit=event=>{
+  event.preventDefault();
+  if(noteSending)return;
+  const recipientId=noteRecipientId;
+  if(!recipientId){$('observationError').textContent='Selecciona un estudiante.';return;}
+  const text=$('observationText').value.trim();
+  const count=text.length;
+  if(!text||count>MAX_NOTE_LENGTH){updateNoteCount();return;}
+  noteSending=true;
+  $('cancelTeacherFeedback').disabled=true;
+  $('closeTeacherFeedback').disabled=true;
+  updateNoteCount();
+  socket.emit('teacher:add-observation',{token:teacherToken,studentId:recipientId,text},result=>{
+    noteSending=false;
+    $('cancelTeacherFeedback').disabled=false;
+    $('closeTeacherFeedback').disabled=false;
+    if(!result?.ok){
+      updateNoteCount();
+      $('observationError').textContent=result?.error||'No se pudo enviar la nota.';
+      return;
+    }
+    closeTeacherFeedback();
+    setMessage('teacherMessage','Nota personal enviada al alumno.');
+  });
+};
 $('copyCode').onclick=async()=>{
   try{await navigator.clipboard.writeText($('displayCode').textContent);$('copyCode').textContent='Copiado';}
   catch{setMessage('teacherMessage',`Código: ${$('displayCode').textContent}`);}
-};
-$('observationText').addEventListener('input',()=>{$('charCount').textContent=`${$('observationText').value.length} / 1000`;});
-$('observationForm').onsubmit=event=>{
-  event.preventDefault();if(!selectedStudentId)return setMessage('teacherMessage','Selecciona un estudiante.',true);
-  socket.emit('teacher:add-observation',{token:teacherToken,studentId:selectedStudentId,text:$('observationText').value},result=>{
-    if(!result?.ok)return setMessage('teacherMessage',result?.error||'No se pudo guardar.',true);
-    $('observationText').value='';$('charCount').textContent='0 / 1000';setMessage('teacherMessage','Nota guardada temporalmente.');
-  });
 };
 function refreshStudentNotes(){
   socket.emit('student:get-observations',result=>{
@@ -310,8 +471,10 @@ $('end').onclick=()=>{
   socket.emit('teacher:end-session',{token:teacherToken},result=>{if(!result?.ok)setMessage('teacherMessage',result?.error||'No se pudo cerrar.',true);});
 };
 socket.on('session:ended',result=>{
+  closeTeacherFeedback();
   clearFileModule();clearStudentLocal();closePeer();
   if(teacherStream){teacherStream.getTracks().forEach(t=>t.stop());teacherStream=null;}
+  updateTeacherShareButtons();
   activeRole=null;teacherToken=null;teacherAttached=false;studentId=null;selectedStudentId=null;
   entry();
   setMessage(accessPath==='/alumno'?'studentEntryMessage':'teacherEntryMessage',`${result.message} Vuelve a abrir /docente si necesitas iniciar otra sesión.`);

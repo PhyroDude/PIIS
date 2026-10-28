@@ -1,3 +1,33 @@
+## Ajuste de UI — Alternar captura docente (InterLAB v0.5.0)
+
+- «Compartir mi pantalla» cambia a «Dejar de compartir mi pantalla» mientras la captura local está activa; la segunda pulsación termina la captura.
+- Se actualiza el estado si el docente termina la captura desde el navegador; el cambio funciona antes y después de crear sesión.
+- Detener la captura docente no reinicia la transmisión WebRTC de un alumno que ya esté presentando.
+- Pruebas y detalles en `docs/desarrollo/fix-boton-compartir-docente-v0.5.0.md`.
+
+## Ajuste de UI — Nota personal (InterLAB v0.5.0)
+
+- Modal centrado para **Dar nota personal** con **Cancelar** y **Enviar**.
+- Límite confirmado de **1000 caracteres** y contador en tiempo real; validación en cliente y servidor.
+- Validación equivalente en servidor y confirmación solo tras respuesta de Socket.IO.
+- Sin cambios en WebRTC, la cola o el módulo de archivos.
+
+## 0.5.0 — Rediseño de interfaz docente (sin cambio de lógica del servidor)
+
+- Panel horizontal de escritorio: participantes extendido desde la altura de los botones de proyección y cola a la izquierda.
+- Código de sesión y fuente actual visibles; participantes con filtro, orden y selección; panel de nota individual expandible.
+- Gestión de archivos reorganizada visualmente, conservando los mismos eventos, API, roles y permisos.
+- Vista previa HTML con datos ficticios y documento de diseño; prueba de regresión de controles y restricción de proyección móvil.
+- **Pendiente:** validación visual y de uso en navegador/laboratorio real.
+
+## 0.5.0 — Ajuste de disponibilidad de proyección según dispositivo (vista docente)
+
+- Al incorporarse, el alumno informa si usa teléfono; el servidor comprueba además el User-Agent de su conexión y registra el indicador durante esa incorporación.
+- En `/docente`, los participantes de teléfono muestran el indicador «📱 Teléfono» y tienen deshabilitado «Solicitar presentación». Los equipos de escritorio mantienen el botón activo.
+- El servidor rechaza solicitudes de turno y concesiones de presentación de alumnos identificados como teléfonos, incluso si intentan invocar los eventos directamente.
+- «Dar nota» continúa disponible para teléfonos y deja de conceder una proyección como efecto secundario.
+- Detección basada en información del navegador: práctica para la interfaz, no garantía frente a User-Agent alterados ni identificación de tabletas.
+
 # InterLAB — Historial de cambios
 
 ## 0.5.0 (beta) — Servidor fijo, receptor y recuperación docente

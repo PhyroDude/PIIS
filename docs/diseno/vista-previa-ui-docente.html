@@ -1,0 +1,405 @@
+<!-- VISTA PREVIA ESTÁTICA. DATOS FICTICIOS. NO CONTROLA INTERLAB. -->
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Aplicación web local para retroalimentación durante sesiones de laboratorio." name="description"/>
+<title>InterLAB · Vista previa del panel docente (datos de demostración)</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033;background:#f5f7fb;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}body{margin:0}header{display:flex;align-items:center;gap:14px;padding:20px max(18px,calc((100% - 980px)/2));background:#fff;border-bottom:1px solid #e2e7ef}header h1{font-size:19px;margin:3px 0}.mark{background:#2546a8;color:white;padding:14px;border-radius:12px;font-weight:800}.status{margin-left:auto;font-size:12px;color:#667085}.status.online{color:#177245}.status.offline{color:#b42318}small{font-size:10px;font-weight:800;letter-spacing:1.2px;color:#2546a8}main{max-width:860px;width:calc(100% - 30px);margin:36px auto 55px}.intro{text-align:center;margin:0 auto 25px;max-width:760px}.intro h2{font-size:clamp(27px,5vw,38px);letter-spacing:-1px;margin:10px 0}.intro p{color:#667085;line-height:1.65}.intro aside{display:inline-block;padding:12px 16px;background:#e8f7ef;color:#175c3b;border-radius:10px;font-size:13px;line-height:1.5}.panel{background:#fff;border:1px solid #e2e7ef;border-radius:18px;padding:clamp(20px,4vw,32px);box-shadow:0 10px 35px #1720330a;margin-bottom:18px}.panel h2{margin:8px 0}.muted{color:#667085;font-size:13px;line-height:1.6}.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.choice{padding:20px;text-align:left;background:#fff;border:1px solid #dce2ed;border-radius:12px;cursor:pointer}.choice:hover{border-color:#8199e8;background:#f9faff}.choice b,.choice span{display:block}.choice span{font-size:12px;color:#667085;margin-top:8px}form{border-top:1px solid #e2e7ef;padding-top:20px;margin-top:20px}form h3{margin:0 0 12px}label{display:block;font-size:12px;font-weight:700;margin:12px 0 6px}input,textarea{width:100%;padding:12px;border:1px solid #ccd3df;border-radius:9px;font:inherit;background:#fff;color:inherit}textarea{resize:vertical;line-height:1.5}.primary,.secondary,.danger{border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer;font:inherit;font-size:13px}.primary{margin-top:14px;background:#2546a8;color:white;border:1px solid #2546a8}.secondary{background:#fff;color:#2546a8;border:1px solid #ccd6f5}.primary:hover{background:#1b3687}.secondary:hover{background:#f2f5ff}.primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none!important}#message,#teacherMessage,#exportStatus{font-size:13px;color:#667085;line-height:1.5}.error{color:#b42318!important}.code{display:flex;align-items:center;flex-direction:column;gap:12px;padding:20px;margin:20px 0;background:#edf2ff;border-radius:12px}.code span{font-size:10px;letter-spacing:1px;color:#2546a8;font-weight:800}.code strong{font-size:34px;letter-spacing:6px}.listHead{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e7ef;gap:12px}.listHead h3{font-size:15px}.listHead>span{font-size:12px;color:#667085}.listHead button{margin-bottom:8px}ul{padding-left:0;list-style:none}li{padding:12px 4px;border-bottom:1px solid #f0f1f5;font-size:13px}.participant{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{margin:0}.subpanel{margin-top:24px;padding:18px;border:1px solid #e2e7ef;border-radius:13px;background:#fcfcfe}.subpanel h3{font-size:16px;margin:0 0 8px}.oral-note{padding:12px 14px;background:#f0f5ff;border-radius:10px;color:#203a80;font-size:13px}.oral-note p{margin:5px 0 0;line-height:1.5}.formFoot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.formFoot .primary{margin-top:8px}.note p{margin:0 0 8px;white-space:pre-wrap;overflow-wrap:anywhere}.note small{color:#667085;letter-spacing:0;font-weight:500}.videoWrap{position:relative;min-height:220px;background:#101827;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}.videoWrap video{display:block;width:100%;max-height:65vh;object-fit:contain;min-height:220px}.videoControl{position:absolute;bottom:12px;right:12px;border:1px solid #ffffff70;background:#172033d9;color:white;padding:9px 12px;border-radius:8px;cursor:pointer}.danger{width:100%;margin-top:24px;border:1px solid #fecdca;background:#fff1f0;color:#b42318}.notice{padding:14px;background:#e8f7ef;color:#175c3b;border-radius:10px;font-size:13px;line-height:1.5}footer{text-align:center;color:#7b8495;font-size:11px;padding:22px;border-top:1px solid #e2e7ef}.error{color:#b42318}@media(max-width:600px){.choices{grid-template-columns:1fr}header h1{font-size:15px}header{padding:15px}.participant{align-items:flex-start;flex-direction:column}.code strong{font-size:29px}.panel{padding:20px}.videoWrap,.videoWrap video{min-height:180px}}
+
+/* Incremento de diseño: pantallas de acceso y paletas diferenciadas por rol. */
+:root{--accent:#2546a8;--accent-hover:#1b3687;--accent-soft:#edf2ff;--accent-border:#ccd6f5;--accent-ink:#203a80;--page-bg:#f5f7fb}
+body{background:var(--page-bg)}
+header .mark{background:var(--accent);transition:background-color .18s ease}
+small{color:var(--accent)}
+.primary{background:var(--accent);border-color:var(--accent)}
+.primary:hover{background:var(--accent-hover)}
+.secondary{color:var(--accent);border-color:var(--accent-border)}
+.secondary:hover{background:var(--accent-soft)}
+.code{background:var(--accent-soft)}
+.code span{color:var(--accent)}
+.oral-note{background:var(--accent-soft);color:var(--accent-ink)}
+.role-picker .choices{margin-bottom:12px}
+.choice{position:relative;min-height:150px;transition:border-color .18s ease,background-color .18s ease,transform .18s ease}
+.choice:hover{transform:translateY(-2px)}
+.choice .role-symbol,.role-heading .role-symbol{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;font-size:23px;font-weight:800;margin-bottom:14px}
+.choice b{font-size:17px}
+.role-screen{max-width:680px;margin-left:auto;margin-right:auto}
+.role-heading{display:flex;align-items:flex-start;gap:16px;margin-bottom:22px}
+.role-heading .role-symbol{flex:0 0 48px;width:48px;height:48px;margin:0}
+.role-heading h2{margin:5px 0 8px}
+.role-heading p{margin:0}
+.role-screen form{margin-top:0}
+.role-screen form .primary{width:100%;padding:13px 16px}
+.back-button{margin-top:18px;padding:9px 0;border:0;background:transparent;color:#667085;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.back-button:hover{text-decoration:underline}
+.form-message{font-size:13px;color:#667085;line-height:1.5}
+body.theme-teacher{--accent:#2546a8;--accent-hover:#1b3687;--accent-soft:#edf2ff;--accent-border:#ccd6f5;--accent-ink:#203a80;--page-bg:#f4f6fc}
+body.theme-teacher header{border-bottom-color:#d9e1fb}
+body.theme-teacher .teacher-choice{border-color:#9aaceb;background:#f3f6ff}
+body.theme-teacher .teacher-choice .role-symbol,body.theme-teacher .role-heading .role-symbol{background:#dfe7ff;color:#2546a8}
+body.theme-teacher .teacher-screen{border-top:5px solid #2546a8}
+body.theme-student{--accent:#087f8c;--accent-hover:#066773;--accent-soft:#e7f7f7;--accent-border:#a8dddd;--accent-ink:#075b63;--page-bg:#f1f9f8}
+body.theme-student header{border-bottom-color:#cce8e6}
+body.theme-student .student-choice{border-color:#8bd0ce;background:#effafa}
+body.theme-student .student-choice .role-symbol,body.theme-student .role-heading .role-symbol{background:#d4f1ef;color:#087f8c}
+body.theme-student .student-screen{border-top:5px solid #087f8c}
+body.theme-student .intro aside{background:#e7f7f0;color:#175c3b}
+@media(prefers-reduced-motion:reduce){.choice,header .mark{transition:none}.choice:hover{transform:none}}
+
+/* InterLAB v0.4.0 · Archivos temporales */
+.file-manager .file-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:20px 0 12px;border-bottom:1px solid #dce2ed;padding-bottom:10px}
+.file-tabs button{border:1px solid #cbd5e1;background:white;color:#334155;padding:9px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px}
+.file-tabs button[aria-selected="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.file-filters{padding:8px 0 13px}.file-filters .actions{margin-top:9px}.file-filters button{font-size:11px;padding:8px 11px}
+.file-list{overflow:auto;margin-bottom:14px}.file-table{width:100%;border-collapse:collapse;min-width:490px;font-size:12px}
+.file-table th,.file-table td{padding:10px 7px;border-bottom:1px solid #e7ebf1;text-align:left;vertical-align:middle;overflow-wrap:anywhere}
+.file-table th{color:#64748b;font-weight:700}.file-table td .actions{gap:5px;flex-wrap:nowrap}.file-table button{padding:6px 9px;font-size:11px}
+.file-table input[type="checkbox"]{width:17px;height:17px;cursor:pointer}.file-icon{font-size:18px;color:var(--accent)}
+.upload-queue{margin:10px 0 0}.upload-item{padding:10px;border:1px solid #e2e8f0;border-radius:9px;margin:8px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px}
+.upload-item strong{overflow-wrap:anywhere;flex:1 1 150px}.upload-item .actions{margin-left:auto}.upload-item progress{height:9px;width:120px;accent-color:var(--accent)}
+.storage-warning{background:#fff5e5;border:1px solid #f9be68;border-radius:8px;padding:12px;color:#8b4a00;font-size:13px}
+.file-empty{padding:20px;text-align:center;color:#64748b;border:1px solid #e2e8f0;border-radius:8px}
+.file-manager button:disabled{opacity:.45;cursor:not-allowed}
+
+/* Aviso de concesión temporal de proyección. */
+.projection-notice{position:fixed;right:20px;bottom:20px;z-index:1000;width:min(380px,calc(100vw - 40px));padding:18px;background:#fff;color:#172033;border:2px solid #087f8c;border-radius:14px;box-shadow:0 12px 35px #17203340}
+.projection-notice p{margin:10px 0;font-size:14px;line-height:1.5}
+.projection-notice .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Mantener visible el código de incorporación en el panel docente. */
+#teacherView .code{position:sticky;top:8px;z-index:15;box-shadow:0 5px 18px #1720331a}
+/* InterLAB v0.5.0 — UI docente de escritorio. Los estilos no afectan /alumno ni /proyeccion. */
+body.dashboard-active{--dash-bg:#071b19;--dash-panel:#092521;--dash-green:#0b4938;--dash-border:#286858;--dash-text:#f1f7f5;--dash-muted:#c2d7d1;--dash-blue:#365cf9;--dash-red:#f6383c;background:var(--dash-bg);color:var(--dash-text)}
+body.dashboard-active>header,body.dashboard-active footer,body.dashboard-active .intro{display:none}
+body.dashboard-active main{width:100%;max-width:none;margin:0;padding:0}
+body.dashboard-active .teacher-dashboard{max-width:none;width:100%;margin:0;padding:16px 22px 24px;border:0;border-radius:0;box-shadow:none;background:linear-gradient(135deg,#071a17 0%,#081d1b 60%,#081b1a 100%);color:var(--dash-text);min-height:100vh}
+.teacher-dashboard{--accent:#365cf9;--accent-hover:#1e40c9;--accent-soft:#193e73;--accent-border:#4768a6;--accent-ink:#eaf1ff;color-scheme:dark}
+.teacher-dashboard *{min-width:0}
+.teacher-dashboard button,.teacher-dashboard input,.teacher-dashboard textarea{font-family:inherit}
+.teacher-dashboard button:focus-visible,.teacher-dashboard input:focus-visible,.teacher-dashboard textarea:focus-visible{outline:3px solid #97f3c4;outline-offset:2px}
+.teacher-dashboard .sr-only{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+.teacher-dashboard .dashboard-header{display:grid;grid-template-columns:minmax(230px,1.25fr) minmax(270px,1fr) minmax(180px,.62fr) minmax(190px,.48fr);gap:16px;align-items:stretch;margin-bottom:14px}
+.teacher-dashboard .brand-lockup{display:flex;align-items:center;gap:15px}
+.teacher-dashboard .brand-emblem{display:grid;place-items:center;flex:0 0 62px;height:62px;border:2px solid #c3b02c;border-radius:50%;background:#034b2c;font-weight:850;font-size:21px;color:#fff}
+.teacher-dashboard .brand-name{font-size:clamp(26px,2.5vw,39px);letter-spacing:-.035em;line-height:1;display:block}
+.teacher-dashboard .brand-lockup p{margin:7px 0 0;font-size:clamp(12px,1vw,15px);color:#dae7df}
+.teacher-dashboard .live-source,.teacher-dashboard .session-code{display:flex;align-items:center;justify-content:center;gap:16px;border:1px solid #316653;border-radius:9px;background:#05271f;padding:10px 16px}
+.teacher-dashboard .live-source>.ui-icon{font-size:38px;color:#d7fff0}
+.teacher-dashboard .live-source small,.teacher-dashboard .session-code small{display:block;color:#b2d2c9;font-weight:700;font-size:11px;letter-spacing:.07em}
+.teacher-dashboard #screenStatus{display:block;margin-top:5px;font-size:15px;font-weight:700;line-height:1.25;color:#fff}
+.teacher-dashboard .session-code{background:#111820;border-color:#60707c;justify-content:space-between;text-align:center;gap:8px}
+.teacher-dashboard .session-code>div{flex:1}
+.teacher-dashboard .session-code strong{display:block;font-size:38px;line-height:1.08;letter-spacing:.1em;color:#fff}
+.teacher-dashboard .icon-button{border:0;border-left:1px solid #627180;background:none;color:#effffa;font-size:27px;padding:8px 4px 8px 15px;cursor:pointer}
+.teacher-dashboard .dashboard-end{width:auto;min-height:65px;margin:0;padding:12px 16px;border:1px solid #f85657;background:var(--dash-red);color:white;display:flex;align-items:center;justify-content:center;gap:12px;font-size:15px;font-weight:800;box-shadow:none}
+.teacher-dashboard .dashboard-end span{font-size:27px}
+.teacher-dashboard .dashboard-end:hover,.teacher-dashboard .action-stop:hover{background:#d7252b}
+.teacher-dashboard .dashboard-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch;height:clamp(420px,53vh,630px)}
+.teacher-dashboard .dashboard-left{display:flex;flex-direction:column;min-height:0;gap:8px}
+.teacher-dashboard .projection-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.teacher-dashboard .projection-actions button{margin:0;min-height:70px;display:flex;align-items:center;justify-content:center;gap:15px;padding:12px 13px;text-align:left;border-radius:8px;color:#fff}
+.teacher-dashboard .projection-actions strong{display:block;font-size:clamp(13px,1.3vw,17px);white-space:normal}
+.teacher-dashboard .projection-actions small{display:block;font-size:clamp(10px,.86vw,12px);letter-spacing:0;color:#ecf0ff;font-weight:500;margin-top:4px}
+.teacher-dashboard .projection-actions .ui-icon{font-size:30px;flex:none}
+.teacher-dashboard .action-share{background:linear-gradient(120deg,#1e56e8,#514cf9);border:1px solid #6481ff}
+.teacher-dashboard .action-stop{background:#f2383e;border:1px solid #f65d65}
+.teacher-dashboard .teacher-capture-status{margin:0;color:#bbd2c9;font-size:12px;min-height:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.teacher-dashboard .dashboard-card{background:linear-gradient(160deg,#092a24,#091e1d);border:1px solid var(--dash-border);border-radius:9px;min-width:0}
+.teacher-dashboard .queue-card,.teacher-dashboard .participants-card{display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.teacher-dashboard .queue-card{flex:1}
+.teacher-dashboard .dashboard-card-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;min-height:58px}
+.teacher-dashboard .card-heading-label{display:flex;align-items:center;gap:9px;min-width:0}
+.teacher-dashboard .card-heading-label>span:first-child{font-size:24px;color:#e6fff2}
+.teacher-dashboard .card-heading-label h3{color:#fff;font-size:clamp(15px,1.25vw,19px);margin:0;font-weight:800;white-space:nowrap}
+.teacher-dashboard .count-bubble{display:inline-block;background:#159b5f;color:white;font-size:12px;border-radius:18px;padding:4px 10px;white-space:nowrap;font-weight:800}
+.teacher-dashboard .dashboard-toolbar{display:flex;align-items:center;gap:8px}
+.teacher-dashboard .dashboard-search{margin:0;min-width:100px;max-width:260px;width:min(18vw,260px)}
+.teacher-dashboard .dashboard-search input{width:100%;min-height:36px;border:1px solid #587476;border-radius:7px;background:#101e26;color:#fff;padding:8px 12px;font-size:12px}
+.teacher-dashboard .dashboard-search input::placeholder{color:#b5c4c8}
+.teacher-dashboard .sort-button{background:#111f25;border:1px solid #607a7a;color:#fff;border-radius:7px;margin:0;padding:9px 12px;min-height:36px;white-space:nowrap}
+.teacher-dashboard .dashboard-table-wrap{flex:1;min-height:0;overflow:auto;scrollbar-color:#607777 #0b2524;scrollbar-width:thin}
+.teacher-dashboard .dashboard-table{width:100%;border-collapse:collapse;table-layout:auto;color:#e8f3f1;text-align:left;font-size:clamp(11px,.84vw,13px)}
+.teacher-dashboard .dashboard-table th{position:sticky;top:0;z-index:2;background:#183c39;color:#f1fbf8;white-space:nowrap;text-align:left;padding:9px 9px;font-weight:750;border-bottom:1px solid #355f58}
+.teacher-dashboard .dashboard-table td{padding:7px 9px;border-bottom:1px solid #24413e;vertical-align:middle}
+.teacher-dashboard .dashboard-table tbody tr:hover{background:#184b3d}
+.teacher-dashboard .dashboard-table tbody tr.is-selected{background:#145a4c;box-shadow:inset 3px 0 #85ffcb}
+.teacher-dashboard .participant-alias{background:none;border:0;color:#f1faf6;text-align:left;font-weight:700;cursor:pointer;padding:2px 0;overflow-wrap:anywhere;font-size:inherit}
+.teacher-dashboard .participant-alias:hover{text-decoration:underline}
+.teacher-dashboard .dashboard-table .dash-row-actions{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.teacher-dashboard .dash-row-actions button{background:#365cf9;border:1px solid #6b8afe;border-radius:5px;color:#fff;font-size:11px;font-weight:700;padding:7px 9px;margin:0;white-space:nowrap;cursor:pointer}
+.teacher-dashboard .dash-row-actions button:hover:not(:disabled){background:#274ce0}
+.teacher-dashboard .dash-row-actions button.secondary{background:#15352f;border-color:#52756b}
+.teacher-dashboard .dash-row-actions button:disabled{color:#b5c6cb;background:#3d5660;border-color:#47636a;cursor:not-allowed;opacity:1}
+.teacher-dashboard .dash-row-actions .note-action{background:#15352f;border-color:#52756b;font-size:16px;padding:4px 8px}
+.teacher-dashboard .device-type{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.teacher-dashboard .device-type .device-glyph{font-size:16px}
+.teacher-dashboard .connected-dot{display:inline-block;width:9px;height:9px;background:#1ff07b;border-radius:50%;margin-right:6px}
+.teacher-dashboard .queue-state{background:#786118;color:#fff0bf;padding:5px 9px;border-radius:6px;white-space:nowrap;font-weight:700}
+.teacher-dashboard .dashboard-table .table-empty{text-align:center;padding:25px;color:#bcd6cc}
+.teacher-dashboard .selected-student{display:flex;align-items:center;gap:16px;padding:13px 20px;margin:13px 0 10px;min-height:78px;flex-wrap:wrap}
+.teacher-dashboard .student-summary{display:flex;align-items:center;gap:12px;flex:0 1 300px}
+.teacher-dashboard .student-avatar{font-size:37px;color:#fff}
+.teacher-dashboard .student-summary small{color:#d3e8e0;font-size:10px;letter-spacing:.04em;display:block}
+.teacher-dashboard .student-summary strong{font-size:19px;display:block;color:#fff;white-space:nowrap}
+.teacher-dashboard .device-pill{background:#772c3c;border-radius:6px;padding:7px 9px;font-size:11px;font-weight:700;color:#fff}
+.teacher-dashboard .selected-student-hint{color:#c7dbd4;font-size:12px;line-height:1.35;margin:0;flex:1 1 220px}
+.teacher-dashboard .selected-actions{display:flex;gap:10px;margin-left:auto}
+.teacher-dashboard .selected-actions button{margin:0;min-height:40px;white-space:nowrap}
+.teacher-dashboard .selected-actions .secondary{background:#102c27;color:#fff;border-color:#7b9692}
+.teacher-dashboard .selected-actions button:disabled{background:#40555c;border:1px solid #526973;color:#cad5d8;opacity:.8}
+.teacher-dashboard .dashboard-feedback{flex-basis:100%;font-size:12px;color:#f2deb0;line-height:1.3;margin:0}
+.teacher-dashboard .dashboard-feedback:empty{display:none}
+.teacher-dashboard .observation-editor{padding:15px 20px;margin-bottom:10px}
+.teacher-dashboard .observation-editor .dashboard-card-heading{padding:0 0 8px}
+.teacher-dashboard .observation-editor h3{color:#fff;margin:0;font-size:16px}
+.teacher-dashboard .observation-editor p,.teacher-dashboard .observation-editor label{font-size:12px;color:#c6dcd5}
+.teacher-dashboard .observation-editor form{border:0;padding:0;margin:0}
+.teacher-dashboard .observation-editor textarea{background:#0b1b1a;border-color:#587670;color:#fff}
+.teacher-dashboard .observation-editor .primary{margin:0}
+.teacher-dashboard .dashboard-files{border:1px solid #63877b;border-radius:10px;background:#cfdfdb;padding:10px;color:#0d2a27;min-height:210px}
+.teacher-dashboard .files-toolbar{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.teacher-dashboard .file-tabs{margin:0;border:0;padding:0;display:flex;gap:8px}
+.teacher-dashboard .file-tabs button{border:1px solid #22443b;background:#0b2322;color:#fff;padding:11px 18px;font-weight:800;min-height:40px}
+.teacher-dashboard .file-tabs button[aria-selected="true"]{background:#0b553e;color:#fff;border-color:#38876d}
+.teacher-dashboard .file-upload-group{display:flex;gap:10px;align-items:center;flex:1 1 340px;justify-content:flex-end}
+.teacher-dashboard .file-picker-label{display:inline-block;color:#10342f;font-size:11px;font-weight:800;margin:0}
+.teacher-dashboard #teacherUpload{width:min(245px,30vw);padding:6px 8px;border:1px solid #6c9d90;background:#f3f8f6;color:#14362f;border-radius:7px;font-size:11px}
+.teacher-dashboard #teacherUpload::file-selector-button{background:#0b553e;color:#fff;border:0;border-radius:5px;padding:6px;cursor:pointer}
+.teacher-dashboard #teacherUploadButton{margin:0;white-space:nowrap;min-height:39px;background:#365cf9;border-color:#5e7bfd}
+.teacher-dashboard .file-filters{display:flex;align-items:center;gap:10px;padding:9px 0;flex-wrap:wrap}
+.teacher-dashboard .file-filters.hidden{display:none!important}
+.teacher-dashboard .file-filters label{font-size:11px;font-weight:800;color:#153c33;margin:0}
+.teacher-dashboard #teacherFileSearch{max-width:280px;min-width:180px;background:#102329;color:#fff;border-color:#5c7775;font-size:12px;padding:9px 11px}
+.teacher-dashboard .file-filters .actions{margin:0}
+.teacher-dashboard .file-filters .secondary{background:#0d3430;border-color:#39765c;color:#fff}
+.teacher-dashboard .file-list{overflow:auto;max-height:285px;min-height:130px;margin:10px 0;border-radius:7px;border:1px solid #38675e;background:#092423;scrollbar-color:#617771 #0b2524}
+.teacher-dashboard .file-table{min-width:530px;color:#e7f6f2}
+.teacher-dashboard .file-table th{position:sticky;top:0;background:#183d39;color:#e9f7f2;border-color:#38635d}
+.teacher-dashboard .file-table td{border-color:#25504a}
+.teacher-dashboard .file-table .secondary{background:#14372f;color:#fff;border-color:#467c6a}
+.teacher-dashboard .file-empty{background:#0e2d2a;color:#d8eee6}
+.teacher-dashboard .files-footer{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:30px}
+.teacher-dashboard .files-footer .secondary{margin:0;background:#082925;color:#fff;border:1px solid #396d5d}
+.teacher-dashboard .files-footer .muted{color:#193f36;margin:0;font-size:12px}
+.teacher-dashboard .upload-queue{color:#103d30}.teacher-dashboard .upload-item{background:#f6faf8;border-color:#a1b6ac}
+.teacher-dashboard .storage-warning{font-size:12px}
+@media(max-width:1250px){.teacher-dashboard .dashboard-header{grid-template-columns:minmax(250px,1.1fr) minmax(210px,1fr) minmax(180px,.65fr);gap:10px}.teacher-dashboard .dashboard-end{grid-column:3;min-height:46px}.teacher-dashboard .dashboard-header .session-code{grid-column:3;grid-row:1}.teacher-dashboard .dashboard-header .brand-lockup{grid-row:1 / 3}.teacher-dashboard .dashboard-header .live-source{grid-row:1 / 3}.teacher-dashboard .dashboard-stage{height:520px}.teacher-dashboard .dashboard-table{font-size:11px}.teacher-dashboard .dashboard-table td,.teacher-dashboard .dashboard-table th{padding:8px 5px}.teacher-dashboard .dash-row-actions button{padding:6px 7px;font-size:10px}.teacher-dashboard .card-heading-label h3{font-size:15px}.teacher-dashboard .dashboard-search{width:150px}}
+@media(max-width:920px){.teacher-dashboard .dashboard-header{grid-template-columns:1fr 1fr}.teacher-dashboard .dashboard-header .brand-lockup,.teacher-dashboard .dashboard-header .live-source,.teacher-dashboard .dashboard-header .session-code,.teacher-dashboard .dashboard-header .dashboard-end{grid-column:auto;grid-row:auto}.teacher-dashboard .dashboard-stage{grid-template-columns:1fr;gap:12px;height:auto}.teacher-dashboard .dashboard-left{min-height:430px}.teacher-dashboard .participants-card{height:450px}.teacher-dashboard .selected-student{gap:12px}.teacher-dashboard .selected-actions{margin-left:0}}
+@media(max-width:620px){body.dashboard-active .teacher-dashboard{padding:10px}.teacher-dashboard .dashboard-header{grid-template-columns:1fr;gap:8px}.teacher-dashboard .brand-lockup{min-height:60px}.teacher-dashboard .dashboard-header .dashboard-end{min-height:50px}.teacher-dashboard .projection-actions{grid-template-columns:1fr}.teacher-dashboard .dashboard-left{min-height:0}.teacher-dashboard .queue-card{height:340px}.teacher-dashboard .participants-card{height:390px}.teacher-dashboard .dashboard-card-heading{flex-wrap:wrap}.teacher-dashboard .dashboard-toolbar{width:100%}.teacher-dashboard .dashboard-search{width:100%;max-width:none;flex:1}.teacher-dashboard .dashboard-table{min-width:550px}.teacher-dashboard .selected-actions{flex-wrap:wrap}.teacher-dashboard .selected-actions button{flex:1}.teacher-dashboard .file-upload-group{justify-content:flex-start}.teacher-dashboard #teacherUpload{width:100%}.teacher-dashboard .files-toolbar{align-items:stretch}.teacher-dashboard .file-tabs{width:100%}}
+@media(prefers-reduced-motion:reduce){.teacher-dashboard *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Estados visibles en la tabla de participantes. */
+.teacher-dashboard .participant-online{color:#cbfbe0;white-space:nowrap}
+.teacher-dashboard .participant-online::first-letter{color:#25ef7d}
+.teacher-dashboard .queue-state-cell{color:#f3d886;font-weight:800}
+
+/* InterLAB v0.5.0 — cuadro modal de nota personal del docente. */
+.teacher-dashboard .note-dialog:not([open]){display:none}
+.teacher-dashboard .note-dialog[open]{
+  display:block;
+  position:fixed;
+  inset:0;
+  width:min(680px,calc(100vw - 32px));
+  max-width:none;
+  max-height:min(85vh,800px);
+  margin:auto;
+  padding:0;
+  overflow-y:auto;
+  border:1px solid #407665;
+  border-radius:16px;
+  background:#0d2424;
+  color:#f1fbf7;
+  box-shadow:0 24px 80px #000b;
+  z-index:2000;
+}
+.teacher-dashboard .note-dialog::backdrop{background:rgba(2,12,16,.76);backdrop-filter:blur(3px)}
+.teacher-dashboard .note-dialog-header{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding:24px 26px 14px;background:linear-gradient(100deg,#0e4638,#112c2c)
+}
+.teacher-dashboard .note-dialog-eyebrow{font-weight:800;letter-spacing:.09em;font-size:11px;color:#b4e9d0}
+.teacher-dashboard .note-dialog-header h3{margin:8px 0 0;color:#fff;font-size:clamp(20px,2.4vw,26px);overflow-wrap:anywhere}
+.teacher-dashboard .note-close-button{
+  padding:2px 10px;margin:0;border:1px solid #588173;border-radius:8px;
+  background:#173c34;color:#fff;font-size:27px;line-height:1.2;cursor:pointer
+}
+.teacher-dashboard .note-close-button:hover{background:#27594c}
+.teacher-dashboard .note-dialog-description{padding:0 26px;font-size:13px;line-height:1.6;color:#d2e8df;margin:17px 0 8px}
+.teacher-dashboard .note-dialog form{margin:0;padding:0 26px 24px;border:0}
+.teacher-dashboard .note-dialog label{font-size:14px;color:#fff;margin-bottom:9px}
+.teacher-dashboard .note-dialog textarea{
+  width:100%;min-height:170px;max-height:45vh;resize:vertical;
+  padding:15px;border:1px solid #5c897a;border-radius:9px;
+  background:#081b1a;color:#fff;font-size:15px;line-height:1.6
+}
+.teacher-dashboard .note-dialog textarea:focus-visible{outline:3px solid #67bfa2;outline-offset:2px}
+.teacher-dashboard .note-dialog-meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:8px 0 0;font-size:12px;color:#a9c9bd}
+.teacher-dashboard .note-dialog-meta .note-limit-exceeded{color:#ffb8b2;font-weight:800}
+.teacher-dashboard .note-dialog-error{min-height:20px;margin:10px 0 6px;color:#ffb8b2;font-size:13px;line-height:1.4}
+.teacher-dashboard .note-dialog-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:8px}
+.teacher-dashboard .note-dialog-actions button{margin:0;min-width:122px;min-height:43px}
+.teacher-dashboard .note-dialog-actions .secondary{background:#183c35;border-color:#5c897a;color:#fff}
+.teacher-dashboard .note-dialog-actions .primary{background:#365cf9;color:#fff;border-color:#6b8afe}
+.teacher-dashboard .note-dialog-actions .primary:disabled{background:#43555c;border-color:#536b70;opacity:.65;cursor:not-allowed}
+@media(max-width:620px){
+  .teacher-dashboard .note-dialog-header{padding:18px 18px 12px}
+  .teacher-dashboard .note-dialog-description{padding:0 18px}
+  .teacher-dashboard .note-dialog form{padding:0 18px 18px}
+  .teacher-dashboard .note-dialog-actions button{flex:1;min-width:0}
+}
+
+</style>
+
+
+
+
+</head>
+<body class="dashboard-active theme-teacher">
+<header><div class="mark">IL</div><div><small>LABORATORIO DE CÓMPUTO</small><h1>InterLAB</h1></div><span class="status" id="connection">Conectando…</span></header>
+<main>
+<section class="intro"><small>MVP · SESIONES TEMPORALES</small><h2>Revisa el trabajo. Da retroalimentación útil.</h2><p>El docente puede orientar verbalmente al estudiante y, cuando lo necesite, registrar una nota individual opcional.</p><aside><b>Privacidad:</b> las observaciones se conservan en memoria y los archivos compartidos, temporalmente en disco. Todo se elimina al finalizar la sesión; no hay historial permanente.</aside></section>
+<section class="panel role-picker" id="roles">
+<small>ACCESO A LA SESIÓN</small>
+<h2>¿Cómo deseas ingresar?</h2>
+<p class="muted">Selecciona tu rol para abrir su pantalla de acceso.</p>
+<div class="choices">
+<button class="choice teacher-choice" id="teacherChoice" type="button"><span aria-hidden="true" class="role-symbol">▤</span><b>Docente</b><span>Crear y administrar una sesión</span></button>
+<button class="choice student-choice" id="studentChoice" type="button"><span aria-hidden="true" class="role-symbol">⌘</span><b>Estudiante</b><span>Ingresar con código y alias temporal</span></button>
+</div>
+<p aria-live="polite" id="message" role="status"></p>
+</section>
+<section class="panel role-screen teacher-screen hidden" id="teacherEntry">
+<div class="role-heading"><span aria-hidden="true" class="role-symbol">▤</span><div><small>ÁREA DOCENTE</small><h2>Acceso del docente</h2><p class="muted">Crea una sesión temporal para organizar la participación del grupo.</p></div></div>
+<button class="secondary" id="teacherShareEntry" type="button">Compartir pantalla de mi laptop</button><form id="teacherForm"><h3>Iniciar sesión docente</h3><p class="muted">Se creará una sesión nueva. El código generado permitirá que los estudiantes se incorporen.</p><button class="primary">Crear sesión temporal</button></form>
+<button class="back-button" id="backFromTeacher" type="button">← Volver a elegir rol</button>
+<p aria-live="polite" class="form-message" id="teacherEntryMessage" role="status"></p>
+</section>
+<section class="panel role-screen student-screen hidden" id="studentEntry">
+<div class="role-heading"><span aria-hidden="true" class="role-symbol">⌘</span><div><small>ÁREA ESTUDIANTIL</small><h2>Acceso del estudiante</h2><p class="muted">Únete a la sesión de tu docente con el código temporal y un alias.</p></div></div>
+<form id="studentForm"><h3>Incorporarme a una sesión</h3><label for="code">Código de sesión</label><input autocomplete="off" id="code" inputmode="numeric" maxlength="4" pattern="[1-9]{4}" placeholder="Ej. 1234" required=""/><label for="alias">Alias temporal</label><input autocomplete="off" id="alias" maxlength="32" placeholder="Ej. Estudiante 04" required=""/><button class="primary">Ingresar a la sesión</button></form>
+<button class="back-button" id="backFromStudent" type="button">← Volver a elegir rol</button>
+<p aria-live="polite" class="form-message" id="studentEntryMessage" role="status"></p>
+</section>
+<section aria-label="Panel docente de InterLAB" class="panel teacher-dashboard" id="teacherView">
+<div class="dashboard-header">
+<div class="brand-lockup">
+<span aria-hidden="true" class="brand-emblem">IL</span>
+<div><strong class="brand-name">InterLAB</strong><p>Panel docente · Control de sesión</p></div>
+</div>
+<div aria-live="polite" class="live-source"><span aria-hidden="true" class="ui-icon">▣</span><div><small>PROYECCIÓN ACTUAL</small><span id="screenStatus">Pantalla del docente</span></div></div>
+<div class="session-code"><div><small>CÓDIGO DE LA SESIÓN</small><strong id="displayCode">4048</strong></div><button aria-label="Copiar código de sesión" class="icon-button" id="copyCode" title="Copiar código de sesión" type="button">⧉</button></div>
+<button class="danger dashboard-end" id="end" type="button"><span aria-hidden="true">↪</span> Finalizar sesión</button>
+</div>
+<div class="dashboard-stage">
+<div class="dashboard-left">
+<div class="projection-actions">
+<button class="primary action-share" id="teacherShareActive" type="button"><span aria-hidden="true" class="ui-icon">▣</span><span><strong>Compartir mi pantalla</strong><small>Proyectar mi equipo en el laboratorio</small></span></button>
+<button class="danger action-stop" id="stopPresentation" type="button"><span aria-hidden="true" class="ui-icon">■</span><span><strong>Detener proyección actual</strong><small>Finalizar la proyección en curso</small></span></button>
+</div>
+<p class="teacher-capture-status" id="teacherScreenStatus" role="status">Captura autorizada · Presentación predeterminada del docente disponible</p>
+<section aria-labelledby="queueHeading" class="dashboard-card queue-card">
+<div class="dashboard-card-heading"><div class="card-heading-label"><span aria-hidden="true">♟</span><h3 id="queueHeading">Cola de presentación</h3><span class="count-bubble" id="queueCount">6</span></div><label class="dashboard-search"><span class="sr-only">Buscar estudiante en la cola</span><input autocomplete="off" id="teacherQueueSearch" placeholder="Buscar en la cola..." type="search"/></label></div>
+<div aria-label="Lista de solicitudes de presentación" class="dashboard-table-wrap" tabindex="0"><table class="dashboard-table"><thead><tr><th scope="col">#</th><th scope="col">Alias del estudiante</th><th scope="col">Solicitado</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead><tbody id="presentationQueue"><tr><td>1</td><td>HUGO</td><td>10:13</td><td>En cola</td><td><button class="secondary">Conceder</button></td></tr><tr><td>2</td><td>PEDRO</td><td>10:14</td><td>En cola</td><td><button class="secondary">Conceder</button></td></tr><tr><td>3</td><td>JUAN</td><td>10:15</td><td>En cola</td><td><button class="secondary">Conceder</button></td></tr><tr><td>4</td><td>JACINTO</td><td>10:16</td><td>En cola</td><td><button class="secondary">Conceder</button></td></tr><tr><td>5</td><td>VANESSA</td><td>10:17</td><td>En cola</td><td><button class="secondary">Conceder</button></td></tr><tr><td>6</td><td>RAMÓN</td><td>10:18</td><td>En cola</td><td><button class="secondary">Conceder</button></td></tr></tbody></table></div>
+</section>
+</div>
+<section aria-labelledby="participantsHeading" class="dashboard-card participants-card">
+<div class="dashboard-card-heading"><div class="card-heading-label"><span aria-hidden="true">♟</span><h3 id="participantsHeading">Participantes en la sesión</h3><span class="count-bubble" id="count">15 / 30</span></div><div class="dashboard-toolbar"><label class="dashboard-search"><span class="sr-only">Buscar participante</span><input autocomplete="off" id="teacherParticipantSearch" placeholder="Buscar participante..." type="search"/></label><button aria-label="Ordenar participantes" class="secondary sort-button" id="teacherParticipantSort" type="button">A–Z</button></div></div>
+<div aria-label="Participantes conectados" class="dashboard-table-wrap" tabindex="0"><table class="dashboard-table"><thead><tr><th scope="col">#</th><th scope="col">Alias</th><th scope="col">Dispositivo</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead><tbody id="participants"><tr><td>1</td><td>HUGO</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>2</td><td>PEDRO</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>3</td><td>JUAN</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>4</td><td>JACINTO</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>5</td><td>VANESSA</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>6</td><td>RAMÓN</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>7</td><td>YOLANDA</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr class="is-selected"><td>8</td><td>FAUSTO</td><td>▯ Teléfono</td><td>● Conectado</td><td><div class="dash-row-actions"><button disabled="disabled">No disponible</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>9</td><td>GEREMÍAS</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>10</td><td>DANTE</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>11</td><td>GUADALUPE</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>12</td><td>VÍCTOR AUGUSTO</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>13</td><td>HERNANDO MARTÍNEZ</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>14</td><td>CESAR DUARTE</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr><tr><td>15</td><td>GALLARDO FLORES</td><td>▣ Equipo</td><td>● Conectado</td><td><div class="dash-row-actions"><button>Solicitar proyección</button><button class="secondary note-action">▤</button></div></td></tr></tbody></table></div>
+</section>
+</div>
+<section aria-label="Alumno seleccionado" class="dashboard-card selected-student">
+<div class="student-summary"><span aria-hidden="true" class="student-avatar">♟</span><div><small>ALUMNO SELECCIONADO</small><strong id="selectedStudentName">FAUSTO</strong></div><span class="device-pill" id="selectedDeviceBadge">Teléfono</span></div>
+<p class="selected-student-hint" id="selectedStudentHint">La proyección de pantalla no está disponible desde teléfonos. Puedes enviarle una nota.</p>
+<div class="selected-actions"><button class="primary" disabled="" id="selectedProjectionRequest" type="button">Solicitar proyección</button><button class="secondary" id="selectedNoteButton" type="button">Dar nota personal</button></div>
+<p aria-live="polite" class="dashboard-feedback" id="teacherMessage" role="status"></p>
+</section>
+    <dialog id="teacherFeedback" class="note-dialog" aria-labelledby="noteDialogTitle" aria-describedby="noteDialogDescription">
+      <div class="note-dialog-header">
+        <div><span class="note-dialog-eyebrow">RETROALIMENTACIÓN INDIVIDUAL</span><h3 id="noteDialogTitle">Nota personal para <span id="selectedAlias"></span></h3></div>
+        <button id="closeTeacherFeedback" class="note-close-button" type="button" aria-label="Cancelar y cerrar nota">×</button>
+      </div>
+      <p id="noteDialogDescription" class="note-dialog-description">La nota solo la recibirá el alumno seleccionado. Se conservará durante la sesión y se eliminará al finalizarla.</p>
+      <form id="observationForm" novalidate>
+        <label for="observationText">Escribe tu nota</label>
+        <textarea id="observationText" rows="9" maxlength="1000" placeholder="Escribe una observación o recomendación para este alumno..." aria-describedby="charCount observationError" required></textarea>
+        <div class="note-dialog-meta"><span id="charCount" aria-live="polite">0 / 1000 caracteres</span><span>Máximo: 1000 caracteres</span></div>
+        <p id="observationError" class="note-dialog-error" role="alert"></p>
+        <div class="note-dialog-actions">
+          <button id="cancelTeacherFeedback" type="button" class="secondary">Cancelar</button>
+          <button id="sendObservation" type="submit" class="primary" disabled>Enviar</button>
+        </div>
+      </form>
+    </dialog>
+
+<section aria-label="Gestión de archivos de la sesión" class="dashboard-files file-manager" id="teacherFiles">
+<div class="files-toolbar"><div aria-label="Secciones de archivos" class="file-tabs" id="teacherFileTabs" role="tablist"><button aria-selected="true" role="tab">Mis archivos</button><button aria-selected="false" role="tab">Archivos de los alumnos</button></div><div class="file-upload-group"><label class="file-picker-label" for="teacherUpload">Seleccionar archivos</label><input aria-label="Seleccionar archivos" id="teacherUpload" multiple="" type="file"/><button class="primary" id="teacherUploadButton" type="button">Subir archivos</button></div></div>
+<p class="storage-warning hidden" id="teacherSpaceWarning" role="alert">No hay espacio suficiente para la carga. Elimina archivos que ya no necesites.</p>
+<div aria-live="polite" class="upload-queue" id="teacherUploadQueue"></div>
+<div class="file-filters hidden" id="teacherFileFilters"><label for="teacherFileSearch">Buscar archivo por nombre</label><input id="teacherFileSearch" placeholder="Buscar archivo por nombre..." type="search"/><div class="actions"><button class="secondary" data-file-sort="name" type="button">Nombre Z→A</button><button class="secondary" data-file-sort="alias" type="button">Alias Z→A</button><button class="secondary" data-file-sort="date" type="button">Fecha: más antiguos</button></div></div>
+<div class="file-list" id="teacherFileList"><table class="file-table"><thead><tr><th></th><th>Tipo</th><th>Nombre</th><th>Fecha y hora</th><th>Acciones</th></tr></thead><tbody><tr><td>□</td><td>▣</td><td>guia_practica.pdf</td><td>28/10/2026 10:15</td><td><button class="secondary">Descargar</button></td></tr><tr><td>□</td><td>▣</td><td>codigo.py</td><td>28/10/2026 10:18</td><td><button class="secondary">Descargar</button></td></tr><tr><td>□</td><td>▣</td><td>diagrama.png</td><td>28/10/2026 10:20</td><td><button class="secondary">Descargar</button></td></tr><tr><td>□</td><td>▣</td><td>reporte.docx</td><td>28/10/2026 10:22</td><td><button class="secondary">Descargar</button></td></tr></tbody></table></div>
+<div class="files-footer"><button class="secondary" disabled="" id="teacherZip" type="button">Descargar seleccionados como ZIP</button><p aria-live="polite" class="muted" id="teacherFileStatus" role="status"></p></div>
+</section>
+<div class="hidden"><video autoplay="" id="screenVideo" playsinline=""></video><button id="fullscreen" type="button">Pantalla completa</button></div>
+</section>
+<section class="panel hidden" id="studentView">
+<small>PANEL DEL ESTUDIANTE</small><h2>Ya estás en la sesión</h2><p>Tu alias temporal: <b id="joinedAlias"></b></p>
+<section class="subpanel"><h3>Compartir pantalla para revisión</h3><p class="muted">Solicita un turno sin capturar ni transmitir pantalla. Cuando el docente te autorice, aparecerá una notificación para que aceptes la captura. El docente también puede elegirte directamente.</p><div class="actions"><button class="primary" id="startShare" type="button">Solicitar turno</button><button class="secondary" disabled="" id="withdrawShare" type="button">Retirar solicitud</button><button class="secondary" disabled="" id="stopShare" type="button">Detener captura</button></div><p aria-live="polite" class="muted" id="studentScreenStatus" role="status">No estás compartiendo pantalla.</p></section>
+<section class="subpanel"><div class="listHead"><h3>Tus observaciones</h3><button class="secondary" id="refreshNotes" type="button">Actualizar</button></div><p class="muted">Aquí aparecen las notas escritas para ti. Si el docente da la retroalimentación solo verbalmente, esta lista puede permanecer vacía.</p><ul id="studentNotes"><li class="muted">Aún no hay observaciones escritas.</li></ul><div class="actions"><button class="secondary" disabled="" id="copyNotes" type="button">Copiar notas</button><button class="secondary" disabled="" id="downloadNotes" type="button">Descargar .txt</button></div><p class="muted" id="exportStatus"></p></section>
+<section class="subpanel file-manager" id="studentFiles">
+<div class="listHead"><h3>Archivos compartidos</h3><span>Solo durante esta sesión</span></div>
+<p class="muted">Puedes descargar los archivos del grupo y eliminar únicamente los que subiste tú.</p>
+<label for="studentUpload">Seleccionar archivos (máximo 50 MB por archivo y 200 MB por selección)</label>
+<input id="studentUpload" multiple="" type="file"/>
+<button class="primary" id="studentUploadButton" type="button">Subir archivos</button>
+<div aria-live="polite" class="upload-queue" id="studentUploadQueue"></div>
+<div aria-label="Secciones de archivos" class="file-tabs" id="studentFileTabs" role="tablist"></div>
+<div class="file-filters hidden" id="studentFileFilters">
+<label for="studentFileSearch">Buscar por nombre (comienza con)</label><input id="studentFileSearch" placeholder="Escribe el inicio del nombre"/>
+<div class="actions"><button class="secondary" data-file-sort="name" type="button">Nombre Z→A</button><button class="secondary" data-file-sort="alias" type="button">Alias Z→A</button><button class="secondary" data-file-sort="date" type="button">Fecha: más antiguos</button></div>
+</div>
+<div class="file-list" id="studentFileList"></div>
+<button class="secondary" disabled="" id="studentZip" type="button">Descargar seleccionados como ZIP</button>
+<p aria-live="polite" class="muted" id="studentFileStatus" role="status"></p>
+</section>
+</section>
+<aside aria-live="assertive" class="projection-notice hidden" id="projectionNotice" role="alert">
+<strong>📺 Solicitud de proyección</strong><p id="projectionNoticeText"></p>
+<div class="actions"><button class="primary" id="projectionNoticeAction" type="button">Autorizar pantalla</button>
+<button class="secondary" id="projectionNoticeReject" type="button">Rechazar</button><button class="secondary" id="projectionNoticeClose" type="button">Cerrar aviso</button></div>
+</aside>
+<p aria-live="polite" class="notice hidden" id="notice" role="status"></p>
+</main>
+<footer>Aplicación local · Comunicación por LAN · Sin base de datos</footer>
+<script>
+// Vista previa estática: el modal funciona localmente, pero NO envía notas al servidor.
+(()=>{
+  const modal=document.getElementById('teacherFeedback');
+  const txt=document.getElementById('observationText');
+  const counter=document.getElementById('charCount');
+  const send=document.getElementById('sendObservation');
+  const err=document.getElementById('observationError');
+  function update(){
+    const count=txt.value.length;
+    counter.textContent=`${count} / 1000 caracteres`;
+    send.disabled=!txt.value.trim()||count>1000;
+    err.textContent=count>1000?'Superaste el límite de 1000 caracteres.':'';
+  }
+  function close(){modal.close();txt.value='';update();}
+  document.getElementById('selectedNoteButton').onclick=()=>{
+    document.getElementById('selectedAlias').textContent='FAUSTO';
+    update();modal.showModal();txt.focus();
+  };
+  document.getElementById('closeTeacherFeedback').onclick=close;
+  document.getElementById('cancelTeacherFeedback').onclick=close;
+  txt.oninput=update;
+  document.getElementById('observationForm').onsubmit=e=>{
+    e.preventDefault();if(send.disabled)return;
+    close();document.getElementById('teacherMessage').textContent='Vista previa: envío simulado (no se guardó ninguna nota).';
+  };
+})();
+</script>
+</body>
+</html>

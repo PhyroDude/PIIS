@@ -1,5 +1,7 @@
 # Trazabilidad y plan de pruebas — base 0.3.0
 
+> **Actualización de la UI en v0.5.0:** las notas personales mantienen el límite original de **1000 caracteres**, con [modal y validación en cliente y servidor](../desarrollo/modal-notas-personales-v0.5.0.md).
+
 - **Estado:** plan de verificación. Los casos no se consideran aprobados hasta ejecutarse y registrarse.
 - **Objetivo:** comprobar sesión temporal, roles, retroalimentación oral, notas individuales y cola exclusiva de presentación.
 

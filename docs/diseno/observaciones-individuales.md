@@ -1,5 +1,7 @@
 # Diseño funcional — gestión de observaciones v0.2
 
+> **Actualización de la UI en v0.5.0:** las notas personales mantienen el límite original de **1000 caracteres**, con [modal y validación en cliente y servidor](../desarrollo/modal-notas-personales-v0.5.0.md).
+
 > **Base de código para la integración:** 0.3.0. La pantalla compartida y la cola se describen en [`proyeccion-pantalla-y-cola.md`](proyeccion-pantalla-y-cola.md). La retroalimentación oral es el flujo normal; la nota escrita sigue siendo opcional.
 
 - **Proyecto:** Sistema local de retroalimentación para laboratorios de cómputo

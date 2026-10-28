@@ -176,7 +176,10 @@ io.on('connection',socket=>{
   });
   socket.on('student:join',(payload={},callback)=>{
     if(store.getRole(socket.id))return reply(callback,{ok:false,error:'Ya tienes un rol en la sesión.'});
-    const result=store.joinStudent(socket.id,payload.code,payload.alias);
+    // Los teléfonos permanecen en la sesión, pero no son elegibles para presentar.
+    // Se usa la detección del cliente y, como respaldo, el User-Agent de la conexión.
+    const phoneUA=/iPhone|iPod|Windows Phone|Android.*Mobile|Mobile.*Android/i.test(socket.handshake.headers['user-agent']||'');
+    const result=store.joinStudent(socket.id,payload.code,payload.alias,payload.isPhone===true||phoneUA);
     reply(callback,result);if(result.ok)updateRoster();
   });
   socket.on('teacher:get-participants',({token}={},callback)=>{
@@ -219,7 +222,12 @@ io.on('connection',socket=>{
   });
   socket.on('teacher:screen-ended',({token}={})=>{
     if(!store.authorizeTeacher(socket.id,token))return;
-    store.session.teacherCaptureReady=false;store.session.epoch++;broadcastProjection();
+    // Detener la captura docente no debe renegociar ni interrumpir a un alumno
+    // que ya está proyectando. El epoch solo cambia si la fuente era el docente.
+    const wasTeacherSource=store.activeSource().kind==='teacher';
+    store.session.teacherCaptureReady=false;
+    if(wasTeacherSource)store.session.epoch++;
+    broadcastProjection();
   });
   socket.on('student:stop-sharing',(_payload,callback)=>{
     if(!store.isStudentInSession(socket.id))return reply(callback,{ok:false,error:'Permiso denegado.'});

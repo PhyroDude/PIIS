@@ -2,7 +2,7 @@
 const crypto = require('node:crypto');
 const ALPHABET = '123456789';
 const MAX_STUDENTS = 30;
-const MAX_NOTE_LENGTH = 1000;
+const MAX_NOTE_LENGTH = 1000; // máximo de caracteres por observación
 const TEACHER_RECONNECT_MS = 90_000;
 function makeCode() { return Array.from({length:4},()=>ALPHABET[crypto.randomInt(ALPHABET.length)]).join(''); }
 function makeToken() { return crypto.randomBytes(32).toString('hex'); }
@@ -88,20 +88,21 @@ class SessionStore {
     this.roles.set(teacherSocketId,{role:'teacher',sid:this.session.id});
     return {ok:true,code:this.session.code,token:this.session.token};
   }
-  joinStudent(socketId,code,alias) {
+  joinStudent(socketId,code,alias,isPhone=false) {
     const normalizedCode=String(code||'').trim();const normalizedAlias=String(alias||'').trim().slice(0,32);
     if (!this.session || normalizedCode!==this.session.code) return {ok:false,error:'Código incorrecto o sesión inactiva.'};
     if (!normalizedAlias) return {ok:false,error:'Escribe un alias.'};
     if (this.session.students.size>=MAX_STUDENTS) return {ok:false,error:'La sesión está llena (30 estudiantes).'};
     if ([...this.session.students.values()].some(s=>s.alias.toLowerCase()===normalizedAlias.toLowerCase())) return {ok:false,error:'Ese alias ya está en uso.'};
-    const student={id:socketId,alias:normalizedAlias,fileToken:makeToken()};
+    const student={id:socketId,alias:normalizedAlias,isPhone:isPhone===true,fileToken:makeToken()};
     this.session.students.set(socketId,student);this.roles.set(socketId,{role:'student',sid:this.session.id});
     return {ok:true,alias:normalizedAlias,studentId:socketId,fileToken:student.fileToken};
   }
-  roster() {return this.session?[...this.session.students.values()].map(({id,alias})=>({id,alias})):[];}
-  presentationQueueRoster() {return this.session?this.session.presentationQueue.filter(id=>this.session.students.has(id)).map((id,i)=>({id,alias:this.session.students.get(id).alias,position:i+1})):[];}
+  roster() {return this.session?[...this.session.students.values()].map(({id,alias,isPhone})=>({id,alias,isPhone})):[];}
+  presentationQueueRoster() {return this.session?this.session.presentationQueue.filter(id=>this.session.students.has(id)).map((id,i)=>({id,alias:this.session.students.get(id).alias,isPhone:this.session.students.get(id).isPhone,position:i+1})):[];}
   requestStudent(socketId) {
     if (!this.isStudentInSession(socketId))return {ok:false,error:'Permiso denegado.'};
+    if (this.session.students.get(socketId).isPhone)return {ok:false,error:'La proyección de pantalla no está disponible desde teléfonos.'};
     if (this.session.selectedStudent===socketId) return {ok:true,selected:true,queue:this.presentationQueueRoster()};
     if (!this.session.presentationQueue.includes(socketId))this.session.presentationQueue.push(socketId);
     return {ok:true,selected:false,queue:this.presentationQueueRoster()};
@@ -125,6 +126,7 @@ class SessionStore {
   selectStudent(studentId) {
     if (!this.teacherConnected())return {ok:false,error:'No hay un docente disponible.'};
     if (!this.session?.students.has(studentId))return {ok:false,error:'El estudiante ya no está en la sesión.'};
+    if (this.session.students.get(studentId).isPhone)return {ok:false,error:'La proyección de pantalla no está disponible desde teléfonos.'};
     const session=this.session,previousStudent=session.selectedStudent;
     const previousWasActive=Boolean(previousStudent&&session.screenReady.has(previousStudent));
     session.presentationQueue=session.presentationQueue.filter(id=>id!==studentId);
@@ -161,7 +163,7 @@ class SessionStore {
     if (!this.authorizeTeacher(socketId,token))return {ok:false,error:'Permiso denegado.'};
     if (!this.session.students.has(studentId))return {ok:false,error:'El estudiante ya no pertenece a la sesión.'};
     const content=String(text||'').trim();if(!content)return {ok:false,error:'Escribe una observación.'};
-    if(content.length>MAX_NOTE_LENGTH)return {ok:false,error:`La observación no puede superar ${MAX_NOTE_LENGTH} caracteres.`};
+    if(content.length>MAX_NOTE_LENGTH)return {ok:false,error:`La nota no puede superar ${MAX_NOTE_LENGTH} caracteres.`};
     const observation={id:crypto.randomUUID(),studentId,studentAlias:this.session.students.get(studentId).alias,text:content,createdAt:new Date().toISOString(),visibility:'individual'};
     this.session.observations.push(observation);return {ok:true,observation};
   }

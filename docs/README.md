@@ -78,3 +78,13 @@ Cada ADR debe indicar estado, contexto, decisión, alternativas, consecuencias, 
 No sobrescribas el SRS para que coincida con el código. No marques WebRTC, pantalla completa o compatibilidad LAN como validados sin ejecutar las pruebas correspondientes. Los cambios de documentación deben permanecer coherentes con la versión de código sobre la que se basan.
 
 - [`arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md`](arquitectura/decisiones/ADR-008-despliegue-lan-y-rutas.md): detección de IP local y limitación de la ruta docente al anfitrión.
+
+## Ajuste visual del panel docente v0.5.0
+
+- [Diseño UX/UI docente en escritorio](diseno/ui-docente-escritorio-v0.5.0.md) — distribución aprobada, comportamiento conservado y pruebas manuales.
+- [Vista previa estática del panel](diseno/vista-previa-ui-docente.html) — datos de demostración; no se conecta a la sesión.
+
+## Mejora de notas personales — InterLAB v0.5.0
+
+- [Modal de notas personales (1000 caracteres)](desarrollo/modal-notas-personales-v0.5.0.md) — flujo de apertura, cancelación, envío y validación.
+- [Vista previa estática del panel docente](diseno/vista-previa-ui-docente.html) — incluye ejemplo interactivo del modal con datos ficticios.
