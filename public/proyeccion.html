@@ -3,5 +3,20 @@
 <title>InterLAB · Proyección</title><link rel="stylesheet" href="/proyeccion.css">
 <script src="/socket.io/socket.io.js" defer></script><script src="/proyeccion.js" defer></script></head>
 <body><main id="stage"><video id="screen" autoplay muted playsinline></video>
-<section id="waiting" aria-live="polite"><div class="logo">InterLAB</div><h1 id="title">Esperando al docente</h1><p id="subtitle">Servidor preparado para recibir una presentación</p><div id="timer" hidden>01:00</div></section>
+<section id="waiting" aria-live="polite">
+  <div class="waiting-header">
+    <div class="logo">InterLAB</div>
+    <h1>Acceso para estudiantes</h1>
+    <p class="waiting-instruction">Ingresa desde la red del laboratorio utilizando la dirección de tu dispositivo.</p>
+  </div>
+  <section id="studentAccess" class="student-access" aria-label="Direcciones de acceso para estudiantes">
+    <p id="accessInfo" class="access-info">Buscando conexiones de red...</p>
+    <div id="accessCards" class="access-cards"></div>
+  </section>
+  <section class="presentation-state" aria-live="polite">
+    <h2 id="title">Esperando al docente</h2>
+    <p id="subtitle">Servidor preparado para recibir una presentación</p>
+    <div id="timer" hidden>01:00</div>
+  </section>
+</section>
 </main></body></html>

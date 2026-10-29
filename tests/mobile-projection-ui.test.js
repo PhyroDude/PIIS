@@ -31,6 +31,7 @@ test('el indicador de plataforma móvil es reconocido', () => {
 });
 test('los teléfonos no solicitan turno ni inician captura desde sus controles', () => {
   assert.match(source, /\$\('startShare'\)\.onclick=\(\)=>\{\s*if\(applyPhoneProjectionRestriction\(\)\)return;/);
-  assert.match(source, /\$\('projectionNoticeAction'\)\.onclick=async\(\)=>\{\s*closeStudentNotice\(\);\s*if\(applyPhoneProjectionRestriction\(\)\)return;/);
-  assert.match(source, /if\(studentOnPhone\)\{\s*\/\/[^\n]*\n[^\n]*\n\s*socket\.emit\('student:stop-sharing'/);
+  assert.match(source, /async function beginStudentCapture\(\)\{\s*closeStudentNotice\(\);\s*if\(applyPhoneProjectionRestriction\(\)\)return;/);
+  assert.match(source, /\$\('projectionNoticeAction'\)\.onclick=\(\)=>beginStudentCapture\(\)/);
+  assert.match(source, /if\(studentOnPhone\)\{socket\.emit\('student:stop-sharing'/);
 });

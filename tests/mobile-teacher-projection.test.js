@@ -56,6 +56,7 @@ test('la vista docente nueva bloquea la proyección móvil pero permite notas pe
   function node(tag='div'){
     return {tag,children:[],disabled:false,textContent:'',className:'',title:'',value:'',style:{},
       classList:{toggle(){},add(){},remove(){}},
+      showModal(){this.open=true;},close(){this.open=false;},
       append(...items){this.children.push(...items);},
       replaceChildren(...items){this.children=[...items];},
       setAttribute(name,value){this[name]=value;},
@@ -81,6 +82,7 @@ test('la vista docente nueva bloquea la proyección móvil pero permite notas pe
   assert.equal(get('selectedAlias').textContent,'Móvil');
   assert.equal(get('selectedProjectionRequest').disabled,true);
   assert.equal(get('selectedNoteButton').disabled,false);
+  assert.equal(get('teacherFeedback').open,true,'abrir modal de notas');
   assert.equal(calls,0,'dar una nota no debe activar un evento de proyección');
 });
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Aplicación web local para retroalimentación durante sesiones de laboratorio.">
-  <title>InterLAB v0.5.0</title>
+  <title>InterLAB v0.5.6</title>
   <link rel="stylesheet" href="/styles.css">
   <script src="/socket.io/socket.io.js" defer></script>
   <script src="/config.js" defer></script>
@@ -105,32 +105,49 @@
     <div class="hidden"><video id="screenVideo" autoplay playsinline></video><button id="fullscreen" type="button">Pantalla completa</button></div>
   </section>
 
-  <section id="studentView" class="panel hidden">
-    <small>PANEL DEL ESTUDIANTE</small><h2>Ya estás en la sesión</h2><p>Tu alias temporal: <b id="joinedAlias"></b></p>
-    <section class="subpanel"><h3>Compartir pantalla para revisión</h3><p class="muted">Solicita un turno sin capturar ni transmitir pantalla. Cuando el docente te autorice, aparecerá una notificación para que aceptes la captura. El docente también puede elegirte directamente.</p><div class="actions"><button id="startShare" class="primary" type="button">Solicitar turno</button><button id="withdrawShare" class="secondary" type="button" disabled>Retirar solicitud</button><button id="stopShare" class="secondary" type="button" disabled>Detener captura</button></div><p id="studentScreenStatus" class="muted" role="status" aria-live="polite">No estás compartiendo pantalla.</p></section>
-    <section class="subpanel"><div class="listHead"><h3>Tus observaciones</h3><button id="refreshNotes" type="button" class="secondary">Actualizar</button></div><p class="muted">Aquí aparecen las notas escritas para ti. Si el docente da la retroalimentación solo verbalmente, esta lista puede permanecer vacía.</p><ul id="studentNotes"><li class="muted">Aún no hay observaciones escritas.</li></ul><div class="actions"><button id="copyNotes" type="button" class="secondary" disabled>Copiar notas</button><button id="downloadNotes" type="button" class="secondary" disabled>Descargar .txt</button></div><p id="exportStatus" class="muted"></p></section>
-    <section class="subpanel file-manager" id="studentFiles">
-      <div class="listHead"><h3>Archivos compartidos</h3><span>Solo durante esta sesión</span></div>
-      <p class="muted">Puedes descargar los archivos del grupo y eliminar únicamente los que subiste tú.</p>
-      <label for="studentUpload">Seleccionar archivos (máximo 50 MB por archivo y 200 MB por selección)</label>
-      <input id="studentUpload" type="file" multiple>
-      <button id="studentUploadButton" class="primary" type="button">Subir archivos</button>
-      <div class="upload-queue" id="studentUploadQueue" aria-live="polite"></div>
-      <div class="file-tabs" id="studentFileTabs" role="tablist" aria-label="Secciones de archivos"></div>
-      <div class="file-filters hidden" id="studentFileFilters">
-        <label for="studentFileSearch">Buscar por nombre (comienza con)</label><input id="studentFileSearch" placeholder="Escribe el inicio del nombre">
-        <div class="actions"><button type="button" class="secondary" data-file-sort="name">Nombre Z→A</button><button type="button" class="secondary" data-file-sort="alias">Alias Z→A</button><button type="button" class="secondary" data-file-sort="date">Fecha: más antiguos</button></div>
-      </div>
-      <div id="studentFileList" class="file-list"></div>
-      <button id="studentZip" class="secondary" type="button" disabled>Descargar seleccionados como ZIP</button>
-      <p id="studentFileStatus" class="muted" role="status" aria-live="polite"></p>
-    </section>
+  <!-- Vista del alumno: escritorio y móvil. Conserva los identificadores de la API existente. -->
+  <section id="studentView" class="student-workspace hidden" aria-label="InterLAB: sesión del alumno">
+    <div class="student-workspace-header">
+      <div class="student-welcome"><span class="student-user-symbol" aria-hidden="true"><svg viewBox="0 0 48 48" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="24" cy="17" r="9"/><path d="M7 43c0-10 7-17 17-17s17 7 17 17"/></svg></span><h2>¡BIENVENIDO <span id="joinedAlias"></span>!</h2></div>
+      <div class="student-clock" aria-label="Hora local"><time id="studentClock">--:--</time></div>
+    </div>
+    <div class="student-activity-grid">
+      <section class="student-presentation" aria-label="Control de proyección">
+        <button id="startShare" type="button" class="student-main-action" aria-live="polite"><img class="student-megaphone" src="/assets/megafono-marron.png" alt="" aria-hidden="true"><span class="student-main-action-copy"><strong id="studentProjectionLabel">Solicitar permiso para proyectar</strong><small id="studentProjectionCaption">Envía una solicitud al docente para presentar tu pantalla y recibir retroalimentación.</small></span></button>
+        <!-- Controles de compatibilidad: la UI concentra todo en el botón naranja. -->
+        <div class="hidden"><button id="withdrawShare" type="button" disabled>Retirar solicitud</button><button id="stopShare" type="button" disabled>Detener captura</button></div>
+        <p id="studentScreenStatus" class="student-status" role="status" aria-live="polite">No estás compartiendo pantalla.</p>
+      </section>
+      <section id="projectionNotice" class="student-request-notice" aria-label="Aviso de proyección del docente" data-mode="idle">
+        <span class="student-alert-symbol" aria-label="Sin solicitudes nuevas" role="img" id="studentAlertSymbol">!</span>
+        <div class="student-alert-details" id="studentAlertDetails" aria-hidden="true">
+          <p id="projectionNoticeText" class="student-alert-message">El profesor solicita que proyectes tu pantalla</p>
+          <div class="student-alert-actions"><button id="projectionNoticeAction" type="button">Aceptar</button><button id="projectionNoticeReject" type="button">Denegar</button></div>
+        </div>
+        <button id="projectionNoticeClose" type="button" class="hidden" tabindex="-1">Cerrar aviso</button>
+      </section>
+    </div>
+    <div class="student-content-grid">
+      <section class="student-files-card file-manager" id="studentFiles" aria-labelledby="studentFilesHeading">
+        <div class="student-section-heading"><span class="student-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="29" height="29" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h10l4 4v14H5z"/><path d="M15 3v5h4M8 12h8M8 16h7"/></svg></span><h3 id="studentFilesHeading">Archivos de la clase</h3><div class="student-file-upload"><input id="studentUpload" type="file" multiple aria-label="Seleccionar archivos para subir"><button id="studentUploadButton" type="button">Subir archivo</button></div></div>
+        <div class="student-file-body">
+          <div class="file-tabs" id="studentFileTabs" role="tablist" aria-label="Secciones de archivos"></div>
+          <div class="file-filters hidden" id="studentFileFilters">
+            <label for="studentFileSearch">Buscar archivos de alumnos por nombre</label><input id="studentFileSearch" type="search" placeholder="Buscar por nombre…">
+            <div class="actions"><button type="button" class="secondary" data-file-sort="name">Nombre Z→A</button><button type="button" class="secondary" data-file-sort="alias">Alias Z→A</button><button type="button" class="secondary" data-file-sort="date">Fecha: más antiguos</button></div>
+          </div>
+          <div class="upload-queue" id="studentUploadQueue" aria-live="polite"></div>
+          <div id="studentFileList" class="file-list"></div>
+          <div class="student-files-footer"><button id="studentZip" type="button" disabled>Descargar archivos seleccionados</button><p id="studentFileStatus" class="muted" role="status" aria-live="polite"></p></div>
+        </div>
+      </section>
+      <section class="student-notes-card" aria-labelledby="studentNotesHeading">
+        <div class="student-section-heading"><span class="student-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="29" height="29" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h11v10H8l-4 4zM15 9h5v10l-4-4h-3"/></svg></span><h3 id="studentNotesHeading">Observaciones del profesor</h3><button id="refreshNotes" type="button" class="student-refresh">Actualizar</button></div>
+        <div class="student-notes-body"><ul id="studentNotes" aria-live="polite"><li class="muted">Aún no hay observaciones escritas.</li></ul></div>
+        <div class="student-note-export"><button id="copyNotes" type="button" class="secondary" disabled>Copiar notas</button><button id="downloadNotes" type="button" class="secondary" disabled>Descargar .txt</button><p id="exportStatus" class="muted" role="status"></p></div>
+      </section>
+    </div>
   </section>
-  <aside id="projectionNotice" class="projection-notice hidden" role="alert" aria-live="assertive">
-    <strong>📺 Solicitud de proyección</strong><p id="projectionNoticeText"></p>
-    <div class="actions"><button id="projectionNoticeAction" class="primary" type="button">Autorizar pantalla</button>
-    <button id="projectionNoticeReject" class="secondary" type="button">Rechazar</button><button id="projectionNoticeClose" class="secondary" type="button">Cerrar aviso</button></div>
-  </aside>
   <p id="notice" class="notice hidden" role="status" aria-live="polite"></p>
 </main>
 <footer>Aplicación local · Comunicación por LAN · Sin base de datos</footer>

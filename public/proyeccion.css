@@ -1,1 +1,29 @@
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#080f1e;color:#fff;font-family:system-ui,sans-serif;overflow:hidden}main{width:100vw;height:100vh;display:grid;place-items:center}video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#080f1e;display:none}#waiting{z-index:2;text-align:center;padding:3rem;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:100vh;gap:12px}.logo{font-size:1.4rem;color:#5bd0e3;font-weight:800;letter-spacing:0.12em}h1{font-size:clamp(2.3rem,5vw,5rem);margin:0}p{font-size:clamp(1rem,2vw,1.7rem);color:#cbd5e1}#timer{font-size:clamp(3rem,8vw,8rem);font-weight:700;font-variant-numeric:tabular-nums}#timer[hidden]{display:none}#waiting.hidden{display:none}
+/* InterLAB · Receptor de video y acceso estudiantil sin Internet */
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:#102b29;color:#fff;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+body{overflow:hidden}
+main#stage{width:100vw;height:100vh;position:relative;display:grid;place-items:center;overflow:hidden}
+video#screen{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#080f1e;display:none}
+#waiting{position:relative;z-index:2;width:100%;height:100%;padding:clamp(18px,3vh,40px) clamp(24px,4vw,74px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:clamp(16px,2.2vh,28px);overflow:auto;text-align:center}
+#waiting.hidden{display:none}
+.waiting-header{flex-shrink:0}
+.logo{font-size:clamp(1.6rem,3vw,2.5rem);color:#a3e7d8;font-weight:800;letter-spacing:.06em}
+.waiting-header h1{font-size:clamp(1.55rem,3.2vw,3rem);font-weight:750;line-height:1.12;margin:10px 0}
+.waiting-instruction{font-size:clamp(1rem,1.55vw,1.45rem);color:#d0e5df;margin:0}
+.student-access{width:min(100%,1400px);flex-shrink:0}
+.access-info{font-size:clamp(.9rem,1.35vw,1.12rem);color:#d0e5df;margin:0 0 13px}
+.access-cards{display:flex;justify-content:center;align-items:stretch;flex-wrap:wrap;gap:clamp(16px,2vw,30px)}
+.access-card{min-width:min(100%,330px);flex:1 1 340px;max-width:660px;padding:clamp(18px,2vw,30px);background:#224740;border:1px solid #49766b;border-radius:18px;box-shadow:0 10px 26px rgba(0,0,0,.13);display:flex;flex-direction:column;align-items:center;gap:10px}
+.access-heading{display:flex;justify-content:center;align-items:center;gap:11px;font-size:clamp(1.14rem,1.65vw,1.65rem);color:#fff}
+.access-symbol{display:grid;place-items:center;border-radius:12px;background:#365f55;color:#b4f2e2;width:42px;height:42px;font-size:1.4rem}
+.access-url{font-family:ui-monospace,Consolas,monospace;font-size:clamp(1.05rem,1.65vw,1.62rem);font-weight:700;overflow-wrap:anywhere;line-height:1.4;color:#fff;margin:0}
+.access-hint{color:#c3e1d7;font-size:clamp(.93rem,1.1vw,1.15rem);margin:0}
+.access-qr{display:flex;align-items:center;justify-content:center;background:#fff;padding:12px;border-radius:12px;margin-top:3px}
+.access-qr img{display:block;width:clamp(180px,22vh,240px);height:clamp(180px,22vh,240px);object-fit:contain;image-rendering:pixelated}
+.presentation-state{flex-shrink:0;max-width:900px;background:rgba(1,20,18,.18);border:1px solid rgba(164,231,214,.17);padding:10px 24px;border-radius:12px}
+.presentation-state h2{font-size:clamp(1.05rem,1.7vw,1.65rem);margin:0;color:#bdeadd}
+.presentation-state p{font-size:clamp(.88rem,1.1vw,1.08rem);margin:4px 0 0;color:#d4e3df}
+#timer{font-size:clamp(2rem,4vw,3.5rem);line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums;margin-top:8px}
+#timer[hidden]{display:none}
+@media(max-height:740px){#waiting{justify-content:flex-start;gap:12px}.access-card{padding:15px}.access-qr img{width:135px;height:135px}}
+@media(max-width:680px){#waiting{justify-content:flex-start;padding:16px}.access-card{flex-basis:100%;min-width:0}.access-qr img{width:150px;height:150px}}

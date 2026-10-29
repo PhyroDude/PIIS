@@ -10,6 +10,7 @@ const {Server}=require('socket.io');
 const {SessionStore,TEACHER_RECONNECT_MS}=require('./src/session-store');
 const {FileStore}=require('./src/file-store');
 const {getLanIPv4Addresses,isLoopbackAddress}=require('./src/network-addresses');
+const {getStudentAccessLinks}=require('./src/student-access-links');
 
 const app=express();
 app.disable('x-powered-by');
@@ -56,6 +57,13 @@ app.get('/docente',(req,res)=>{
   return sendApp(res);
 });
 app.get('/alumno',(_req,res)=>sendApp(res));
+// La vista de proyección en la computadora fija consulta las URL reales
+// para alumnos. Se recalculan en cada petición por si cambia la red.
+app.get('/api/projection/student-access',(req,res)=>{
+  if(!isLoopbackAddress(req.socket.remoteAddress))return res.sendStatus(403);
+  res.setHeader('Cache-Control','no-store');
+  return res.json(getStudentAccessLinks({protocol:HTTPS_ENABLED?'https':'http',port:PORT}));
+});
 app.get('/proyeccion.html',(req,res)=>res.redirect(302,'/proyeccion'));
 app.get('/proyeccion',(req,res)=>{
   if(!isLoopbackAddress(req.socket.remoteAddress))return res.status(403).send('La proyección solo está disponible en la computadora fija.');
@@ -217,10 +225,11 @@ io.on('connection',socket=>{
   });
   socket.on('teacher:select-student',({token,studentId}={},callback)=>{
     if(!store.authorizeTeacher(socket.id,token))return reply(callback,{ok:false,error:'Permiso denegado.'});
+    const fromQueue=store.session.presentationQueue.includes(studentId);
     const result=store.selectStudent(studentId);reply(callback,result);
     if(!result.ok)return;
     if(result.previousStudent)io.to(result.previousStudent).emit('screen:stop');
-    io.to(studentId).emit('screen:requested',{message:'Tu docente solicita que proyectes. Autoriza la captura para comenzar.'});
+    io.to(studentId).emit('screen:requested',{fromQueue,message:'Tu docente solicita que proyectes. Autoriza la captura para comenzar.'});
     updateRoster();broadcastProjection();
   });
   socket.on('teacher:reject-request',({token,studentId}={},callback)=>{
@@ -284,7 +293,7 @@ io.on('connection',socket=>{
 });
 server.listen(PORT,HOST,()=>{
   const protocol=HTTPS_ENABLED?'https':'http';
-  console.log(`InterLAB 0.5.0 activo en ${HOST}:${PORT}.`);
+  console.log(`InterLAB 0.5.7 activo en ${HOST}:${PORT}.`);
   console.log(`Receptor local: ${protocol}://localhost:${PORT}/proyeccion`);
   console.log(`Docente LAN: ${protocol}://<IP-de-servidor>:${PORT}/docente`);
   for(const entry of getLanIPv4Addresses())console.log(`LAN ${entry.interfaceName}: ${protocol}://${entry.address}:${PORT}/alumno`);

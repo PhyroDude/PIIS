@@ -36,14 +36,13 @@ function harness(){
   return {ctx,sent,messages,stopped,video,stream,elements};
 }
 
-test('los dos botones reflejan si la captura docente esta activa',async()=>{
+test('el botón docente refleja si la captura local esta activa',async()=>{
   const h=harness(),button=h.elements.get('teacherShareActive');
   assert.equal(button['strong'].textContent,'Compartir mi pantalla');
   assert.equal(button.attrs['aria-pressed'],'false');
   await h.ctx.captureTeacher();
   assert.equal(button['strong'].textContent,'Dejar de compartir mi pantalla');
   assert.equal(button.attrs['aria-pressed'],'true');
-  assert.equal(h.elements.get('teacherShareEntry').textContent,'Dejar de compartir mi pantalla');
   assert.equal(button.classes.has('is-sharing'),true);
   await h.ctx.captureTeacher();
   assert.equal(button['strong'].textContent,'Compartir mi pantalla');

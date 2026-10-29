@@ -1,0 +1,19 @@
+InterLAB v0.5.0 estable — Parche para teléfonos
+
+Base: InterLAB-v0.5.0-beta(1).zip (la versión estable proporcionada por el usuario).
+
+Instalación:
+1. Realiza copia de seguridad de InterLAB/public/app.js.
+2. Sustituye InterLAB/public/app.js por el contenido de este parche.
+3. Reinicia el servidor si hace falta y actualiza /alumno en el móvil (recarga completa).
+
+Comportamiento:
+- Desde teléfonos Android e iPhone, al ingresar a la sesión, se deshabilita «Solicitar turno».
+- Se muestra la explicación «La proyección de pantalla no está disponible desde teléfonos...». 
+- Si el docente selecciona directamente a ese teléfono, se rechaza la solicitud y se libera el turno.
+- Archivos, observaciones y participación siguen funcionando.
+- En escritorio no se modifica la función de presentación.
+
+Límite: la detección por navegador (userAgent/userAgentData) no equivale a un control de seguridad y puede fallar en navegadores que alteren su identificación.
+
+Verificación: node --test tests/mobile-projection-ui.test.js

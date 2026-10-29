@@ -248,23 +248,136 @@ body.dashboard-active .teacher-dashboard{max-width:none;width:100%;margin:0;padd
 
 /* La pantalla docente de conexión solo aparece durante la autorización del socket. */
 #teacherEntry #reenterTeacher:not(.hidden){display:inline-block;margin-top:14px;padding:12px 18px;border-radius:10px;text-decoration:none}
-/* InterLAB - Corrección del fondo de la vista docente */
 
-html:has(body.dashboard-active) {
-  min-height: 100%;
-  background-color: #071b19;
+/* InterLAB v0.5.6 — Vista de alumno basada en bocetos confirmados.
+   Estilos limitados a /alumno; no modificar el dashboard docente ni el receptor. */
+body.theme-student:has(#studentView:not(.hidden)) {
+  --student-cream:#faf6e9;
+  --student-ink:#293550;
+  --student-orange:#ffa000;
+  background:var(--student-cream);
+  color:var(--student-ink);
+}
+body.theme-student:has(#studentView:not(.hidden)) >header,
+body.theme-student:has(#studentView:not(.hidden)) >footer,
+body.theme-student:has(#studentView:not(.hidden)) .intro {display:none}
+body.theme-student:has(#studentView:not(.hidden)) main{width:100%;max-width:none;margin:0;padding:0}
+.student-workspace{width:100%;min-height:100vh;padding:clamp(18px,2.2vw,36px);background:#faf6e9;color:#293550}
+.student-workspace *{box-sizing:border-box}
+.student-workspace button{font-family:inherit}
+.student-workspace button:focus-visible,.student-workspace input:focus-visible{outline:3px solid #284da2;outline-offset:3px}
+.student-workspace-header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0 0 clamp(14px,2.4vh,32px)}
+.student-welcome{background:#a66d00;color:#fff;border-radius:13px;min-height:95px;width:min(48%,690px);display:flex;align-items:center;gap:28px;padding:13px 20px}
+.student-user-symbol{display:grid;place-items:center;flex:0 0 66px;width:66px;height:66px;border:2px solid #4169ef;border-radius:50%;background:#fff;color:#4169ef;font-size:42px;font-weight:400}
+.student-welcome h2{margin:0;font-size:clamp(21px,2.3vw,36px);font-weight:750;letter-spacing:.005em;overflow-wrap:anywhere}
+.student-clock{font-size:clamp(23px,2.5vw,38px);font-weight:500;color:#46340f;padding:12px 6vw 12px 12px;white-space:nowrap}
+.student-activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(22px,3vw,50px);min-height:150px;align-items:start;margin-bottom:clamp(22px,3.6vh,42px)}
+.student-presentation{display:flex;flex-direction:column;align-items:center;gap:9px}
+.student-main-action{display:flex;align-items:center;justify-content:center;gap:22px;background:#ffa000;color:#402600;width:min(100%,540px);min-height:126px;padding:20px 24px;border:2px solid transparent;border-radius:22px;text-align:left;cursor:pointer;transition:background .22s, box-shadow .22s,transform .22s}
+.student-main-action:hover:not(:disabled){background:#ffae26;transform:translateY(-2px);box-shadow:0 9px 20px #8d53001b}
+.student-main-action.is-pending{background:#e8a63e}
+.student-main-action.is-active{background:#176b63;color:#fff}
+.student-main-action:disabled{opacity:.6;cursor:not-allowed}
+.student-megaphone{width:clamp(72px,8vw,110px);height:clamp(72px,8vw,110px);object-fit:contain;flex:0 0 auto}
+.student-main-action-copy{display:flex;flex-direction:column;gap:8px;max-width:310px}
+.student-main-action-copy strong{font-size:clamp(17px,1.42vw,23px);line-height:1.24}
+.student-main-action-copy small{font-size:clamp(12px,.9vw,14px);line-height:1.4;font-weight:500;letter-spacing:0;color:inherit}
+.student-status{color:#6c5b36;font-size:13px;text-align:center;margin:0;max-width:540px;min-height:21px}
+.student-status.error{color:#992b27}
+/* Estado plegado = solamente el símbolo, sin elementos accionables. */
+.student-request-notice{display:flex;align-items:center;justify-content:flex-end;gap:16px;min-height:126px;max-width:100%;overflow:visible}
+.student-alert-symbol{flex:0 0 clamp(83px,9vw,119px);height:clamp(83px,9vw,119px);display:grid;place-items:center;border-radius:50%;border:3px solid transparent;background:#eadeda;color:#b1a2a0;font-size:clamp(68px,7.7vw,101px);line-height:1;font-family:Georgia,serif;font-weight:900;user-select:none;transition:background .35s,color .35s,border-color .35s,box-shadow .35s}
+.student-alert-details{flex:0 1 0;max-width:0;min-width:0;opacity:0;visibility:hidden;pointer-events:none;overflow:hidden;transform:translateX(-12px);transition:max-width .42s ease,flex-basis .42s ease,opacity .25s ease,transform .4s ease,visibility .4s ease}
+.student-request-notice.is-open .student-alert-details{flex-basis:min(74%,500px);max-width:500px;opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0)}
+.student-request-notice.is-open .student-alert-symbol{color:#e43222;background:#5a1c1b;border-color:#ae3832}
+.student-request-notice.is-open[data-mode="direct"] .student-alert-symbol{animation:studentAlertBreath 2s ease-in-out infinite}
+@keyframes studentAlertBreath{0%,100%{border-color:#872b28;box-shadow:0 0 0 0 #e334240d,0 0 5px #e3342414}50%{border-color:#ff6c56;box-shadow:0 0 0 5px #e334242d,0 0 24px #ff4b4b88}}
+.student-alert-message{background:#c65f5f;color:#251416;border-radius:7px;padding:14px 17px;margin:0 0 12px;font-size:clamp(14px,1.15vw,18px);text-align:center;line-height:1.35}
+.student-alert-actions{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.student-alert-actions button{padding:13px 12px;border:0;border-radius:7px;color:white;font-size:16px;font-weight:650;cursor:pointer;margin:0}
+#projectionNoticeAction{background:#39468c}
+#projectionNoticeReject{background:#475569}
+.student-alert-actions button:hover:not(:disabled){filter:brightness(1.12)}
+.student-alert-actions button:disabled{cursor:default}
+/* Si la autorización viene de una petición voluntaria, no hay alerta roja. */
+.student-request-notice[data-mode="queued"] .student-alert-symbol{background:#ead5a0;color:#996500;border-color:#e4a42a;animation:none}
+.student-request-notice[data-mode="queued"] .student-alert-message{background:#f3e3b9;color:#614315}
+.student-content-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(22px,3vw,50px);align-items:stretch}
+.student-files-card,.student-notes-card{border:0;margin:0;padding:0;min-width:0;background:transparent}
+.student-section-heading{display:flex;align-items:center;gap:12px;min-height:50px;position:relative;padding-left:15px;padding-right:4px}
+.student-section-heading h3{margin:0;font-size:clamp(16px,1.4vw,21px);font-weight:650;line-height:1.2;padding:11px 15px 11px 31px;border-radius:5px}
+.student-section-icon{position:relative;z-index:1;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;font-size:35px;font-weight:700;flex:0 0 56px;margin-right:-30px;color:white}
+.student-files-card .student-section-icon{background:#31537c}
+.student-notes-card .student-section-icon{background:#477348}
+.student-files-card .student-section-heading h3{background:#addadd;color:#294a71}
+.student-notes-card .student-section-heading h3{background:#abcbaa;color:#31513a}
+.student-file-upload{margin-left:auto;display:flex;align-items:center;gap:9px}
+.student-file-upload input{font-size:11px;width:min(13vw,135px);padding:5px;border-color:#bed8d6;background:#fff;min-width:65px}
+.student-file-upload button{background:#252f5b;color:#fff;border:0;border-radius:7px;padding:11px 16px;font-weight:700;white-space:nowrap;cursor:pointer}
+.student-file-body{background:#e6f2ee;padding:12px 15px 16px;border-radius:0 9px 9px 9px;min-height:315px;display:flex;flex-direction:column}
+.student-files-card.file-manager .file-tabs{display:flex;gap:0;border:none;margin:0 0 8px;padding:0;flex-wrap:nowrap}
+.student-files-card .file-tabs button{border:none;border-radius:0;background:#f4f5f5;color:#3d4a55;flex:1 1 0;font-size:clamp(12px,.98vw,15px);font-weight:500;padding:11px 8px;min-width:0}
+.student-files-card .file-tabs button[aria-selected="true"]{background:#addadd;color:#294a71;font-weight:700;border:0}
+.student-files-card .file-list{background:#fff;border:1px solid #81c5c8;border-radius:3px;flex:1;min-height:180px;max-height:360px;overflow:auto;padding:5px}
+.student-files-card .file-table{min-width:410px;font-size:12px;color:#283b50}
+.student-files-card .file-table th{color:#425a68}
+.student-files-card .file-empty{margin:30px 7px;background:#fff;color:#5f7781}
+.student-files-card .student-files-footer{padding-top:10px;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+#studentZip{background:#176b63;color:#fff;border:0;border-radius:6px;margin:0;padding:12px 15px;cursor:pointer;font-weight:600}
+#studentZip:disabled{background:#aebeba;color:#485955;opacity:1;cursor:not-allowed}
+.student-files-card .file-filters{font-size:12px;padding:5px 0}.student-files-card .file-filters input{padding:9px}
+.student-notes-card .student-refresh{margin-left:auto;padding:9px 12px;border:1px solid #658d6d;background:#e6f2e6;color:#355d42;border-radius:7px;cursor:pointer;font-size:12px}
+.student-notes-body{background:#d6e6d4;border-radius:0 9px 9px 9px;padding:15px;min-height:315px}
+.student-notes-body ul{margin:0;list-style:none;padding:10px;background:#fff;border:1px solid #a0b9a0;max-height:410px;min-height:230px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.student-notes-body li{border:0;margin:0;font-size:clamp(13px,.95vw,15px)}
+.student-notes-body .note{background:#e4e9e5;border-radius:16px;padding:14px 15px;line-height:1.5;color:#2d3f32}
+.student-notes-body .note small{font-size:11px;display:block;margin-top:5px;color:#577058}
+.student-note-export{padding:7px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.student-note-export .secondary{font-size:12px;padding:8px 12px}.student-note-export p{margin:0}
+body.theme-student .student-workspace .file-manager button:disabled{opacity:.65}
+@media(max-width:960px){.student-workspace{padding:20px}.student-welcome{width:58%}.student-clock{padding-right:12px}.student-main-action{padding:14px}.student-content-grid{gap:16px}.student-activity-grid{gap:16px}.student-alert-symbol{flex-basis:86px;height:86px;font-size:70px}.student-request-notice.is-open .student-alert-details{flex-basis:76%}.student-file-upload input{width:92px}}
+@media(max-width:720px){
+ .student-workspace{padding:16px 13px 34px}
+ .student-workspace-header{gap:8px;margin-bottom:18px}
+ .student-welcome{width:auto;min-height:75px;flex:1;padding:12px;gap:10px;border-radius:10px}
+ .student-user-symbol{width:43px;height:43px;flex-basis:43px;font-size:27px}
+ .student-welcome h2{font-size:clamp(15px,3.7vw,22px)}
+ .student-clock{font-size:clamp(15px,3.6vw,23px);padding:5px 2px}
+ .student-activity-grid,.student-content-grid{grid-template-columns:1fr;gap:17px}
+ .student-activity-grid{min-height:0}
+ .student-main-action{width:100%;min-height:100px;justify-content:flex-start}
+ .student-request-notice{justify-content:center;min-height:70px}
+ .student-alert-symbol{flex-basis:62px;width:62px;height:62px;font-size:48px}
+ .student-request-notice.is-open .student-alert-details{flex-basis:calc(100% - 80px)}
+ .student-alert-message{font-size:13px;padding:10px}
+ .student-alert-actions{gap:8px}.student-alert-actions button{font-size:13px;padding:11px 6px}
+ .student-content-grid{gap:20px}.student-section-heading h3{font-size:16px}.student-section-icon{width:44px;height:44px;flex-basis:44px;font-size:28px;margin-right:-27px}
+ .student-file-upload{gap:5px}.student-file-upload input{width:76px}.student-file-upload button{padding:10px 8px;font-size:11px}
+ .student-file-body,.student-notes-body{min-height:250px;padding:8px}
+ .student-files-card .file-list{min-height:140px;max-height:300px}
+ .student-notes-body ul{min-height:200px;max-height:300px}
+}
+/* Teléfonos: conservar solo los dos módulos acordados y ocultar las acciones de captura. */
+body.student-is-phone .student-activity-grid{display:none}
+body.student-is-phone .student-content-grid{grid-template-columns:1fr}
+@media(prefers-reduced-motion:reduce){
+ .student-workspace *, .student-workspace *::before, .student-workspace *::after {animation:none!important;transition:none!important}
 }
 
-body.dashboard-active {
-  min-height: 100vh;
-  background-color: #071b19;
-}
-
-body.dashboard-active main {
-  min-height: 100vh;
-  background-color: #071b19;
-}
-
-body.dashboard-active .teacher-dashboard {
-  min-height: 100vh;
-}
+/* Acceso estudiantil: dos campos existentes, diseño naranja de los bocetos. */
+body.theme-student:has(#studentEntry:not(.hidden)){--page-bg:#faf6e9;background:#faf6e9}
+body.theme-student:has(#studentEntry:not(.hidden)) .intro{display:none}
+body.theme-student #studentEntry.role-screen{max-width:500px;background:#ffa000;border:1px solid #a96b08;border-radius:30px;box-shadow:0 12px 40px #67430016;padding:30px 34px;margin:90px auto 40px;color:#332b22;position:relative}
+body.theme-student #studentEntry .role-heading{align-items:center;justify-content:center;text-align:center;margin:0 0 20px}
+body.theme-student #studentEntry .role-heading .role-symbol{background:#fff;color:#31537c;border:2px solid #365df3;border-radius:50%;font-size:30px;width:64px;height:64px;flex:0 0 64px}
+body.theme-student #studentEntry h2{font-size:clamp(22px,3vw,28px);color:#37270f}
+body.theme-student #studentEntry .role-heading p{display:none}
+body.theme-student #studentEntry .role-heading small{display:none}
+body.theme-student #studentEntry form{border:0;padding:0}
+body.theme-student #studentEntry form h3{display:none}
+body.theme-student #studentEntry label{font-size:15px;font-weight:600;color:#46300c;margin:20px 0 8px}
+body.theme-student #studentEntry input{min-height:46px;background:#fff;border-radius:5px;color:#293550}
+body.theme-student #studentEntry form .primary{background:#3934aa;color:#fff;border-color:#3934aa;margin-top:30px;min-height:54px;font-weight:750;font-size:17px}
+body.theme-student #studentEntry form .primary:hover{background:#272283}
+body.theme-student #studentEntry .back-button{color:#46300c}
+@media(max-width:600px){body.theme-student #studentEntry.role-screen{margin:48px auto;padding:22px 20px}}

@@ -1,6 +1,6 @@
 # Índice y reglas de documentación
 
-Esta carpeta documenta el Sistema local de retroalimentación. La base histórica adoptada es **PIIS v0.3.4**; la versión actual de código es **InterLAB v0.5.0 beta**, posterior a la beta v0.4.0. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
+Esta carpeta documenta el Sistema local de retroalimentación. La base histórica adoptada es **PIIS v0.3.4**; la versión actual de código es **InterLAB v0.5.7 beta**, posterior a la beta v0.4.0. Los documentos describen decisiones y estado de validación; no convierten por sí mismos una propuesta en requisito aprobado ni una prueba pendiente en resultado exitoso.
 
 ## Orden de autoridad
 
@@ -92,3 +92,9 @@ No sobrescribas el SRS para que coincida con el código. No marques WebRTC, pant
 ## Inicio automático del docente (ajuste v0.5.0)
 
 - [Acceso `/docente` y generación automática de sesión](producto/inicio-automatico-sesion-docente-v0.5.0.md): primera conexión, recuperación de sesión, cierre y captura voluntaria.
+
+
+## Acceso de estudiantes desde proyección — v0.5.7
+
+- [Diseño y reglas de URL completas y QR exclusivo de Wi-Fi](diseno/pantalla-acceso-estudiantes-v0.5.7.md).
+- [Detalle de implementación y pruebas](desarrollo/implementacion-acceso-proyeccion-v0.5.7.md).

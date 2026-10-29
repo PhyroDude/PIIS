@@ -1,6 +1,7 @@
 'use strict';
 const socket=io();const video=document.getElementById('screen');const waiting=document.getElementById('waiting');
 const title=document.getElementById('title'),subtitle=document.getElementById('subtitle'),timer=document.getElementById('timer');
+const accessInfo=document.getElementById('accessInfo'),accessCards=document.getElementById('accessCards');
 let peer=null,remoteId=null,epoch=null,pending=[],status=null,syncServerOffset=0;
 function closePeer(){if(peer){peer.onicecandidate=null;peer.ontrack=null;peer.close();}peer=null;remoteId=null;epoch=null;pending=[];video.srcObject=null;video.style.display='none';waiting.classList.remove('hidden');}
 function fmt(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
@@ -22,8 +23,49 @@ function drawWaiting(){
     title.textContent='Esperando pantalla';subtitle.textContent='El docente debe autorizar o restablecer la captura';
   }else{title.textContent='Esperando al docente';subtitle.textContent='Servidor preparado';}
 }
+// Consulta local: la IP puede cambiar sin reiniciar la aplicación. Los QR
+// contienen solo la URL /alumno; no utilizan servicios externos.
+let lastAccessJson='';
+function makeAccessCard(kind,entry){
+  const card=document.createElement('article');card.className='access-card '+kind;
+  const heading=document.createElement('div');heading.className='access-heading';
+  const symbol=document.createElement('span');symbol.className='access-symbol';
+  symbol.textContent=kind==='wifi'?'◉':'▤';symbol.setAttribute('aria-hidden','true');
+  const text=document.createElement('strong');text.textContent=kind==='wifi'?'Teléfonos · Wi-Fi':kind==='ethernet'?'Computadoras · Ethernet':'Red local';
+  heading.append(symbol,text);card.append(heading);
+  const url=document.createElement('p');url.className='access-url';url.textContent=entry.url;card.append(url);
+  const hint=document.createElement('p');hint.className='access-hint';
+  hint.textContent=kind==='wifi'?'Escanea el código o escribe la dirección en tu teléfono.':'Escribe la dirección completa en el navegador.';
+  card.append(hint);
+  if(kind==='wifi'&&entry.qrSvg){
+    const container=document.createElement('div');container.className='access-qr';
+    const img=document.createElement('img');img.alt='QR para acceder a '+entry.url;
+    img.width=190;img.height=190;
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(entry.qrSvg);
+    container.append(img);card.append(container);
+  }
+  return card;
+}
+async function refreshStudentAccess(){
+  try{
+    const result=await fetch('/api/projection/student-access',{cache:'no-store'});
+    if(!result.ok)throw Error('No se pudieron consultar las direcciones.');
+    const access=await result.json();
+    const serialized=JSON.stringify(access);
+    if(serialized===lastAccessJson)return;
+    lastAccessJson=serialized;
+    const entries=[...(access.ethernet||[]).map(x=>['ethernet',x]),...(access.wifi||[]).map(x=>['wifi',x]),...(access.lan||[]).map(x=>['lan',x])];
+    accessCards.replaceChildren(...entries.map(([kind,entry])=>makeAccessCard(kind,entry)));
+    accessInfo.textContent=entries.length?'Ingresa tu alias y el código de sesión que te proporcione el docente.':'No se detectaron direcciones IPv4 de acceso en la red local.';
+  }catch(error){
+    if(!lastAccessJson)accessInfo.textContent='Esperando las direcciones de acceso del servidor.';
+    console.warn('Direcciones de alumnos:',error.message);
+  }
+}
+refreshStudentAccess();
+setInterval(refreshStudentAccess,20_000);
 setInterval(drawWaiting,250);
-socket.on('connect',()=>socket.emit('projection:register',{},result=>{if(!result?.ok){title.textContent='Error de receptor';subtitle.textContent=result?.error||'Sin autorización.';}}));
+socket.on('connect',()=>{refreshStudentAccess();socket.emit('projection:register',{},result=>{if(!result?.ok){title.textContent='Error de receptor';subtitle.textContent=result?.error||'Sin autorización.';}});});
 socket.on('disconnect',()=>{closePeer();drawWaiting();});
 socket.on('projection:replaced',()=>{closePeer();title.textContent='Receptor sustituido';});
 socket.on('projection:source',async state=>{

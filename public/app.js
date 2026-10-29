@@ -4,6 +4,8 @@ const $=id=>document.getElementById(id);
 let teacherToken=null,activeRole=null,teacherAttached=false,studentId=null,selectedStudentId=null;
 let teacherStream=null,studentStream=null,mediaPeer=null,mediaEpoch=null,mediaReceiverId=null;
 let candidateBuffer=[],studentNotes=[],presentationQueue=[];
+let studentProjectionState='idle';
+let studentRequestMode='idle';
 const earlySignals=new Map();
 const peerConfig={iceServers:[]};
 const accessPath=location.pathname.replace(/\/$/,'')||'/';
@@ -15,6 +17,38 @@ function isPhoneDevice(){
 }
 const studentOnPhone=isPhoneDevice();
 const PHONE_PROJECTION_MESSAGE='La proyección de pantalla no está disponible desde teléfonos. Puedes seguir participando y compartiendo archivos.';
+// La vista se deriva de estados del servidor y de la conexión multimedia,
+// nunca de una pulsación que todavía no ha sido autorizada.
+function setStudentProjectionState(state){
+  studentProjectionState=state;
+  const labels={idle:'Solicitar permiso para proyectar',pending:'Cancelar solicitud',granted:'Iniciar proyección',starting:'Preparando proyección…',active:'Proyectando'};
+  const captions={idle:'Envía una solicitud al docente para presentar tu pantalla y recibir retroalimentación.',pending:'Tu solicitud está en la cola. Pulsa para cancelarla.',granted:'El docente autorizó tu turno. Pulsa para elegir qué pantalla compartir.',starting:'Estableciendo el video con el proyector. Pulsa para detener la captura si es necesario.',active:'Tu pantalla está compartida. Pulsa para dejar de proyectar.'};
+  $('studentProjectionLabel').textContent=labels[state]||labels.idle;
+  $('studentProjectionCaption').textContent=captions[state]||captions.idle;
+  $('startShare').classList.toggle('is-active',state==='active');
+  $('startShare').classList.toggle('is-pending',state==='pending'||state==='starting');
+  $('startShare').disabled=studentOnPhone;
+  $('startShare').setAttribute('aria-label',labels[state]||labels.idle);
+  $('startShare').setAttribute('aria-pressed',String(state==='active'));
+  $('withdrawShare').disabled=state!=='pending';
+  $('stopShare').disabled=state!=='active'&&state!=='starting';
+}
+function setStudentRequestMode(mode){
+  studentRequestMode=mode;
+  const notice=$('projectionNotice');
+  notice.dataset.mode=mode;
+  notice.classList.toggle('is-open',mode!=='idle');
+  $('studentAlertDetails').setAttribute('aria-hidden',String(mode==='idle'));
+  $('studentAlertSymbol').setAttribute('aria-label',mode==='idle'?'Sin solicitudes nuevas':mode==='direct'?'El docente solicita tu pantalla':'Tu turno ha sido autorizado');
+  $('projectionNoticeAction').disabled=mode==='idle';
+  $('projectionNoticeReject').disabled=mode==='idle';
+}
+function startStudentClock(){
+  const time=$('studentClock');
+  if(time)time.textContent=new Intl.DateTimeFormat('es-MX',{hour:'numeric',minute:'2-digit',hour12:true}).format(new Date());
+}
+startStudentClock();setInterval(startStudentClock,30_000);
+
 function applyPhoneProjectionRestriction(){
   if(!studentOnPhone)return false;
   $('startShare').disabled=true;
@@ -80,7 +114,8 @@ socket.on('connect',()=>{
 });
 socket.on('disconnect',()=>{
   $('connection').textContent='Conexión interrumpida';$('connection').classList.remove('online');$('connection').classList.add('offline');
-  closePeer();if(activeRole==='teacher')setMessage('teacherScreenStatus','Sin conexión al servidor. La sesión continúa en InterLAB.');
+  closePeer();if(activeRole==='student'){clearStudentLocal();setMessage('studentScreenStatus','Se perdió la conexión con el servidor.',true);}
+  if(activeRole==='teacher')setMessage('teacherScreenStatus','Sin conexión al servidor. La sesión continúa en InterLAB.');
 });
 socket.on('teacher:revoked',()=>{
   closeTeacherFeedback();
@@ -95,8 +130,10 @@ $('studentForm').onsubmit=event=>{
   socket.emit('student:join',{code:$('code').value,alias:$('alias').value,isPhone:studentOnPhone},result=>{
     if(!result?.ok)return setMessage('studentEntryMessage',result?.error||'No se pudo ingresar.',true);
     activeRole='student';studentId=result.studentId;fileToken=result.fileToken;
+    document.body.classList.toggle('student-is-phone',studentOnPhone);
     initializeFileModule('student');$('joinedAlias').textContent=result.alias;
     hide('roles');hide('studentEntry');show('studentView');refreshStudentNotes();
+    setStudentProjectionState('idle');setStudentRequestMode('idle');
     applyPhoneProjectionRestriction();
     if(!window.APP_CONFIG?.allowNoteExport)$('exportStatus').textContent='Copiar y descargar están deshabilitados hasta validar formalmente su compatibilidad con RNF-002.';
   });
@@ -347,27 +384,32 @@ $('downloadNotes').onclick=()=>{
 };
 
 // Una solicitud NO inicia captura ni transmisión de vídeo.
+// Flujo UX del estudiante. El botón es la única acción de solicitud/cancelación/captura.
 $('startShare').onclick=()=>{
   if(applyPhoneProjectionRestriction())return;
+  if(studentProjectionState==='pending')return $('withdrawShare').click();
+  if(studentProjectionState==='active'||studentProjectionState==='starting')return $('stopShare').click();
+  if(studentProjectionState==='granted')return beginStudentCapture();
+  if(studentProjectionState!=='idle')return;
   socket.emit('student:request-presentation',{},result=>{
     if(!result?.ok)return setMessage('studentScreenStatus',result?.error||'Error al solicitar.',true);
-    if(result.selected)return setMessage('studentScreenStatus','Tu docente ya te seleccionó. Revisa la notificación.');
+    if(result.selected){setStudentProjectionState('granted');return setMessage('studentScreenStatus','El docente ya autorizó tu turno. Pulsa «Iniciar proyección».');}
     const position=result.queue.findIndex(item=>item.id===studentId)+1;
+    setStudentProjectionState('pending');
     setMessage('studentScreenStatus',`Solicitud registrada (posición ${position}). Todavía no transmites video.`);
-    $('startShare').disabled=true;$('withdrawShare').disabled=false;
   });
 };
 socket.on('presentation:request-rejected',()=>{
   if(activeRole==='student'){
-    $('startShare').disabled=false;$('withdrawShare').disabled=true;
+    setStudentProjectionState('idle');setStudentRequestMode('idle');
     setMessage('studentScreenStatus','El docente rechazó tu solicitud. Puedes solicitar turno nuevamente.');
   }
 });
 $('withdrawShare').onclick=()=>socket.emit('student:withdraw-presentation',{},result=>{
-  if(result?.ok){$('startShare').disabled=false;$('withdrawShare').disabled=true;setMessage('studentScreenStatus','Solicitud retirada de la cola.');}
+  if(result?.ok){setStudentProjectionState('idle');setMessage('studentScreenStatus','Solicitud retirada de la cola.');}
   else setMessage('studentScreenStatus',result?.error||'No se pudo retirar.',true);
 });
-function closeStudentNotice(){hide('projectionNotice');}
+function closeStudentNotice(){setStudentRequestMode('idle');}
 $('projectionNoticeClose').onclick=closeStudentNotice;
 $('projectionNoticeReject').onclick=()=>{
   closeStudentNotice();
@@ -378,8 +420,9 @@ $('projectionNoticeReject').onclick=()=>{
 };
 function clearStudentLocal(){
   closeStudentNotice();closePeer();
-  if(studentStream)studentStream.getTracks().forEach(t=>t.stop());studentStream=null;
-  $('startShare').disabled=false;$('withdrawShare').disabled=true;$('stopShare').disabled=true;
+  const stream=studentStream;studentStream=null;
+  if(stream)stream.getTracks().forEach(t=>t.stop());
+  setStudentProjectionState('idle');
   if(activeRole==='student')applyPhoneProjectionRestriction();
 }
 $('stopShare').onclick=()=>{
@@ -388,32 +431,37 @@ $('stopShare').onclick=()=>{
   });
   setMessage('studentScreenStatus','Proyección finalizada.');
 };
-$('projectionNoticeAction').onclick=async()=>{
+async function beginStudentCapture(){
   closeStudentNotice();
   if(applyPhoneProjectionRestriction())return;
   if(!navigator.mediaDevices?.getDisplayMedia)return setMessage('studentScreenStatus','No es posible capturar pantalla sin HTTPS confiable.',true);
   try{
-    studentStream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:12,max:20}},audio:false});
-    studentStream.getVideoTracks()[0].addEventListener('ended',()=>{$('stopShare').click();},{once:true});
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:12,max:20}},audio:false});
+    studentStream=stream;
+    stream.getVideoTracks()[0].addEventListener('ended',()=>{if(studentStream===stream)$('stopShare').click();},{once:true});
+    setStudentProjectionState('starting');
     socket.emit('student:screen-ready',{},result=>{
       if(!result?.ok){clearStudentLocal();return setMessage('studentScreenStatus',result?.error||'Autorización revocada.',true);}
-      $('startShare').disabled=true;$('withdrawShare').disabled=true;$('stopShare').disabled=false;
-      setMessage('studentScreenStatus','Presentación autorizada. El servidor está mostrando tu pantalla.');
+      setMessage('studentScreenStatus','Captura autorizada. Conectando con el receptor de proyección…');
     });
-  }catch(error){setMessage('studentScreenStatus',error.name==='NotAllowedError'?'No autorizaste la captura.':error.message,true);}
-};
-socket.on('screen:requested',()=>{
+  }catch(error){
+    setStudentProjectionState('granted');
+    setMessage('studentScreenStatus',error.name==='NotAllowedError'?'No autorizaste la captura. Puedes volver a intentarlo.':error.message,true);
+  }
+}
+$('projectionNoticeAction').onclick=()=>beginStudentCapture();
+socket.on('screen:requested',({fromQueue=false}={})=>{
   if(activeRole!=='student')return;
-  if(studentOnPhone){
-    // El docente puede seleccionar a un alumno desde la lista. Si usa un
-    // teléfono, liberamos ese turno sin pedir una captura imposible.
-    socket.emit('student:stop-sharing',{});
-    applyPhoneProjectionRestriction();
+  if(studentOnPhone){socket.emit('student:stop-sharing',{});applyPhoneProjectionRestriction();return;}
+  if(fromQueue){
+    // El docente concedió una petición voluntaria: se confirma desde el botón naranja.
+    closeStudentNotice();setStudentProjectionState('granted');
+    setMessage('studentScreenStatus','Tu turno fue autorizado. Pulsa «Iniciar proyección» para elegir pantalla.');
     return;
   }
-  $('projectionNoticeText').textContent='Tu docente solicita que presentes tu pantalla. Pulsa «Autorizar pantalla» para elegir qué compartir.';
-  show('projectionNotice');$('withdrawShare').disabled=true;
-  setMessage('studentScreenStatus','El docente te seleccionó. Debes autorizar la captura para proyectar.');
+  $('projectionNoticeText').textContent='El profesor solicita que proyectes tu pantalla';
+  setStudentRequestMode('direct');
+  setMessage('studentScreenStatus','El docente solicita tu pantalla. Acepta o deniega la petición.');
 });
 socket.on('screen:stop',()=>{
   if(activeRole==='student'){clearStudentLocal();setMessage('studentScreenStatus','El docente detuvo tu turno. Ya no se transmite video.');}
@@ -441,6 +489,14 @@ socket.on('screen:signal',async({from,epoch,description,candidate})=>{
       const key=`${from}:${epoch}`;const early=earlySignals.get(key)||[];earlySignals.clear();
       closePeer();mediaEpoch=epoch;mediaReceiverId=from;
       const peer=new RTCPeerConnection(peerConfig);mediaPeer=peer;
+      if(activeRole==='student')peer.onconnectionstatechange=()=>{
+        if(mediaPeer!==peer||activeRole!=='student')return;
+        if(peer.connectionState==='connected'){
+          setStudentProjectionState('active');setMessage('studentScreenStatus','Proyectando tu pantalla en el laboratorio.');
+        }else if(peer.connectionState==='failed'){
+          setMessage('studentScreenStatus','No se pudo establecer el video WebRTC. Puedes detener la captura e intentarlo nuevamente.',true);
+        }
+      };
       stream.getTracks().forEach(track=>peer.addTrack(track,stream));
       peer.onicecandidate=event=>{if(event.candidate&&mediaPeer===peer)socket.emit('screen:signal',{to:from,epoch,candidate:event.candidate});};
       await peer.setRemoteDescription(description);
@@ -465,6 +521,7 @@ socket.on('session:ended',result=>{
   if(teacherStream){teacherStream.getTracks().forEach(t=>t.stop());teacherStream=null;}
   updateTeacherShareButtons();
   activeRole=null;teacherToken=null;teacherAttached=false;studentId=null;selectedStudentId=null;
+  document.body.classList.remove('student-is-phone');
   entry();
   setMessage(accessPath==='/alumno'?'studentEntryMessage':'teacherEntryMessage',`${result.message} Vuelve a abrir /docente si necesitas iniciar otra sesión.`);
   if(accessPath==='/docente')show('reenterTeacher');

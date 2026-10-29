@@ -1,3 +1,23 @@
+## 0.5.7 (beta) — Pantalla de acceso de estudiantes en el proyector (29-10-2026)
+
+- La vista `/proyeccion` muestra direcciones completas `http(s)://IP:PUERTO/alumno` cuando nadie transmite.
+- Ethernet muestra únicamente URL; Wi-Fi muestra URL y un QR local escaneable.
+- Se excluyen interfaces de VPN, Docker y loopback habituales. Configuración opcional `INTERLAB_WIFI_ACCESS_IP` cuando los móviles acceden a la IP Ethernet.
+- Se mantienen el flujo WebRTC docente/alumno y los avisos de reconexión de 90 segundos debajo de la zona de enlaces.
+- Se actualizan las direcciones sin Internet ni dependencia de servicios externos.
+- Documentación y pruebas de las nuevas funciones; validación en laboratorio pendiente.
+
+## 0.5.6 (beta) — Interfaz del alumno y flujo unificado de presentación (29-10-2026)
+
+- Diseño institucional en colores crema, naranja, azul claro y verde salvia para escritorio y teléfono.
+- Un único botón de alumno concentra solicitud, cancelación, inicio autorizado y fin de presentación, con etiquetas vinculadas al estado.
+- Alertas directas del docente plegadas por defecto, desplegables al recibir una petición, con efecto de respiración sobre el borde. Aceptar/Denegar repliegan la alerta.
+- Una autorización desde la cola no despliega una falsa solicitud directa: habilita «Iniciar proyección» en el botón principal.
+- Estados de transmisión ajustados al estado de WebRTC; se conserva captura bajo autorización explícita del alumno.
+- En teléfonos se oculta la sección de proyección; permanecen archivos y observaciones. No se añadieron funciones de cámara ni edición de alias.
+- Se preserva el panel docente, el receptor y la API HTTP de archivos. La señalización incluye un indicador no privilegiado para diferenciar selección desde cola.
+- **Validación:** pruebas locales sin dependencias externas aprobadas; integración con Express/Socket.IO, navegador visual y WebRTC real pendientes.
+
 ## Ajuste de v0.5.0 — inicio automático de sesión docente (28-10-2026)
 
 - El primer ingreso autorizado a `/docente` crea una sesión automáticamente al conectarse Socket.IO.

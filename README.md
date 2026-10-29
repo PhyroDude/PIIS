@@ -1,6 +1,6 @@
 # InterLAB — Sistema local de retroalimentación para laboratorios de cómputo
 
-Aplicación web LAN para sesiones temporales de clase, retroalimentación, proyección de pantalla por WebRTC y archivos compartidos. **Versión actual: 0.5.0 beta**. La base histórica es `PIIS(1).zip` = v0.3.4; v0.4.0 incorporó los archivos temporales, y **v0.5.0 rediseñó el servidor y la proyección**.
+Aplicación web LAN para sesiones temporales de clase, retroalimentación, proyección de pantalla por WebRTC y archivos compartidos. **Versión actual: 0.5.6 beta**. La base histórica es `PIIS(1).zip` = v0.3.4; v0.4.0 incorporó los archivos temporales, y **v0.5.0 rediseñó el servidor y la proyección**.
 
 > El código incluye mecanismos de reconexión y exclusividad, pero **todavía no se ha validado la recepción de video entre equipos reales ni el arranque automático en una computadora de laboratorio**. Los tests locales no equivalen a una certificación de uso en clase.
 
@@ -26,11 +26,15 @@ Se conserva la gestión de archivos de v0.4.0: máximo 50 MB por archivo, 200 MB
 - `/proyeccion`: disponible **solo por loopback** desde la computadora fija y abierta en modo quiosco. No expone la transmisión a estaciones remotas.
 - `/`: redirige a `/alumno`. Credencial docente privada en cookie `HttpOnly; SameSite=Strict` y `Secure` en HTTPS; el código de clase no da permisos administrativos.
 
+## Vista del alumno — v0.5.6
+
+Se implementó el rediseño UX/UI aprobado para escritorio y teléfono: bienvenida con alias, reloj local, botón naranja de proyección con estados, alerta lateral replegable con animación y paneles de archivos y observaciones. El teléfono **no muestra** acciones de proyección y mantiene los módulos de archivos y notas. La proyección voluntaria se solicita a través de un solo botón: **Solicitar permiso para proyectar → Cancelar solicitud → Iniciar proyección (autorización) → Proyectando**. El botón **Proyectando** permite detener la captura. El rótulo «Proyectando» se activa al establecerse WebRTC, no solamente al recibir la autorización. El servidor distingue la concesión desde la cola y la solicitud directa para mostrar la alerta roja solo en esta última. Véase [especificación UX/UI](docs/diseno/interfaz-alumno-v0.5.6.md).
+
 ## Flujo de presentación de pantalla
 
 1. Docente autoriza su captura una vez mediante un gesto del navegador y el receptor del servidor muestra su pantalla predeterminada.
 2. Alumno solicita entrar a la cola sin capturar ni transmitir video; el docente autoriza desde la cola o elige directamente.
-3. El alumno recibe un aviso y pulsa «Autorizar pantalla» o «Rechazar». El navegador solicita permiso de captura solo si acepta.
+3. Si el docente selecciona directamente al estudiante, se despliega el aviso «El profesor solicita que proyectes tu pantalla» con **Aceptar** y **Denegar**. Si autoriza desde la cola, el botón naranja pasa a **Iniciar proyección**. En ambos casos la captura requiere una acción explícita del estudiante.
 4. El servidor autoriza una fuente exclusiva y cambia la negociación WebRTC hacia `/proyeccion`. Al detener el estudiante o perderse su conexión, vuelve a la pantalla del docente si está disponible.
 5. Si el docente pierde conexión, continúa cualquier presentación estudiantil ya autorizada; las solicitudes siguientes permanecen en cola pero nadie recibe permiso automáticamente.
 6. Al cerrar explícitamente la sesión se invalidan credenciales, cortan transferencias y elimina contenido temporal.
@@ -68,3 +72,8 @@ En otra terminal **del equipo fijo** ejecuta `npm run start:receptor` para abrir
 ### Inicio automático de sesión docente (ajuste v0.5.0)
 
 Al acceder a `/docente` desde el navegador autorizado, el servidor inicia la sesión de clase automáticamente al establecerse la conexión Socket.IO y muestra de inmediato el panel con el código de incorporación. No hay botón «Crear sesión». Una recarga recupera la misma sesión; «Finalizar sesión» sigue borrando los recursos temporales con confirmación. La captura de pantalla continúa requiriendo pulsar «Compartir mi pantalla». Consulta [el cambio funcional](docs/producto/inicio-automatico-sesion-docente-v0.5.0.md).
+
+
+### Pantalla de acceso del proyector (v0.5.7)
+
+Cuando no hay video activo, `/proyeccion` muestra las URL completas `/alumno` del servidor. La entrada Wi-Fi, si está disponible, tiene QR escaneable generado sin Internet. Para laboratorios con servidor solo Ethernet y teléfonos que llegan por Wi-Fi a esa IP, consulte [la guía](docs/diseno/pantalla-acceso-estudiantes-v0.5.7.md) y el ajuste opcional `INTERLAB_WIFI_ACCESS_IP`.
