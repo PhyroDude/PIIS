@@ -25,8 +25,25 @@ function setStudentProjectionState(state){
   const captions={idle:'Envía una solicitud al docente para presentar tu pantalla y recibir retroalimentación.',pending:'Tu solicitud está en la cola. Pulsa para cancelarla.',granted:'El docente autorizó tu turno. Pulsa para elegir qué pantalla compartir.',starting:'Estableciendo el video con el proyector. Pulsa para detener la captura si es necesario.',active:'Tu pantalla está compartida. Pulsa para dejar de proyectar.'};
   $('studentProjectionLabel').textContent=labels[state]||labels.idle;
   $('studentProjectionCaption').textContent=captions[state]||captions.idle;
+  // Iconografía personalizada: reposo = megáfono, cola/autorización = mano,
+  // transmisión efectiva = proyector. No altera los estados ni la autorización.
+  const projectionIcons={
+    idle:'/assets/megafono-marron.png',
+    pending:'/assets/alumno-mano-alzada.png',
+    granted:'/assets/alumno-mano-alzada.png',
+    starting:'/assets/alumno-mano-alzada.png',
+    active:'/assets/alumno-proyector.png'
+  };
+  const projectionIcon=$('studentProjectionIcon');
+  if(projectionIcon){
+    const nextIcon=projectionIcons[state]||projectionIcons.idle;
+    projectionIcon.setAttribute('src',nextIcon);
+  }
   $('startShare').classList.toggle('is-active',state==='active');
-  $('startShare').classList.toggle('is-pending',state==='pending'||state==='starting');
+  $('startShare').classList.toggle('is-pending',state==='pending');
+  // Una autorización visible permanece resaltada mientras el alumno elige pantalla
+  // y hasta que la negociación WebRTC confirma la transmisión efectiva.
+  $('startShare').classList.toggle('is-ready',state==='granted'||state==='starting');
   $('startShare').disabled=studentOnPhone;
   $('startShare').setAttribute('aria-label',labels[state]||labels.idle);
   $('startShare').setAttribute('aria-pressed',String(state==='active'));
@@ -435,6 +452,9 @@ async function beginStudentCapture(){
   closeStudentNotice();
   if(applyPhoneProjectionRestriction())return;
   if(!navigator.mediaDevices?.getDisplayMedia)return setMessage('studentScreenStatus','No es posible capturar pantalla sin HTTPS confiable.',true);
+  // También cubre las solicitudes directas aceptadas: el selector nativo puede
+  // permanecer abierto bastante tiempo antes de que getDisplayMedia termine.
+  setStudentProjectionState('granted');
   try{
     const stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:12,max:20}},audio:false});
     studentStream=stream;

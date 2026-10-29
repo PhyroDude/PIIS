@@ -1,6 +1,6 @@
 # InterLAB — Sistema local de retroalimentación para laboratorios de cómputo
 
-Aplicación web LAN para sesiones temporales de clase, retroalimentación, proyección de pantalla por WebRTC y archivos compartidos. **Versión actual: 0.5.6 beta**. La base histórica es `PIIS(1).zip` = v0.3.4; v0.4.0 incorporó los archivos temporales, y **v0.5.0 rediseñó el servidor y la proyección**.
+Aplicación web LAN para sesiones temporales de clase, retroalimentación, proyección de pantalla por WebRTC y archivos compartidos. **Versión actual: 0.5.9 beta**. La base histórica es `PIIS(1).zip` = v0.3.4; v0.4.0 incorporó los archivos temporales, y **v0.5.0 rediseñó el servidor y la proyección**.
 
 > El código incluye mecanismos de reconexión y exclusividad, pero **todavía no se ha validado la recepción de video entre equipos reales ni el arranque automático en una computadora de laboratorio**. Los tests locales no equivalen a una certificación de uso en clase.
 
@@ -77,3 +77,11 @@ Al acceder a `/docente` desde el navegador autorizado, el servidor inicia la ses
 ### Pantalla de acceso del proyector (v0.5.7)
 
 Cuando no hay video activo, `/proyeccion` muestra las URL completas `/alumno` del servidor. La entrada Wi-Fi, si está disponible, tiene QR escaneable generado sin Internet. Para laboratorios con servidor solo Ethernet y teléfonos que llegan por Wi-Fi a esa IP, consulte [la guía](docs/diseno/pantalla-acceso-estudiantes-v0.5.7.md) y el ajuste opcional `INTERLAB_WIFI_ACCESS_IP`.
+
+### Señal visual de autorización del alumno (v0.5.8)
+
+El botón principal cambia de naranja a **azul brillante con un pulso suave** cuando el profesor autoriza proyectar. El efecto continúa mientras el alumno selecciona la pantalla en el navegador y durante «Preparando proyección…». Se detiene al entrar en «Proyectando» o si se cancela la autorización. Puede desactivarse desde la configuración de movimiento reducido del sistema. Consulta [especificación](docs/diseno/estado-proyeccion-autorizada-v0.5.8.md).
+
+### Iconografía del botón del alumno (v0.5.9)
+
+El botón de proyección muestra el megáfono original cuando está disponible; la persona levantando la mano en cola, permiso concedido o preparación; y el proyector cuando la transmisión está activa. Se usan los PNG aportados por el usuario. Los colores y la animación azul de v0.5.8 no cambian. Véase [especificación](docs/diseno/iconografia-boton-alumno-v0.5.9.md).

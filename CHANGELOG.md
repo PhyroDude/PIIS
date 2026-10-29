@@ -1,3 +1,17 @@
+## 0.5.9 (beta) — Iconos por estado del botón del alumno (29-10-2026)
+
+- El botón de proyección mantiene la lógica y los textos de v0.5.8; solo cambian los iconos: megáfono original en reposo, PNG de mano alzada en solicitud enviada / permiso concedido / preparación y PNG de proyector en transmisión activa.
+- Se conservan naranja en reposo, tono ámbar/grisáceo en cola sin animación, azul respirante cuando está autorizado o preparando y verde estático cuando WebRTC está proyectando.
+- Los nuevos PNG proceden de los recursos suministrados por el usuario; la palomita se reserva y no se muestra.
+- Se preservan las restricciones móviles, las alertas directas, el acceso URL/QR, archivos, control WebRTC y la preferencia de movimiento reducido.
+
+## 0.5.8 (beta) — Indicador de permiso de proyección para alumno (29-10-2026)
+
+- Cuando el profesor autoriza una presentación, el botón principal del alumno cambia a azul brillante y respira suavemente cada 2 segundos mientras el navegador espera la selección de pantalla.
+- El indicador continúa durante «Preparando proyección…» y termina al comenzar a proyectar, detener/revocar el turno o volver a reposo.
+- Se aplica tanto a solicitudes desde cola como a solicitudes directas aceptadas; `prefers-reduced-motion` mantiene el botón estático.
+- No se modifican los eventos, los permisos ni la negociación WebRTC del servidor.
+
 ## 0.5.7 (beta) — Pantalla de acceso de estudiantes en el proyector (29-10-2026)
 
 - La vista `/proyeccion` muestra direcciones completas `http(s)://IP:PUERTO/alumno` cuando nadie transmite.

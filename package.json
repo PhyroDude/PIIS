@@ -1,8 +1,8 @@
 {
   "name": "interlab",
-  "version": "0.5.7",
+  "version": "0.5.9",
   "private": true,
-  "description": "InterLAB v0.5.7 — sesión local, proyección WebRTC y acceso de estudiantes con URL/QR Wi-Fi.",
+  "description": "InterLAB v0.5.9 — iconos por estado en el botón de proyección del alumno.",
   "scripts": {
     "start": "node server.js",
     "test": "node --test",
